@@ -1,0 +1,277 @@
+{
+  "schemaVersion": 1,
+  "id": "sime.district.harborline",
+  "displayName": "Harborline",
+  "status": "design-only; runtime coordinates, navigation and NPC bindings are not yet surveyed",
+  "designIntent": "A large coastal district that feels like a genuine extension of Hyland Point, not a small isolated outpost.",
+  "connection": {
+    "vanillaDistrict": "docks",
+    "method": "road-and-pedestrian-connection",
+    "coordinates": null,
+    "requiresInGameSurvey": true
+  },
+  "zones": [
+    {
+      "id": "harbor_gate",
+      "name": "Harbor Gate and Customs Approach",
+      "purpose": "Main road connection, port administration, vehicle queue and access control.",
+      "poiIds": [
+        "sime.poi.harborline.harbor_gate",
+        "sime.poi.harborline.customs_office",
+        "sime.poi.harborline.port_operations"
+      ],
+      "targetNpcIdsByRole": {
+        "port_operations_staff": 2,
+        "office_staff": 1
+      }
+    },
+    {
+      "id": "container_port",
+      "name": "Container Port and Shipyard",
+      "purpose": "Container stacks, cranes, loading lanes, quay, repair sheds, shipyard and freight handling.",
+      "poiIds": [
+        "sime.poi.harborline.container_terminal",
+        "sime.poi.harborline.crane_yard",
+        "sime.poi.harborline.ship_repair",
+        "sime.poi.harborline.fishing_quay"
+      ],
+      "targetNpcIdsByRole": {
+        "dockworker": 6,
+        "cargo_driver": 2
+      }
+    },
+    {
+      "id": "freight_logistics",
+      "name": "Freight and Logistics Park",
+      "purpose": "Large warehouses, cold storage, loading docks, truck staging, freight depot and delivery offices.",
+      "poiIds": [
+        "sime.poi.harborline.harbor_freight_warehouse",
+        "sime.poi.harborline.cold_storage",
+        "sime.poi.harborline.freight_depot",
+        "sime.poi.harborline.truck_staging",
+        "sime.poi.harborline.shipping_offices"
+      ],
+      "targetNpcIdsByRole": {
+        "dockworker": 2,
+        "cargo_driver": 3,
+        "office_staff": 2
+      }
+    },
+    {
+      "id": "market_high_street",
+      "name": "Harbor Market and High Street",
+      "purpose": "Market hall, walkable main street, shops, restaurants, service businesses and a central public square.",
+      "poiIds": [
+        "sime.poi.harborline.harbor_market",
+        "sime.poi.harborline.portside_supply",
+        "sime.poi.harborline.harbor_diner",
+        "sime.poi.harborline.retail_row",
+        "sime.poi.harborline.market_square"
+      ],
+      "targetNpcIdsByRole": {
+        "market_vendor": 5,
+        "tourist": 1,
+        "dealer": 1
+      }
+    },
+    {
+      "id": "industrial_service",
+      "name": "Industrial and Vehicle Service Quarter",
+      "purpose": "Vehicle workshop, industrial maintenance, power infrastructure, fabrication and service yards.",
+      "poiIds": [
+        "sime.poi.harborline.harbor_auto_works",
+        "sime.poi.harborline.harbor_power_plant",
+        "sime.poi.harborline.maintenance_depot",
+        "sime.poi.harborline.fabrication_yard"
+      ],
+      "targetNpcIdsByRole": {
+        "mechanic": 4
+      }
+    },
+    {
+      "id": "workers_residential",
+      "name": "Workers' Residential Quarter",
+      "purpose": "Apartment blocks, worker housing, local diner, laundromat, convenience store and small parking courts.",
+      "poiIds": [
+        "sime.poi.harborline.worker_apartments",
+        "sime.poi.harborline.dormitory",
+        "sime.poi.harborline.laundromat",
+        "sime.poi.harborline.corner_store",
+        "sime.poi.harborline.residential_diner"
+      ],
+      "targetNpcIdsByRole": {
+        "resident": 6,
+        "office_staff": 1
+      }
+    },
+    {
+      "id": "waterfront_promenade",
+      "name": "Waterfront, Marina and Pier Promenade",
+      "purpose": "Public waterfront, fishing spots, marina, small boat dock, seafood café, bait shop and visitor areas.",
+      "poiIds": [
+        "sime.poi.harborline.pier_promenade",
+        "sime.poi.harborline.marina",
+        "sime.poi.harborline.bait_shop",
+        "sime.poi.harborline.seafood_cafe",
+        "sime.poi.harborline.tourism_kiosk"
+      ],
+      "targetNpcIdsByRole": {
+        "fisher": 3,
+        "tourist": 3
+      }
+    }
+  ],
+  "population": {
+    "totalPhysicalNpcTarget": 42,
+    "customerNpcTarget": 26,
+    "dealerNpcTarget": 1,
+    "nonCustomerNonDealerNpcTarget": 15,
+    "initialSimultaneousPopulationTarget": 16,
+    "performanceTestCeiling": 20,
+    "npcGroups": [
+      {
+        "id": "dockworkers",
+        "role": "dockworker",
+        "physicalCount": 8,
+        "customerCount": 6
+      },
+      {
+        "id": "cargo_drivers",
+        "role": "cargo_driver",
+        "physicalCount": 5,
+        "customerCount": 3
+      },
+      {
+        "id": "fishers",
+        "role": "fisher",
+        "physicalCount": 3,
+        "customerCount": 2
+      },
+      {
+        "id": "market_vendors",
+        "role": "market_vendor",
+        "physicalCount": 5,
+        "customerCount": 4
+      },
+      {
+        "id": "mechanics",
+        "role": "mechanic",
+        "physicalCount": 4,
+        "customerCount": 2
+      },
+      {
+        "id": "residents",
+        "role": "resident",
+        "physicalCount": 6,
+        "customerCount": 4
+      },
+      {
+        "id": "tourists",
+        "role": "tourist",
+        "physicalCount": 4,
+        "customerCount": 2
+      },
+      {
+        "id": "office_staff",
+        "role": "office_staff",
+        "physicalCount": 4,
+        "customerCount": 3
+      },
+      {
+        "id": "port_operations_staff",
+        "role": "port_operations_staff",
+        "physicalCount": 2,
+        "customerCount": 0
+      },
+      {
+        "id": "dealer",
+        "role": "dealer",
+        "physicalCount": 1,
+        "customerCount": 0
+      }
+    ],
+    "populationPolicy": [
+      "All physical NPC IDs are stable and namespaced.",
+      "The first in-game vertical slice remains 3-5 NPCs; scale toward 42 only after pathfinding, save/load, multiplayer and performance tests pass.",
+      "Do not instantiate all 42 at once unless the target game build proves that scene streaming and NPC scheduling can handle it.",
+      "Police officers are not included in this roster; they are owned and spawned by the native law-enforcement system."
+    ]
+  },
+  "businessAndServices": {
+    "existingBusinessSystems": [
+      "native Realtor/property ownership",
+      "native shop catalogue and cash/inventory systems",
+      "native phone and ProductManagerApp"
+    ],
+    "plannedAdditionalSites": [
+      {
+        "poiId": "sime.poi.harborline.cold_storage",
+        "type": "warehouse_business",
+        "realtorCandidate": true
+      },
+      {
+        "poiId": "sime.poi.harborline.harbor_diner",
+        "type": "restaurant_business",
+        "realtorCandidate": true
+      },
+      {
+        "poiId": "sime.poi.harborline.ship_repair",
+        "type": "industrial_service_business",
+        "realtorCandidate": true
+      }
+    ],
+    "rule": "Candidate listings are not enabled until the existing Realtor registration and purchase lifecycle is proven in-game."
+  },
+  "police": {
+    "system": "Schedule I native LawController, LawManager and CheckpointManager",
+    "customPoliceNpcCount": 0,
+    "plannedCheckpointPoiIds": [
+      "sime.poi.harborline.harbor_gate",
+      "sime.poi.harborline.freight_depot",
+      "sime.poi.harborline.market_square"
+    ],
+    "plannedPatrolRouteIds": [
+      "sime.route.harborline.port_loop",
+      "sime.route.harborline.freight_market_loop"
+    ],
+    "routeCoordinates": null,
+    "activationPolicy": "Use discovered native police routes and the existing global law intensity/automatic evaluation rules. Do not force-spawn officers or change the global heat level to fake local police activity."
+  },
+  "randomization": {
+    "drugPreferences": {
+      "system": "native NPCCustomer affinity configuration",
+      "runtimeCatalog": "DrugType enum values discovered from the installed S1API/game build",
+      "assignmentAlgorithm": "save-seeded deterministic per-NPC affinity vectors with uniqueness enforced within the Harborline customer roster",
+      "favoriteAffinityRange": [0.70, 1.00],
+      "dislikeAffinityRange": [-1.00, -0.70],
+      "otherAffinityRange": [-0.45, 0.55],
+      "assignmentTiming": "once when the host initializes a new world/save roster, then persisted and synchronized",
+      "notes": [
+        "Do not use the expansion-only sime.product.batch.* order tiers as DrugType affinities.",
+        "Do not hardcode DrugType names that are absent from the installed game.",
+        "If the installed runtime exposes too few DrugType combinations for all unique profiles, fail validation rather than silently cloning preferences."
+      ]
+    },
+    "appearance": {
+      "system": "S1API NPCAppearance.GenerateRandomAppearance followed by Appearance.Build",
+      "randomizationTiming": "once per NPC identity, not on every schedule tick",
+      "required": [
+        "Generate appearance through the native S1API appearance pipeline.",
+        "Do not replace vanilla avatar systems with custom NPC meshes when a native avatar setting is available.",
+        "Use per-NPC stable identity and host-owned generation data so co-op peers resolve the same NPC prefab.",
+        "Before release, verify appearance persistence across save/load and ensure no duplicate appearance signature exists among Harborline NPCs.",
+        "Check whether a supported runtime AvatarSettings signature/readback is available before implementing automatic duplicate rejection."
+      ],
+      "publicApiLimit": "The documented NPCAppearance API exposes random generation and Build, but does not document a public appearance-signature readback or seeded GenerateRandomAppearance overload. Visual no-duplicate enforcement is therefore an explicit in-game integration gate, not yet a proven feature."
+    }
+  },
+  "releaseGates": [
+    "Capture real world-space anchors, elevations, entrances and road connections in the target game build.",
+    "Build a greybox and validate pedestrian/vehicle navigation before enabling full NPC population.",
+    "Prove one customer NPC end-to-end using native DrugType affinities, native schedule, save/load and two-player late join.",
+    "Prove distinct randomized appearance settings remain stable after save/load and are not duplicated in the generated Harborline roster.",
+    "Prove two native police patrol routes and all three checkpoint anchors without altering unrelated vanilla districts.",
+    "Prove new property candidates through the original Realtor UI and native purchase lifecycle.",
+    "Record host/client performance at 5, 10, 16 and 20 simultaneously active NPCs."
+  ]
+}
