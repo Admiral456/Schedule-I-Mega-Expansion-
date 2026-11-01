@@ -188,11 +188,11 @@ public sealed class HylandNetworkPhoneApp : PhoneApp
             foreach (var entry in snapshot.Data.Orders.OrderBy(pair => pair.Key, StringComparer.Ordinal))
             {
                 ExpansionOrderRecord order = entry.Value;
-                string items = string.Join("\\n", order.Items.Select(item => item.ProductId + "  x" + item.Quantity));
+                string items = string.Join("\n", order.Items.Select(item => item.ProductId + "  x" + item.Quantity));
                 AddCard(entry.Key, order.Status.ToUpperInvariant() + "  /  " + order.ProvinceId +
-                    "\\nCustomer: " + order.CustomerId +
-                    "\\nEscrowed payment: $" + order.TotalPrice +
-                    "\\n" + items);
+                    "\nCustomer: " + order.CustomerId +
+                    "\nEscrowed payment: $" + order.TotalPrice +
+                    "\n" + items);
                 renderedOrderIds.Add(entry.Key);
                 rendered++;
             }
@@ -203,11 +203,11 @@ public sealed class HylandNetworkPhoneApp : PhoneApp
             if (renderedOrderIds.Contains(order.OrderId))
                 continue;
 
-            string items = string.Join("\\n", order.Items.Select(item => item.ProductId + "  x" + item.Quantity));
+            string items = string.Join("\n", order.Items.Select(item => item.ProductId + "  x" + item.Quantity));
             AddCard(order.OrderId, order.Status.ToUpperInvariant() + "  /  " + order.ProvinceId +
-                "\\nCustomer: " + order.CustomerId +
-                "\\nEscrowed payment: $" + order.TotalPrice +
-                "\\n" + items);
+                "\nCustomer: " + order.CustomerId +
+                "\nEscrowed payment: $" + order.TotalPrice +
+                "\n" + items);
             rendered++;
         }
 
