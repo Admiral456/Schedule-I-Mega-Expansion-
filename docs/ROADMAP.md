@@ -9,6 +9,13 @@
 - SteamNetworkLib initialization and protocol compatibility handshake.
 - Native-system reuse audit: `NATIVE_SYSTEM_REUSE_AUDIT.md`.
 
+## Harborline population and world expansion
+- Seven subdistricts and a 42-NPC target are defined in data/harborline_population.json.
+- NpcDrugAffinityRandomizer creates deterministic, non-identical native drug-affinity vectors per save and stable NPC ID; runtime DrugType mapping and save-seed persistence remain integration tasks.
+- Native avatar randomization uses S1API; appearance-signature duplicate rejection and appearance save/load persistence remain release gates.
+- Native police patrols/checkpoints use LawController, LawManager and CheckpointManager, not custom police NPCs.
+- Start with 3–5 NPCs, then measure 5/10/16/20 simultaneously active NPCs before expanding toward 42 physical residents.
+
 ## First native gameplay vertical slice
 1. Compile the game-facing project against the exact local Schedule I IL2CPP assemblies, S1API 3.2.2 and SteamNetworkLib binaries. Documentation review is not a build result.
 2. Spawn or bind one expansion resident to the native NPC lifecycle and native `NPCCustomer` component. Use `WithCustomerDefaults`, native product affinities/preferences, native budget/standards and native schedule/relationship behavior where available.
