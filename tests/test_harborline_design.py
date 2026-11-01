@@ -50,6 +50,8 @@ class HarborlineDesignTests(unittest.TestCase):
         self.assertEqual(self.native["regionIntegration"]["harborlineParentNativeRegion"], "Docks")
         self.assertTrue(self.native["regionIntegration"]["nativeRegionEnumVerified"])
         self.assertFalse(self.native["regionIntegration"]["customRegionEnumRequired"])
+        self.assertEqual(self.native["worldMap"]["regionId"], "Docks")
+        self.assertFalse(self.native["worldMap"]["requiresNativeRegionRegistration"])
         self.assertEqual(set(self.native["regionIntegration"]["availableNativeRegionValues"]), allowed)
 
     def test_native_npc_random_appearance_is_required(self):
