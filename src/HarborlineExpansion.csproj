@@ -4,7 +4,7 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyName>ScheduleIMegaExpansion</AssemblyName>
+    <AssemblyName>ScheduleIMegaExpansion.Scaffold</AssemblyName>
     <RootNamespace>ScheduleIMegaExpansion</RootNamespace>
     <Configurations>Debug;Release;Il2Cpp</Configurations>
     <GameDir Condition="'$(GameDir)' == ''">$(SCHEDULEI_GAME_DIR)</GameDir>
@@ -14,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="Core/Domain.Core.csproj" />
     <Compile Remove="Core/**/*.cs" />
+    <Compile Remove="GameIntegration/**/*.cs" />
   </ItemGroup>
 
   <ItemGroup Condition="Exists('$(MelonLoaderDll)')">

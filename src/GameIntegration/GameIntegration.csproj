@@ -1,0 +1,84 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>ScheduleIMegaExpansion.GameIntegration</AssemblyName>
+    <RootNamespace>ScheduleIMegaExpansion.GameIntegration</RootNamespace>
+    <Configurations>Debug;Release;Il2Cpp</Configurations>
+
+    <GameDir Condition="'$(GameDir)' == ''">$(SCHEDULEI_GAME_DIR)</GameDir>
+    <Il2CppAssembliesDir Condition="'$(Il2CppAssembliesDir)' == ''">$(GameDir)\MelonLoader\Il2CppAssemblies</Il2CppAssembliesDir>
+    <MelonLoaderAssembliesDir Condition="'$(MelonLoaderAssembliesDir)' == ''">$(GameDir)\MelonLoader\net6</MelonLoaderAssembliesDir>
+
+    <MelonLoaderDll Condition="'$(MelonLoaderDll)' == ''">$(MelonLoaderAssembliesDir)\MelonLoader.dll</MelonLoaderDll>
+    <UnityEngineDll Condition="'$(UnityEngineDll)' == ''">$(Il2CppAssembliesDir)\UnityEngine.dll</UnityEngineDll>
+    <UnityCoreDll Condition="'$(UnityCoreDll)' == ''">$(Il2CppAssembliesDir)\UnityEngine.CoreModule.dll</UnityCoreDll>
+    <UnityUiDll Condition="'$(UnityUiDll)' == ''">$(Il2CppAssembliesDir)\UnityEngine.UI.dll</UnityUiDll>
+    <UnityUiModuleDll Condition="'$(UnityUiModuleDll)' == ''">$(Il2CppAssembliesDir)\UnityEngine.UIModule.dll</UnityUiModuleDll>
+    <UnityTextRenderingDll Condition="'$(UnityTextRenderingDll)' == ''">$(Il2CppAssembliesDir)\UnityEngine.TextRenderingModule.dll</UnityTextRenderingDll>
+    <Il2CppInteropRuntimeDll Condition="'$(Il2CppInteropRuntimeDll)' == ''">$(MelonLoaderAssembliesDir)\Il2CppInterop.Runtime.dll</Il2CppInteropRuntimeDll>
+    <Il2CppInteropCommonDll Condition="'$(Il2CppInteropCommonDll)' == ''">$(MelonLoaderAssembliesDir)\Il2CppInterop.Common.dll</Il2CppInteropCommonDll>
+    <Il2CppFishNetDll Condition="'$(Il2CppFishNetDll)' == ''">$(Il2CppAssembliesDir)\Il2CppFishNet.Runtime.dll</Il2CppFishNetDll>
+
+    <S1ApiDll Condition="'$(S1ApiDll)' == ''">$(GameDir)\Mods\S1API.Il2Cpp.MelonLoader.dll</S1ApiDll>
+    <SteamNetworkLibDll Condition="'$(SteamNetworkLibDll)' == ''">$(MSBuildProjectDirectory)\..\..\libs\SteamNetworkLib\Il2cpp\SteamNetworkLib.dll</SteamNetworkLibDll>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Core/Domain.Core.csproj" />
+    <Content Include="../../assets/ui/SIME_HylandNetwork.png" Link="SIME_HylandNetwork.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup Condition="Exists('$(MelonLoaderDll)')">
+    <Reference Include="MelonLoader"><HintPath>$(MelonLoaderDll)</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+  <ItemGroup Condition="Exists('$(UnityEngineDll)')">
+    <Reference Include="UnityEngine"><HintPath>$(UnityEngineDll)</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+  <ItemGroup Condition="Exists('$(UnityCoreDll)')">
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(UnityCoreDll)</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+  <ItemGroup Condition="Exists('$(UnityUiDll)')">
+    <Reference Include="UnityEngine.UI"><HintPath>$(UnityUiDll)</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+  <ItemGroup Condition="Exists('$(UnityUiModuleDll)')">
+    <Reference Include="UnityEngine.UIModule"><HintPath>$(UnityUiModuleDll)</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+  <ItemGroup Condition="Exists('$(UnityTextRenderingDll)')">
+    <Reference Include="UnityEngine.TextRenderingModule"><HintPath>$(UnityTextRenderingDll)</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+  <ItemGroup Condition="Exists('$(Il2CppInteropRuntimeDll)')">
+    <Reference Include="Il2CppInterop.Runtime"><HintPath>$(Il2CppInteropRuntimeDll)</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+  <ItemGroup Condition="Exists('$(Il2CppInteropCommonDll)')">
+    <Reference Include="Il2CppInterop.Common"><HintPath>$(Il2CppInteropCommonDll)</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+  <ItemGroup Condition="Exists('$(Il2CppFishNetDll)')">
+    <Reference Include="Il2CppFishNet.Runtime"><HintPath>$(Il2CppFishNetDll)</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+  <ItemGroup Condition="Exists('$(S1ApiDll)')">
+    <Reference Include="S1API"><HintPath>$(S1ApiDll)</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+  <ItemGroup Condition="Exists('$(SteamNetworkLibDll)')">
+    <Reference Include="SteamNetworkLib"><HintPath>$(SteamNetworkLibDll)</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+
+  <Target Name="CheckIl2CppGameReferences" BeforeTargets="ResolveReferences">
+    <Error Condition="'$(GameDir)' == ''" Text="Set GameDir or SCHEDULEI_GAME_DIR to the Schedule I installation folder." />
+    <Error Condition="!Exists('$(MelonLoaderDll)')" Text="MelonLoader net6 reference not found: $(MelonLoaderDll)" />
+    <Error Condition="!Exists('$(UnityEngineDll)')" Text="UnityEngine reference not found: $(UnityEngineDll)" />
+    <Error Condition="!Exists('$(UnityCoreDll)')" Text="UnityEngine.CoreModule reference not found: $(UnityCoreDll)" />
+    <Error Condition="!Exists('$(UnityUiDll)')" Text="UnityEngine.UI reference not found: $(UnityUiDll)" />
+    <Error Condition="!Exists('$(UnityUiModuleDll)')" Text="UnityEngine.UIModule reference not found: $(UnityUiModuleDll)" />
+    <Error Condition="!Exists('$(UnityTextRenderingDll)')" Text="UnityEngine.TextRenderingModule reference not found: $(UnityTextRenderingDll)" />
+    <Error Condition="!Exists('$(Il2CppInteropRuntimeDll)')" Text="Il2CppInterop.Runtime reference not found: $(Il2CppInteropRuntimeDll)" />
+    <Error Condition="!Exists('$(Il2CppInteropCommonDll)')" Text="Il2CppInterop.Common reference not found: $(Il2CppInteropCommonDll)" />
+    <Error Condition="!Exists('$(Il2CppFishNetDll)')" Text="Il2CppFishNet.Runtime reference not found: $(Il2CppFishNetDll)" />
+    <Error Condition="!Exists('$(S1ApiDll)')" Text="S1API IL2CPP reference not found: $(S1ApiDll). Install the matching S1API 3.2.2 build first." />
+    <Error Condition="!Exists('$(SteamNetworkLibDll)')" Text="SteamNetworkLib IL2CPP release DLL not found: $(SteamNetworkLibDll). Put the matching 1.6.0 DLL in libs/SteamNetworkLib/Il2cpp or set SteamNetworkLibDll." />
+  </Target>
+</Project>

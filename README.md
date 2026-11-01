@@ -2,7 +2,7 @@
 
 Fan-made world and gameplay expansion for Schedule I, targeting Steam Default / IL2CPP and two-player co-op.
 
-> **Current state:** project foundation plus testable game-independent domain core. This is not yet a finished, compiled or tested in-game expansion DLL.
+> **Current state:** project foundation, independently tested domain core and first game-facing IL2CPP adapter scaffold. A playable three-province build does not exist yet.
 
 ## World scope
 Preserve vanilla Hyland Point and add three major provinces:
@@ -11,17 +11,20 @@ Preserve vanilla Hyland Point and add three major provinces:
 - **Lakeside** — lake, marina, resorts, hotels, recreation and luxury businesses.
 
 ## Gameplay scope
-- **Hyland Network:** phone app with contacts, profiles, messages, reputation, NPC orders, contracts and online shops.
+- **Hyland Network:** native in-game phone app with contacts, profiles, messages, reputation, NPC orders, contracts and online shops.
 - **Portside Supply:** physical shop and online phone ordering with one shared stock and price source.
 - **Realtor:** every purchasable expansion business is listed through the existing Realtor flow.
 - **NPCs:** individual preferences, budgets, schedules, relationships and generated customer orders.
 - **Dealers and police:** new dealers, patrol routes, checkpoints and controls in all three provinces.
 - **Co-op:** host-authoritative ownership, shop transactions, orders, reputation, police and save state.
 
-## Technical candidates
-MelonLoader, S1API, S1MAPI and SteamNetworkLib IL2CPP. Sideload and ScheduleOne-Personnel remain optional candidates pending integration/license checks.
+## Technical baseline
+- S1API 3.2.2 for native phone apps and per-save-slot Saveables.
+- S1MAPI 2.0.1 for geometry/building/GLTF prototypes.
+- SteamNetworkLib 1.6.0 for Steam lobby and typed P2P.
+- .NET 6.0 game-facing IL2CPP target.
 
-These candidates do not prove map streaming, NavMesh, vehicle road graph extension, Realtor hooks or multiplayer persistence. Those require separate in-game proof-of-concepts.
+See docs/FRAMEWORK_INTEGRATION.md and docs/COMPATIBILITY_AND_DEPENDENCIES.md for runtime setup and limitations.
 
 ## Start here
 - [Scope](docs/PROJECT_SCOPE.md)
@@ -30,18 +33,17 @@ These candidates do not prove map streaming, NavMesh, vehicle road graph extensi
 - [Multiplayer](docs/MULTIPLAYER_ARCHITECTURE.md)
 - [Network protocol](docs/NETWORK_PROTOCOL.md)
 - [Save store](docs/SAVE_STORE.md)
+- [Framework integration](docs/FRAMEWORK_INTEGRATION.md)
 - [Domain core](docs/DOMAIN_CORE.md)
-- [Compatibility](docs/COMPATIBILITY_AND_DEPENDENCIES.md)
-- [Technical spikes](docs/TECHNICAL_SPIKES.md)
 - [Implementation plan](docs/IMPLEMENTATION_PLAN.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Test plan](docs/TEST_PLAN.md)
 
 ## CI
-GitHub Actions validates project JSON schemas/cross-file references and runs .NET domain-core unit tests.
+GitHub Actions validates project JSON schemas/cross-file references and runs .NET domain-core unit tests. Game integration requires the player's local Schedule I IL2CPP assemblies and installed framework DLLs.
 
 ## Existing-save safety
-The core save store writes only to a caller-provided mod-owned path and maintains a previous-file backup. It is not wired to the game's S1API save lifecycle. Never point it at the vanilla save file. First tests must use a copy of the existing save.
+The game adapter uses S1API's native per-save-slot Saveable mechanism. Future-schema or invalid data is held read-only in its raw serialized field; it is never silently reset. First in-game tests must use a copied save. Never point the sidecar JSON utility at a vanilla save file.
 
 ## Status
-The domain core is tested independently, but no physical map, phone app, Realtor integration, NPC AI or two-player game adapter is claimed complete.
+The core and data validation are tested independently. The first phone-app navigation shell, S1API save adapter and Steam protocol handshake are written as game-facing scaffolds but have not been compiled against the user's local game assemblies or exercised in-game. Map streaming, Realtor integration, NPC AI and live two-player gameplay are not yet verified.

@@ -1,0 +1,13 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"Dependency baseline",
+  "type":"object",
+  "required":["schemaVersion","checkedOn","gameTarget","dependencies"],
+  "properties":{
+    "schemaVersion":{"type":"integer","minimum":1},
+    "checkedOn":{"type":"string","format":"date"},
+    "gameTarget":{"type":"object","required":["branch","runtime","targetFramework","gameBuild"],"properties":{"branch":{"type":"string"},"runtime":{"const":"IL2CPP"},"targetFramework":{"type":"string"},"gameBuild":{"type":"string"}},"additionalProperties":false},
+    "dependencies":{"type":"array","minItems":1,"items":{"type":"object","required":["id","version","runtime","targetFramework","license","role","status","url"],"properties":{"id":{"type":"string"},"version":{"type":"string"},"runtime":{"type":"string"},"targetFramework":{"type":"string"},"license":{"type":"string"},"role":{"type":"string"},"status":{"type":"string"},"url":{"type":"string","format":"uri"}},"additionalProperties":false}}
+  },
+  "additionalProperties":false
+}

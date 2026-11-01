@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate project JSON schemas and cross-file world/business/NPC references."""
+"""Validate project JSON schemas and cross-file world/business/NPC/dependency references."""
 from __future__ import annotations
 
 import json
@@ -23,8 +23,9 @@ def require(condition: bool, message: str):
 def validate_schema(data_path: str, schema_path: str):
     data = load(data_path)
     schema = load(schema_path)
+    validator = Draft202012Validator(schema, format_checker=Draft202012Validator.FORMAT_CHECKER)
     errors = sorted(
-        Draft202012Validator(schema).iter_errors(data),
+        validator.iter_errors(data),
         key=lambda error: (list(error.path), error.message),
     )
     if errors:
@@ -35,7 +36,7 @@ def validate_schema(data_path: str, schema_path: str):
     print(f"schema ok: {data_path}")
 
 def main():
-    # Every JSON fixture must be syntactically valid.
+    # Every JSON file in the repository must be syntactically valid.
     for path in ROOT.rglob("*.json"):
         if ".git" not in path.parts:
             json.loads(path.read_text(encoding="utf-8"))
@@ -43,10 +44,12 @@ def main():
     validate_schema("data/provinces.json", "schemas/provinces.schema.json")
     validate_schema("data/businesses.json", "schemas/businesses.schema.json")
     validate_schema("data/npc_profiles.json", "schemas/npc_profiles.schema.json")
+    validate_schema("data/dependency-baseline.json", "schemas/dependency-baseline.schema.json")
 
     provinces_doc = load("data/provinces.json")
     businesses_doc = load("data/businesses.json")
     npcs_doc = load("data/npc_profiles.json")
+    dependency_doc = load("data/dependency-baseline.json")
 
     provinces = provinces_doc["provinces"]
     province_ids = {item["id"] for item in provinces}
@@ -93,7 +96,23 @@ def main():
         sensitivity = npc["preferences"]["priceSensitivity"]
         require(0.0 <= sensitivity <= 1.0, f"{npc['id']} priceSensitivity must be between 0 and 1")
 
-    print("Project data validation passed: three provinces, business/Realtor links, shared shop stock and NPC references are consistent.")
+    dependencies = dependency_doc["dependencies"]
+    dependency_ids = [item["id"] for item in dependencies]
+    require(len(dependency_ids) == len(set(dependency_ids)), "dependency IDs must be unique")
+    require(dependency_doc["gameTarget"]["runtime"] == "IL2CPP", "project baseline must remain Steam Default / IL2CPP")
+
+    expected = {
+        "ifbars.s1api": ("3.2.2", "net6.0"),
+        "ifbars.s1mapi": ("2.0.1", "net6.0"),
+        "ifbars.steamnetworklib": ("1.6.0", "netstandard2.1"),
+    }
+    actual = {item["id"]: item for item in dependencies}
+    for dependency_id, (version, target_framework) in expected.items():
+        require(dependency_id in actual, f"missing pinned dependency {dependency_id}")
+        require(actual[dependency_id]["version"] == version, f"{dependency_id} version differs from the reviewed baseline")
+        require(actual[dependency_id]["targetFramework"] == target_framework, f"{dependency_id} target framework differs from the reviewed baseline")
+
+    print("Project data validation passed: provinces, Realtor listings, shared shop stock, NPC references and IL2CPP dependency pins are consistent.")
 
 if __name__ == "__main__":
     main()
