@@ -58,7 +58,7 @@ S1API documents the random generator and build step. It does not currently docum
 
 The project uses `LawController`, `LawManager` and `CheckpointManager`. Planned checkpoints are at Harbor Gate, the freight depot and the market square. Patrol routes follow the port loop and freight-market loop after route objects and navigation are verified in-game.
 
-Law intensity is global. Harborline must not change global law intensity to fake a local patrol system, force-spawn officers, or override dispatch. Native automatic evaluation, available officers and existing game rules remain in control.
+Law intensity is global. Harborline must not change global law intensity to fake a local patrol system, force-spawn custom officers, or override dispatch. After live routes are created, use LawManager.GetAllFootPatrolRoutes/GetAllVehiclePatrolRoutes and the native StartFootPatrol/StartVehiclePatrol APIs so officers are assigned from the nearest police station. CheckpointManager retains its automatic evaluation of time, curfew, distance, law intensity and officer availability.
 
 ## Individual NPC roster\nThe complete stable-ID roster is in data/harborline_npc_roster.json. Every planned physical character has a distinct identity key and an appearance profile key; world positions remain null until the live map survey.\n\n## Multiplayer and other mods
 
