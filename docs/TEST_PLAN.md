@@ -30,6 +30,10 @@ Steam Default / IL2CPP, exact public game build pinned for each run, pinned load
 - Host/client agree after reconnect.
 
 ## NPC
+- Harborline data checks enforce 42 planned physical residents, 26 customers and matching zone/group totals.
+- Affinity vectors are stable for the same save seed, contain a favourite and a disliked type, and are unique within the Harborline roster.
+- Random appearance does not reroll on update; no duplicate appearance signature remains within Harborline after save/load.
+- Compare active Harborline appearances against visible vanilla NPCs and other S1API NPCs where supported by the public API.
 - Stable ID survives save/load.
 - Schedule and spawn are deterministic.
 - Preferences affect product selection.
