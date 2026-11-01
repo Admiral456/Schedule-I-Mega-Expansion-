@@ -5,7 +5,7 @@ namespace ScheduleIMegaExpansion.Tests;
 
 public sealed class NpcDrugAffinityRandomizerTests
 {
-    private static readonly string[] DrugTypes = { "DrugA", "DrugB", "DrugC", "DrugD" };
+    private static readonly string[] DrugTypes = { "Marijuana", "Methamphetamine", "Cocaine", "MDMA", "Shrooms", "Heroin" };
     private static readonly string[] NpcIds =
         Enumerable.Range(1, 26)
             .Select(index => $"sime.npc.harborline.customer_{index:00}")
