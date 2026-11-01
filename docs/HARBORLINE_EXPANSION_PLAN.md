@@ -60,7 +60,7 @@ The project uses `LawController`, `LawManager` and `CheckpointManager`. Planned 
 
 Law intensity is global. Harborline must not change global law intensity to fake a local patrol system, force-spawn officers, or override dispatch. Native automatic evaluation, available officers and existing game rules remain in control.
 
-## Multiplayer and other mods
+## Individual NPC roster\nThe complete stable-ID roster is in data/harborline_npc_roster.json. Every planned physical character has a distinct identity key and an appearance profile key; world positions remain null until the live map survey.\n\n## Multiplayer and other mods
 
 - S1API NPC definitions and native customer components are the source of truth for spawn, appearance, schedule, persistence and NPC behavior.
 - The host owns first-time random rolls and persists their seed/assignments; clients consume the same registered identities instead of rolling locally.
