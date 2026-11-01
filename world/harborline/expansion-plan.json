@@ -81,5 +81,28 @@
     "initialTestNpcCount": 5,
     "scaleAfterProfiling": true,
     "streamingAndDistanceActivation": "Use only if supported by the native world/NPC systems; do not invent a parallel streaming system."
+  },
+  "mapIntegration": {
+    "sameGameMap": true,
+    "physicallyExtendPlayableWorld": true,
+    "attachToExistingDistrict": "Docks",
+    "includeTerrainCoastRoadsCollisionNavigation": true,
+    "normalPhoneMapMustShowFullNewDistrict": true,
+    "notSatisfiedBy": [
+      "standalone map image",
+      "custom phone app map",
+      "POI markers without world geometry"
+    ],
+    "mapBounds": null,
+    "worldToMapTransform": null,
+    "newRegionId": null,
+    "status": "requires in-game map/scene survey and verified native map-region hook"
+  },
+  "buildings": {
+    "useNativeBuildingPrefabFirst": true,
+    "fallback": "S1MAPI BuildingBuilder may create structure geometry only; it does not automatically make the shell a native Building, Property, Shop or functional business.",
+    "functionalInteriorsRequired": true,
+    "doors": "native interactive networked door prefab/controller",
+    "navigation": "colliders plus verified navmesh/NavigationBuilder doorway links; NPCs must traverse entrances and use native StayInBuilding schedules"
   }
 }
