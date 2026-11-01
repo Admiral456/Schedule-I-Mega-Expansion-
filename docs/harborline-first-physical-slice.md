@@ -2,7 +2,7 @@
 
 ## Co se nyní skutečně vytváří
 
-Mod umí po načtení uložené hry zachytit aktuální pozici a natočení hlavní herní kamery. Na F7 následně vytvoří v herním světě fyzický přístavní areál jako sadu Unity GameObjects. Každý základní blok vzniká přes `GameObject.CreatePrimitive(PrimitiveType.Cube)`, takže má skutečnou geometrii, MeshRenderer a primitivní kolizní collider.
+Po načtení uložené hry mod automaticky načte nativní umístění nemovitosti Docks Warehouse, prohledá okolní oblast a na nalezeném rovném volném terénu vytvoří fyzický přístavní areál jako sadu Unity GameObjects. Každý základní blok vzniká přes `GameObject.CreatePrimitive(PrimitiveType.Cube)`, takže má skutečnou geometrii, MeshRenderer a primitivní kolizní collider.
 
 Slice obsahuje:
 - velkou přístavní zpevněnou plochu, asfaltovou komunikaci a vodicí čáry;
@@ -16,12 +16,11 @@ Slice obsahuje:
 
 1. Nainstaluj DLL do `Schedule I/Mods`.
 2. Spusť single-player hru a načti uloženou pozici.
-3. Jdi do oblasti Docks na místo, kde chceš Harborline připojit. Stůj na volném místě a otoč se směrem do volného prostoru.
-4. Stiskni F6. Vznikne `UserData/ScheduleIMegaExpansion/Harborline/harborline-anchor.json`.
-5. Stiskni F7. Geometrie se vytvoří přibližně 22 metrů před zachyceným bodem.
+3. Po načtení save se Harborline vygeneruje automaticky. Není potřeba nic stisknout ani nastavovat.
+4. Výsledek a zvolená pozice se zaznamenají do `UserData/ScheduleIMegaExpansion/Harborline/last-generation.json`.
 
 ## Záměrná omezení této verze
 
-Toto je první fyzická prototypová etapa, nikoli hotová čtvrť. Objekty jsou zatím session-local a nejsou replikované přes multiplayer. Sklad není registrovaný jako nativní Schedule I Building/Property/Business, dveře jsou zatím průchozí otvor, ne nativní interaktivní dveře. Nejsou ještě vytvořeni NPC, zákaznické chování, obchody, Realtor záznamy, mobilní objednávky, policejní dispatch ani nativní mapové ikony.
+Generování je automatické, ale toto je stále první fyzická prototypová etapa, nikoli hotová čtvrť. Umístění se odvozuje od Docks Warehouse a bezpečně ověřovaného terénu; při neúspěšné kontrole se nic nespawnuje. Objekty jsou zatím session-local a nejsou replikované přes multiplayer. Sklad není registrovaný jako nativní Schedule I Building/Property/Business, dveře jsou zatím průchozí otvor, ne nativní interaktivní dveře. Nejsou ještě vytvořeni NPC, zákaznické chování, obchody, Realtor záznamy, mobilní objednávky, policejní dispatch ani nativní mapové ikony.
 
 Další implementace musí převést ověřené herní prefaby/komponenty a registry na skutečné herní systémy; současné dekorativní prvky nejsou vydávány za hotové funkční podniky.
