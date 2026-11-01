@@ -4,7 +4,7 @@
 
 Harborline NPCs are real S1API.Entities.NPC entities built on Schedule I's prefab, avatar, schedule, customer/dealer, save/load and FishNet networking systems. Personnel is not a required dependency and no standalone NPC pack framework is used for runtime spawning.
 
-Use S1API.Entities.NPCAppearance.GenerateRandomAppearance() followed by Build() to ask the native avatar pipeline for each NPC's appearance. Use the game's installed avatar settings and vanilla avatar layers; do not implement an independent face/body/clothing generator.
+On the NPC instance, call `Appearance.GenerateRandomAppearance()` followed by `Appearance.Build()` to ask the native avatar pipeline for its appearance. `GenerateRandomAppearance()` is an instance method on the `NPCAppearance` object exposed by the NPC; it is not a static call on the type. Use the game's installed avatar settings and vanilla avatar layers; do not implement an independent face/body/clothing generator.
 
 Generate the appearance once on the authoritative host. Preserve the resolved avatar state through native NPC save/load and replication so all peers see the same NPC and the appearance does not reroll after reload or late join. Detect exact duplicates from the resolved native avatar settings and request another native random appearance only for a collision. Verify this comparison against the target S1API build before claiming that duplicates are impossible.
 
@@ -28,7 +28,7 @@ Randomness must be deterministic and persistent:
 
 ## Appearance
 
-- Randomize by calling NPCAppearance.GenerateRandomAppearance(); do not create an independent avatar generator.
+- Randomize on the NPC instance with Appearance.GenerateRandomAppearance(), then call Appearance.Build(); do not create an independent avatar generator.
 - Keep only vanilla avatar layers unless a later project scope explicitly needs custom art.
 - Generate once and let the native save/network lifecycle preserve it.
 - Compare resolved native avatar settings to identify exact full appearance duplicates. Do not claim this is implemented until the target API exposes and the runtime test confirms the required settings snapshot.
@@ -54,7 +54,7 @@ The three planned inspection zones are the district entry, freight road and mark
 ## Validation gates
 
 1. Verify target game build, MelonLoader and S1API versions.
-2. Verify the native GenerateRandomAppearance() pipeline and vanilla avatar options against that build.
+2. Verify the instance-level Appearance.GenerateRandomAppearance() pipeline and vanilla avatar options against that build.
 3. Validate stable NPC IDs, distinct resolved appearances and customer preference profiles.
 4. Test 3-5 NPCs in single-player: spawn, schedule, economy, save/load.
 5. Test host + client: initial join, late join, disconnect/reconnect, save/load, no duplicate NPCs and identical appearance/preferences.
