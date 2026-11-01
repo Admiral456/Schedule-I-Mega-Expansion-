@@ -50,7 +50,7 @@ Do not confuse expansion-only online-order product tiers (`sime.product.batch.*`
 
 ## Seed ownership and multiplayer
 
-The host creates one random seed per save slot before the Harborline roster is initialized. The seed and resulting affinity vectors must be stored in the expansion save. The host is the only authority allowed to create or migrate those values. A client joining later receives the same registered NPC prefabs and save state; it never calls a separate local roll for an already registered NPC.
+The host creates one random seed per save slot before the Harborline roster is initialized. The seed and resulting affinity vectors must be stored in the expansion save. The adapter discovers the live game's DrugType enum values at runtime and maps each generated affinity to the native `WithAffinities(...)` call inside `WithCustomerDefaults(...)`; no drug enum members are hardcoded into the core helper. The host is the only authority allowed to create or migrate those values. A client joining later receives the same registered NPC prefabs and save state; it never calls a separate local roll for an already registered NPC.
 
 The seed must not use or reset `UnityEngine.Random`, because doing so can perturb unrelated game systems and other mods. The core helper uses SHA-256 over the save seed, NPC ID, algorithm version and choice channel. Changing one NPC ID does not reroll every other resident.
 
