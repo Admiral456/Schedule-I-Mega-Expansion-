@@ -11,7 +11,7 @@ public sealed class NpcOrderPlacementServiceTests
 
     private static NpcOrderPlacementRequest Request(string id = "request-001") => new(
         id, "steam-player-1|morgan|portside", "76561198000000001", ShopId,
-        WorldInterval: 42, CreatedAtUnixSeconds: 1_800_000_000, DeadlineUnixSeconds: 1_800_001_800, PlayerReputation: 0);
+        WorldInterval: 42, CreatedAtUnixSeconds: 1_800_000_000, DeadlineUnixSeconds: 1_800_001_800, ExpansionStanding: 0);
 
     private static ShopPurchaseService CreateShop()
     {
