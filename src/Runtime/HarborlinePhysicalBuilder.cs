@@ -136,11 +136,13 @@ namespace ScheduleIMegaExpansion.Runtime
                 log("Physical slice spawned at X=" + F(placement.X) + " Y=" + F(placement.Y) + " Z=" + F(placement.Z) + " yaw=" + F(placement.Yaw));
                 log("Created under root object: " + RootName);
                 log("This stage is physical geometry only; native property/shop registration, doors, NPCs and multiplayer replication remain separate implementation stages.");
+                return true;
             }
             catch (Exception ex)
             {
                 warn("Harborline physical build failed: " + ex.GetType().Name + ": " + ex.Message);
                 warn(ex.StackTrace ?? string.Empty);
+                return false;
             }
         }
 
