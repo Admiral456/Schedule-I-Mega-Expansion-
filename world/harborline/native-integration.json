@@ -122,7 +122,7 @@
     "output": "UserData/ScheduleIMegaExpansion/Diagnostics/<timestamp>",
     "mutatesGameState": false,
     "compileTarget": "IL2CPP net6.0",
-    "status": "source added; build and in-game execution not yet verified",
+    "status": "source added; CI compile result pending; in-game execution not yet verified",
     "outputFiles": [
       "summary.txt",
       "native-regions.csv",
@@ -131,6 +131,8 @@
       "native-businesses.csv",
       "standalone-phone-map-pois.csv",
       "native-map-property-api.txt"
-    ]
+    ],
+    "compileRequiresGameAssemblies": false,
+    "buildWorkflow": ".github/workflows/build-runtime.yml"
   }
 }
