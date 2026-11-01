@@ -150,30 +150,72 @@ public sealed class HylandNetworkPhoneApp : PhoneApp
                 "\nAvoids: " + avoided;
 
             AddCard(resident.DisplayName.ToUpperInvariant(), body);
+            AddOrderRequestButton(resident);
         }
+    }
+
+    private void AddOrderRequestButton(NpcCustomerDirectoryEntry resident)
+    {
+        if (_content == null)
+            return;
+
+        string safeId = resident.Profile.NpcId.Replace(".", "_", StringComparison.Ordinal);
+        var (_, button, _) = UIFactory.RoundedButtonWithLabel(
+            "RequestNpcOrder_" + safeId,
+            "REQUEST CUSTOMER ORDER",
+            _content,
+            new Color(0.08f, 0.20f, 0.28f, 1f),
+            190, 34, 11, Color.white);
+
+        ButtonUtils.AddListener(button, () =>
+        {
+            ScheduleINetworkBootstrap? bootstrap = ScheduleINetworkBootstrap.Instance;
+            if (bootstrap is not null)
+                _ = bootstrap.RequestNpcOrderAsync(
+                    resident.Profile.NpcId,
+                    "sime.business.harborline.portside_supply");
+        });
     }
 
     private void BuildOrders()
     {
         ExpansionSaveDocument? snapshot = ExpansionSaveable.Instance?.GetDocumentSnapshot();
-        if (snapshot == null)
+        var renderedOrderIds = new HashSet<string>(StringComparer.Ordinal);
+        int rendered = 0;
+
+        if (snapshot?.Data.Orders is not null)
         {
-            AddCard("ORDERS UNAVAILABLE", "The expansion save has not loaded or is read-only.");
-            return;
-        }
-        if (snapshot.Data.Orders.Count == 0)
-        {
-            AddCard("NO ORDERS YET", "Customer orders will appear here when the NPC order generator is connected to the game.");
-            return;
+            foreach (var entry in snapshot.Data.Orders.OrderBy(pair => pair.Key, StringComparer.Ordinal))
+            {
+                ExpansionOrderRecord order = entry.Value;
+                string items = string.Join("\\n", order.Items.Select(item => item.ProductId + "  x" + item.Quantity));
+                AddCard(entry.Key, order.Status.ToUpperInvariant() + "  /  " + order.ProvinceId +
+                    "\\nCustomer: " + order.CustomerId +
+                    "\\nEscrowed payment: $" + order.TotalPrice +
+                    "\\n" + items);
+                renderedOrderIds.Add(entry.Key);
+                rendered++;
+            }
         }
 
-        foreach (var entry in snapshot.Data.Orders.OrderBy(pair => pair.Key, StringComparer.Ordinal))
+        foreach (ExpansionNpcOrderResultPayload order in ExpansionOrderSyncCache.GetAll())
         {
-            ExpansionOrderRecord order = entry.Value;
-            string items = string.Join("\n", order.Items.Select(item => item.ProductId + "  x" + item.Quantity));
-            AddCard(entry.Key, order.Status.ToUpperInvariant() + "  /  " + order.ProvinceId +
-                "\nCustomer: " + order.CustomerId +
-                "\nReward: $" + order.Reward + "\n" + items);
+            if (renderedOrderIds.Contains(order.OrderId))
+                continue;
+
+            string items = string.Join("\\n", order.Items.Select(item => item.ProductId + "  x" + item.Quantity));
+            AddCard(order.OrderId, order.Status.ToUpperInvariant() + "  /  " + order.ProvinceId +
+                "\\nCustomer: " + order.CustomerId +
+                "\\nEscrowed payment: $" + order.TotalPrice +
+                "\\n" + items);
+            rendered++;
+        }
+
+        if (rendered == 0)
+        {
+            AddCard("NO ORDERS YET", snapshot is null
+                ? "The expansion save has not loaded. Host-confirmed orders will appear here."
+                : "No NPC customer orders have been committed yet. Request one from Contacts after shop stock is registered.");
         }
     }
 
