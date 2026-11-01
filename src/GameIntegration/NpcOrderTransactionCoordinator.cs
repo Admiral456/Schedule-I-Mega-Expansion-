@@ -71,6 +71,18 @@ public sealed class NpcOrderTransactionCoordinator
             // Until the Schedule I world-clock adapter is bound, use host UTC time.
             long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             long interval = now / WorldIntervalSeconds;
+            bool hasActiveOrder = current.Data.Orders.Values.Any(order =>
+                string.Equals(order.RequesterId, requesterId, StringComparison.Ordinal) &&
+                string.Equals(order.CustomerId, customer.Profile.NpcId, StringComparison.Ordinal) &&
+                order.WorldInterval == interval &&
+                !string.Equals(order.Status, "completed", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(order.Status, "cancelled", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(order.Status, "expired", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(order.Status, "failed", StringComparison.OrdinalIgnoreCase));
+
+            if (hasActiveOrder)
+                return Failure(payload.RequestId, "ActiveOrderAlreadyExists");
+
             string reputationKey = "player:" + requesterId + ":npc:" + customer.Profile.NpcId;
             int reputation = current.Data.ReputationByScope.TryGetValue(reputationKey, out int savedReputation)
                 ? savedReputation
