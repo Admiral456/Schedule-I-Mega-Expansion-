@@ -7,7 +7,7 @@ Cílem je přirozeně rozšířit Hyland Point o nové obyvatelné a funkční o
 ## Principy
 
 1. **Nejdřív znovu použít hru.** Preferujeme existující prefaby, budovy, nábytek, světla, silniční prvky a herní interakce. Vlastní geometrii použijeme jen tam, kde ve hře vhodný prvek neexistuje.
-2. **NPC jako data.** NPC budou tvořena jako Personnel pack a poběží jako skutečné S1API postavy. Jejich zákaznické/dealerské vlastnosti, rozvrhy a kontakty budou definované v balíčku.
+2. **NPC jako data.** NPC budou tvořena jako S1API.Entities.NPC přes původní herní NPC systém; vzhled generuje NPCAppearance.GenerateRandomAppearance(). Jejich zákaznické/dealerské vlastnosti, rozvrhy a kontakty budou definované v balíčku.
 3. **Žádné vymyšlené souřadnice.** Pozice se musí zachytit přímo ve hře. 2D mapové souřadnice z webového pomocníka nejsou Unity World X/Y/Z.
 4. **Host je autorita.** Síťové změny a stav světa musí respektovat síťové/ukládací mechanismy hry a S1API.
 5. **Po malých ověřitelných krocích.** Nejdřív funkční Harborline, až potom další provincie a rozšiřování mobilní sítě.
@@ -21,18 +21,17 @@ NPC role a cílové počty jsou v `packs/Harborline/roster.json`: nově 42 fyzic
 ## Generování NPC a multiplayer
 
 - Každý zákazník má vlastní náhodné preference, ale generování je deterministické podle stabilního ID a uložené do save; po načtení ani připojení hráče se znovu nelosuje.
-- Vzhledy se generují z ověřených vanilla avatar vrstev. Kontroluje se otisk celé kombinace a při kolizi se vzhled přegeneruje.
+- Vzhledy generuje nativní NPCAppearance.GenerateRandomAppearance(); přesné duplicity se mají kontrolovat na skutečných AvatarSettings.
 - Policie se nebude nahrazovat vlastním AI; Harborline se napojí na nativní policejní spawn/dispatch a navigaci.
-- Host je autorita pro spawn a stav NPC. Všichni hráči musí mít shodnou verzi modu, Personnel a S1API.
+- Host je autorita pro spawn a stav NPC. Všichni hráči musí mít shodnou verzi modu a S1API.
 - Detailní kontrakt a testovací brány: `docs/npc-generation-and-multiplayer.md`.
 
 ## Technologická vrstva
 
 - **MelonLoader + S1API Forked** – základní mod runtime a herní API.
-- **Personnel** – definice, registrace, spawn, rozvrhy, zákaznické/dealerské role, save/load a síťování NPC.
 - **S1MAPI** – budovy a interiéry pouze pro prvky, které nelze vhodně znovu použít z původní hry.
 
-Verze závislostí se uzamknou až při prvním sestavitelném runtime projektu. Aktuální Personnel dokumentace uvádí MelonLoader 0.7.3+ a S1API Forked 3.2.1+. Viz [Personnel](https://docs.doodesch.de/mods/personnel/) a [S1MAPI](https://ifbars.github.io/S1MAPI/).
+Verze závislostí se uzamknou až při prvním sestavitelném runtime projektu. Aktuální Personnel dokumentace uvádí MelonLoader 0.7.3+ a S1API Forked 3.2.1+. Viz [S1API Custom NPCs](https://ifbars.github.io/S1API/docs/custom-npcs.html), [NPCAppearance](https://ifbars.github.io/S1API/api/S1API.Entities.NPCAppearance.html) a [S1MAPI](https://ifbars.github.io/S1MAPI/).
 
 ## Aktuální stav a limity
 
@@ -46,13 +45,15 @@ Verze závislostí se uzamknou až při prvním sestavitelném runtime projektu.
 - `docs/architecture.md` – technická architektura a pořadí implementace.
 - `docs/prefab-reuse-rules.md` – pravidla pro opakované použití vanilla prefabů a multiplayer.
 - `docs/harborline-survey-checklist.md` – přesný postup zaměření spawnu, tras, budov a checkpointů ve hře.
-- `docs/npc-generation-and-multiplayer.md` – náhodné preference, jedinečný vzhled, policie a multiplayerový kontrakt.
+- `docs/npc-generation-and-multiplayer.md` – náhodné preference, nativní generování vzhledu, policie a multiplayer.
+- `docs/native-map-buildings-interiors.md` – herní mapa, nativní ikony/vlastnictví, dveře a funkční interiéry.
+- `world/harborline/native-integration.json` – nativní integrační pravidla a kontrolní brány.
 - `world/harborline/anchors.json` – seznam lokalit a míst k zaměření.
 - `world/harborline/expansion-plan.json` – plán větší oblasti a pěti podčástí.
 - `world/harborline/prefabs.json` – katalog původních prefabů ověřených přímo ve hře.
 - `packs/Harborline/roster.json` – role a cílové počty NPC.
 - `packs/Harborline/customer-designs.json` – 30 návrhů zákaznických preferencí, které se před vydáním mapují na ověřená herní data.
-- `tools/validate_personnel_pack.py` – validace skutečného Personnel manifestu.
+- `tools/validate_personnel_pack.py` zůstává pouze pomocným validátorem cizích Personnel packů; není součástí plánovaného runtime.
 - `tests/` – testy validátoru.
 
 ## Lokální kontrola
