@@ -32,12 +32,13 @@ public sealed class ExpansionHelloMessage : TypedP2PMessage<ExpansionHelloPayloa
 }
 
 /// <summary>
-/// Safe SteamNetworkLib lifecycle bootstrap for the default IL2CPP branch.
-/// This currently performs only a protocol handshake, not gameplay synchronization.
+/// SteamNetworkLib lifecycle bootstrap for the default IL2CPP branch.
+/// This performs only protocol/version compatibility negotiation, not gameplay synchronization.
 /// </summary>
 public sealed class ScheduleINetworkBootstrap : MelonMod
 {
     private const int SupportedProtocolVersion = 1;
+    private const string SupportedModVersion = "0.0.2";
     private static readonly TimeSpan RetryInterval = TimeSpan.FromSeconds(2);
 
     private SteamNetworkClient? _client;
@@ -45,17 +46,20 @@ public sealed class ScheduleINetworkBootstrap : MelonMod
     private float _nextRetryAt;
     private string? _lastInitializationWarning;
     private readonly HashSet<ulong> _helloSentTo = new();
-    private readonly Dictionary<ulong, int> _peerProtocols = new();
+    private readonly HashSet<ulong> _compatiblePeers = new();
+
+    public static ScheduleINetworkBootstrap? Instance { get; private set; }
+    public SteamNetworkClient? Client => _client;
 
     public override void OnInitializeMelon()
     {
-        var rules = new NetworkRules
+        Instance = this;
+        _client = new SteamNetworkClient(new NetworkRules
         {
             EnableRelay = true,
             AcceptOnlyFriends = true
-        };
+        });
 
-        _client = new SteamNetworkClient(rules);
         LoggerInstance.Msg("Mega Expansion loaded. Waiting for Steamworks to become available.");
     }
 
@@ -89,14 +93,13 @@ public sealed class ScheduleINetworkBootstrap : MelonMod
         }
     }
 
-    public bool IsPeerProtocolCompatible(ulong steamId64) =>
-        _peerProtocols.TryGetValue(steamId64, out int version) && version == SupportedProtocolVersion;
+    public bool IsPeerProtocolCompatible(ulong steamId64) => _compatiblePeers.Contains(steamId64);
 
     public override void OnDeinitializeMelon()
     {
         _networkReady = false;
         _helloSentTo.Clear();
-        _peerProtocols.Clear();
+        _compatiblePeers.Clear();
 
         try
         {
@@ -108,6 +111,7 @@ public sealed class ScheduleINetworkBootstrap : MelonMod
         }
 
         _client = null;
+        Instance = null;
     }
 
     private void TryInitializeNetworking()
@@ -156,15 +160,26 @@ public sealed class ScheduleINetworkBootstrap : MelonMod
         _client.RegisterMessageHandler<ExpansionHelloMessage>((message, senderId) =>
         {
             ulong peerId = senderId.m_SteamID;
-            int peerProtocol = message.Payload?.ProtocolVersion ?? 0;
-            _peerProtocols[peerId] = peerProtocol;
 
-            if (peerProtocol != SupportedProtocolVersion)
+            if (!_client.IsInLobby ||
+                !_client.GetRemoteMembers().Any(member => member.SteamId64 == peerId))
             {
-                LoggerInstance.Warning("Co-op peer " + peerId + " uses unsupported Mega Expansion protocol " + peerProtocol + ".");
+                LoggerInstance.Warning("Ignored compatibility message from a peer outside the active lobby: " + peerId);
                 return;
             }
 
+            int peerProtocol = message.Payload?.ProtocolVersion ?? 0;
+            string peerVersion = message.Payload?.ModVersion ?? string.Empty;
+
+            if (peerProtocol != SupportedProtocolVersion || peerVersion != SupportedModVersion)
+            {
+                _compatiblePeers.Remove(peerId);
+                LoggerInstance.Warning("Co-op peer " + peerId + " has incompatible Mega Expansion version/protocol (" +
+                    peerVersion + " / " + peerProtocol + ").");
+                return;
+            }
+
+            _compatiblePeers.Add(peerId);
             LoggerInstance.Msg("Compatible Mega Expansion co-op peer detected: " + peerId + ".");
         });
 
@@ -176,12 +191,13 @@ public sealed class ScheduleINetworkBootstrap : MelonMod
 
     private void SendHelloToNewPeers()
     {
-        if (_client is null || !_client.IsInitialized)
+        if (_client is null || !_client.IsInitialized || !_client.IsInLobby)
             return;
 
         List<SteamMemberInfo> remoteMembers = _client.GetRemoteMembers();
         var connectedIds = remoteMembers.Select(member => member.SteamId64).ToHashSet();
         _helloSentTo.RemoveWhere(id => !connectedIds.Contains(id));
+        _compatiblePeers.RemoveWhere(id => !connectedIds.Contains(id));
 
         if (remoteMembers.Count > 1)
             LoggerInstance.Warning("This project is configured for two-player co-op, but more than one remote player is in the lobby.");
@@ -205,7 +221,7 @@ public sealed class ScheduleINetworkBootstrap : MelonMod
             var payload = new ExpansionHelloPayload
             {
                 ProtocolVersion = SupportedProtocolVersion,
-                ModVersion = "0.0.2",
+                ModVersion = SupportedModVersion,
                 RequiredPlayerCount = 2
             };
 

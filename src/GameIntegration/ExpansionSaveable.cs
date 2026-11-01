@@ -2,13 +2,13 @@ using System.Text.Json;
 using MelonLoader;
 using S1API.Internal.Abstraction;
 using S1API.Saveables;
+using SteamNetworkLib;
 
 namespace ScheduleIMegaExpansion.GameIntegration;
 
 /// <summary>
 /// S1API discovers concrete Saveable subclasses automatically.
-/// The persisted field is a raw JSON string so newer schemas can be preserved
-/// without deserializing them into an older DTO and discarding unknown fields.
+/// Raw JSON is preserved when a newer or malformed schema is encountered.
 /// </summary>
 public sealed class ExpansionSaveable : Saveable
 {
@@ -31,7 +31,6 @@ public sealed class ExpansionSaveable : Saveable
     public static ExpansionSaveable? Instance { get; private set; }
     public bool IsReadOnly { get; private set; }
     public bool IsLoaded { get; private set; }
-    public ExpansionSaveDocument? Document => _document;
 
     public ExpansionSaveable()
     {
@@ -69,8 +68,7 @@ public sealed class ExpansionSaveable : Saveable
             }
 
             if (!root.TryGetProperty("schemaVersion", out JsonElement versionElement) ||
-                !versionElement.TryGetInt32(out int schemaVersion) ||
-                schemaVersion < 1)
+                !versionElement.TryGetInt32(out int schemaVersion) || schemaVersion < 1)
             {
                 MarkReadOnly("Expansion save schemaVersion is missing or invalid. Original data was preserved.");
                 return;
@@ -91,8 +89,7 @@ public sealed class ExpansionSaveable : Saveable
 
             ExpansionSaveDocument? loaded = JsonSerializer.Deserialize<ExpansionSaveDocument>(_rawDocument, JsonOptions);
             if (loaded is null || loaded.Data is null ||
-                string.IsNullOrWhiteSpace(loaded.WorldId) ||
-                loaded.WorldRevision < 0)
+                string.IsNullOrWhiteSpace(loaded.WorldId) || loaded.WorldRevision < 0)
             {
                 MarkReadOnly("Expansion save failed its integrity checks. Original data was preserved.");
                 return;
@@ -109,31 +106,63 @@ public sealed class ExpansionSaveable : Saveable
     protected override void OnSaved()
     {
         // S1API serializes SaveableField values before calling OnSaved.
-        // Keep the serialized field current at mutation time, not here.
+        // Keep this field current at mutation time, not here.
+    }
+
+    /// <summary>Returns a detached snapshot, so callers cannot mutate persisted state.</summary>
+    public ExpansionSaveDocument? GetDocumentSnapshot()
+    {
+        if (_document is null)
+            return null;
+
+        return JsonSerializer.Deserialize<ExpansionSaveDocument>(
+            JsonSerializer.Serialize(_document, JsonOptions), JsonOptions);
     }
 
     /// <summary>
-    /// Caller authority must be derived from the authenticated SteamNetworkLib session,
-    /// never from a client-supplied boolean or payload.
+    /// Replaces shared state only when the initialized SteamNetworkLib client reports
+    /// that this local peer is the host of an active lobby. Client payloads cannot assert authority.
     /// </summary>
-    public bool TryReplaceWorldState(ExpansionWorldState newState, bool callerIsAuthoritativeHost)
+    public bool TryReplaceWorldState(ExpansionWorldState newState, SteamNetworkClient? network)
     {
-        if (!callerIsAuthoritativeHost || IsReadOnly || !IsLoaded || _document is null || newState is null)
+        if (!IsAuthoritativeHost(network) || IsReadOnly || !IsLoaded || _document is null || newState is null)
             return false;
 
-        _document.Data = newState;
-        _document.WorldRevision = checked(_document.WorldRevision + 1);
-        RefreshSerializedField();
-        return true;
+        if (_document.WorldRevision == long.MaxValue)
+            return false;
+
+        try
+        {
+            ExpansionWorldState? detached = JsonSerializer.Deserialize<ExpansionWorldState>(
+                JsonSerializer.Serialize(newState, JsonOptions), JsonOptions);
+            if (detached is null)
+                return false;
+
+            _document.Data = detached;
+            _document.WorldRevision++;
+            RefreshSerializedField();
+            return true;
+        }
+        catch (JsonException exception)
+        {
+            MelonLogger.Error("[MegaExpansion] State update rejected because serialization failed: " + exception.Message);
+            return false;
+        }
     }
 
-    public bool RequestHostSave(bool callerIsAuthoritativeHost)
+    public bool RequestHostSave(SteamNetworkClient? network)
     {
-        if (!callerIsAuthoritativeHost || IsReadOnly || _document is null)
+        if (!IsAuthoritativeHost(network) || IsReadOnly || _document is null)
             return false;
 
         return Saveable.RequestGameSave();
     }
+
+    private static bool IsAuthoritativeHost(SteamNetworkClient? network) =>
+        network is not null &&
+        network.IsInitialized &&
+        network.IsInLobby &&
+        network.IsHost;
 
     private void RefreshSerializedField()
     {

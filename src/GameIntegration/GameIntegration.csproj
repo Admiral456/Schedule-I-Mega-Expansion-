@@ -13,11 +13,16 @@
     <MelonLoaderAssembliesDir Condition="'$(MelonLoaderAssembliesDir)' == ''">$(GameDir)\MelonLoader\net6</MelonLoaderAssembliesDir>
 
     <MelonLoaderDll Condition="'$(MelonLoaderDll)' == ''">$(MelonLoaderAssembliesDir)\MelonLoader.dll</MelonLoaderDll>
+    <HarmonyDll Condition="'$(HarmonyDll)' == ''">$(MelonLoaderAssembliesDir)\0Harmony.dll</HarmonyDll>
     <UnityEngineDll Condition="'$(UnityEngineDll)' == ''">$(Il2CppAssembliesDir)\UnityEngine.dll</UnityEngineDll>
     <UnityCoreDll Condition="'$(UnityCoreDll)' == ''">$(Il2CppAssembliesDir)\UnityEngine.CoreModule.dll</UnityCoreDll>
     <UnityUiDll Condition="'$(UnityUiDll)' == ''">$(Il2CppAssembliesDir)\UnityEngine.UI.dll</UnityUiDll>
     <UnityUiModuleDll Condition="'$(UnityUiModuleDll)' == ''">$(Il2CppAssembliesDir)\UnityEngine.UIModule.dll</UnityUiModuleDll>
     <UnityTextRenderingDll Condition="'$(UnityTextRenderingDll)' == ''">$(Il2CppAssembliesDir)\UnityEngine.TextRenderingModule.dll</UnityTextRenderingDll>
+    <UnityTmpDll Condition="'$(UnityTmpDll)' == ''">$(Il2CppAssembliesDir)\Unity.TextMeshPro.dll</UnityTmpDll>
+    <GameAssemblyDll Condition="'$(GameAssemblyDll)' == ''">$(Il2CppAssembliesDir)\Assembly-CSharp.dll</GameAssemblyDll>
+    <S1CoreDll Condition="'$(S1CoreDll)' == ''">$(Il2CppAssembliesDir)\Il2CppScheduleOne.Core.dll</S1CoreDll>
+    <SteamworksInteropDll Condition="'$(SteamworksInteropDll)' == ''">$(Il2CppAssembliesDir)\Il2CppSteamworks.dll</SteamworksInteropDll>
     <Il2CppInteropRuntimeDll Condition="'$(Il2CppInteropRuntimeDll)' == ''">$(MelonLoaderAssembliesDir)\Il2CppInterop.Runtime.dll</Il2CppInteropRuntimeDll>
     <Il2CppInteropCommonDll Condition="'$(Il2CppInteropCommonDll)' == ''">$(MelonLoaderAssembliesDir)\Il2CppInterop.Common.dll</Il2CppInteropCommonDll>
     <Il2CppFishNetDll Condition="'$(Il2CppFishNetDll)' == ''">$(Il2CppAssembliesDir)\Il2CppFishNet.Runtime.dll</Il2CppFishNetDll>
@@ -33,52 +38,46 @@
     </Content>
   </ItemGroup>
 
-  <ItemGroup Condition="Exists('$(MelonLoaderDll)')">
-    <Reference Include="MelonLoader"><HintPath>$(MelonLoaderDll)</HintPath><Private>false</Private></Reference>
-  </ItemGroup>
-  <ItemGroup Condition="Exists('$(UnityEngineDll)')">
-    <Reference Include="UnityEngine"><HintPath>$(UnityEngineDll)</HintPath><Private>false</Private></Reference>
-  </ItemGroup>
-  <ItemGroup Condition="Exists('$(UnityCoreDll)')">
-    <Reference Include="UnityEngine.CoreModule"><HintPath>$(UnityCoreDll)</HintPath><Private>false</Private></Reference>
-  </ItemGroup>
-  <ItemGroup Condition="Exists('$(UnityUiDll)')">
-    <Reference Include="UnityEngine.UI"><HintPath>$(UnityUiDll)</HintPath><Private>false</Private></Reference>
-  </ItemGroup>
-  <ItemGroup Condition="Exists('$(UnityUiModuleDll)')">
-    <Reference Include="UnityEngine.UIModule"><HintPath>$(UnityUiModuleDll)</HintPath><Private>false</Private></Reference>
-  </ItemGroup>
-  <ItemGroup Condition="Exists('$(UnityTextRenderingDll)')">
-    <Reference Include="UnityEngine.TextRenderingModule"><HintPath>$(UnityTextRenderingDll)</HintPath><Private>false</Private></Reference>
-  </ItemGroup>
-  <ItemGroup Condition="Exists('$(Il2CppInteropRuntimeDll)')">
-    <Reference Include="Il2CppInterop.Runtime"><HintPath>$(Il2CppInteropRuntimeDll)</HintPath><Private>false</Private></Reference>
-  </ItemGroup>
-  <ItemGroup Condition="Exists('$(Il2CppInteropCommonDll)')">
-    <Reference Include="Il2CppInterop.Common"><HintPath>$(Il2CppInteropCommonDll)</HintPath><Private>false</Private></Reference>
-  </ItemGroup>
-  <ItemGroup Condition="Exists('$(Il2CppFishNetDll)')">
-    <Reference Include="Il2CppFishNet.Runtime"><HintPath>$(Il2CppFishNetDll)</HintPath><Private>false</Private></Reference>
-  </ItemGroup>
-  <ItemGroup Condition="Exists('$(S1ApiDll)')">
-    <Reference Include="S1API"><HintPath>$(S1ApiDll)</HintPath><Private>false</Private></Reference>
-  </ItemGroup>
-  <ItemGroup Condition="Exists('$(SteamNetworkLibDll)')">
-    <Reference Include="SteamNetworkLib"><HintPath>$(SteamNetworkLibDll)</HintPath><Private>false</Private></Reference>
-  </ItemGroup>
+  <ItemGroup Condition="Exists('$(MelonLoaderDll)')"><Reference Include="MelonLoader"><HintPath>$(MelonLoaderDll)</HintPath><Private>false</Private></Reference></ItemGroup>
+  <ItemGroup Condition="Exists('$(HarmonyDll)')"><Reference Include="0Harmony"><HintPath>$(HarmonyDll)</HintPath><Private>false</Private></Reference></ItemGroup>
+  <ItemGroup Condition="Exists('$(UnityEngineDll)')"><Reference Include="UnityEngine"><HintPath>$(UnityEngineDll)</HintPath><Private>false</Private></Reference></ItemGroup>
+  <ItemGroup Condition="Exists('$(UnityCoreDll)')"><Reference Include="UnityEngine.CoreModule"><HintPath>$(UnityCoreDll)</HintPath><Private>false</Private></Reference></ItemGroup>
+  <ItemGroup Condition="Exists('$(UnityUiDll)')"><Reference Include="UnityEngine.UI"><HintPath>$(UnityUiDll)</HintPath><Private>false</Private></Reference></ItemGroup>
+  <ItemGroup Condition="Exists('$(UnityUiModuleDll)')"><Reference Include="UnityEngine.UIModule"><HintPath>$(UnityUiModuleDll)</HintPath><Private>false</Private></Reference></ItemGroup>
+  <ItemGroup Condition="Exists('$(UnityTextRenderingDll)')"><Reference Include="UnityEngine.TextRenderingModule"><HintPath>$(UnityTextRenderingDll)</HintPath><Private>false</Private></Reference></ItemGroup>
+  <ItemGroup Condition="Exists('$(UnityTmpDll)')"><Reference Include="Unity.TextMeshPro"><HintPath>$(UnityTmpDll)</HintPath><Private>false</Private></Reference></ItemGroup>
+  <ItemGroup Condition="Exists('$(GameAssemblyDll)')"><Reference Include="Assembly-CSharp"><HintPath>$(GameAssemblyDll)</HintPath><Private>false</Private></Reference></ItemGroup>
+  <ItemGroup Condition="Exists('$(S1CoreDll)')"><Reference Include="Il2CppScheduleOne.Core"><HintPath>$(S1CoreDll)</HintPath><Private>false</Private></Reference></ItemGroup>
+  <ItemGroup Condition="Exists('$(SteamworksInteropDll)')"><Reference Include="Il2CppSteamworks"><HintPath>$(SteamworksInteropDll)</HintPath><Private>false</Private></Reference></ItemGroup>
+  <ItemGroup Condition="Exists('$(Il2CppInteropRuntimeDll)')"><Reference Include="Il2CppInterop.Runtime"><HintPath>$(Il2CppInteropRuntimeDll)</HintPath><Private>false</Private></Reference></ItemGroup>
+  <ItemGroup Condition="Exists('$(Il2CppInteropCommonDll)')"><Reference Include="Il2CppInterop.Common"><HintPath>$(Il2CppInteropCommonDll)</HintPath><Private>false</Private></Reference></ItemGroup>
+  <ItemGroup Condition="Exists('$(Il2CppFishNetDll)')"><Reference Include="Il2CppFishNet.Runtime"><HintPath>$(Il2CppFishNetDll)</HintPath><Private>false</Private></Reference></ItemGroup>
+  <ItemGroup Condition="Exists('$(S1ApiDll)')"><Reference Include="S1API"><HintPath>$(S1ApiDll)</HintPath><Private>false</Private></Reference></ItemGroup>
+  <ItemGroup Condition="Exists('$(SteamNetworkLibDll)')"><Reference Include="SteamNetworkLib"><HintPath>$(SteamNetworkLibDll)</HintPath><Private>false</Private></Reference></ItemGroup>
 
   <Target Name="CheckIl2CppGameReferences" BeforeTargets="ResolveReferences">
     <Error Condition="'$(GameDir)' == ''" Text="Set GameDir or SCHEDULEI_GAME_DIR to the Schedule I installation folder." />
-    <Error Condition="!Exists('$(MelonLoaderDll)')" Text="MelonLoader net6 reference not found: $(MelonLoaderDll)" />
-    <Error Condition="!Exists('$(UnityEngineDll)')" Text="UnityEngine reference not found: $(UnityEngineDll)" />
-    <Error Condition="!Exists('$(UnityCoreDll)')" Text="UnityEngine.CoreModule reference not found: $(UnityCoreDll)" />
-    <Error Condition="!Exists('$(UnityUiDll)')" Text="UnityEngine.UI reference not found: $(UnityUiDll)" />
-    <Error Condition="!Exists('$(UnityUiModuleDll)')" Text="UnityEngine.UIModule reference not found: $(UnityUiModuleDll)" />
-    <Error Condition="!Exists('$(UnityTextRenderingDll)')" Text="UnityEngine.TextRenderingModule reference not found: $(UnityTextRenderingDll)" />
-    <Error Condition="!Exists('$(Il2CppInteropRuntimeDll)')" Text="Il2CppInterop.Runtime reference not found: $(Il2CppInteropRuntimeDll)" />
-    <Error Condition="!Exists('$(Il2CppInteropCommonDll)')" Text="Il2CppInterop.Common reference not found: $(Il2CppInteropCommonDll)" />
-    <Error Condition="!Exists('$(Il2CppFishNetDll)')" Text="Il2CppFishNet.Runtime reference not found: $(Il2CppFishNetDll)" />
-    <Error Condition="!Exists('$(S1ApiDll)')" Text="S1API IL2CPP reference not found: $(S1ApiDll). Install the matching S1API 3.2.2 build first." />
-    <Error Condition="!Exists('$(SteamNetworkLibDll)')" Text="SteamNetworkLib IL2CPP release DLL not found: $(SteamNetworkLibDll). Put the matching 1.6.0 DLL in libs/SteamNetworkLib/Il2cpp or set SteamNetworkLibDll." />
+    <Error Condition="!Exists('$(MelonLoaderDll)')" Text="Missing MelonLoader net6 reference: $(MelonLoaderDll)" />
+    <Error Condition="!Exists('$(HarmonyDll)')" Text="Missing Harmony reference: $(HarmonyDll)" />
+    <Error Condition="!Exists('$(UnityEngineDll)')" Text="Missing UnityEngine reference: $(UnityEngineDll)" />
+    <Error Condition="!Exists('$(UnityCoreDll)')" Text="Missing UnityEngine.CoreModule reference: $(UnityCoreDll)" />
+    <Error Condition="!Exists('$(UnityUiDll)')" Text="Missing UnityEngine.UI reference: $(UnityUiDll)" />
+    <Error Condition="!Exists('$(UnityUiModuleDll)')" Text="Missing UnityEngine.UIModule reference: $(UnityUiModuleDll)" />
+    <Error Condition="!Exists('$(UnityTextRenderingDll)')" Text="Missing UnityEngine.TextRenderingModule reference: $(UnityTextRenderingDll)" />
+    <Error Condition="!Exists('$(UnityTmpDll)')" Text="Missing Unity.TextMeshPro reference: $(UnityTmpDll)" />
+    <Error Condition="!Exists('$(GameAssemblyDll)')" Text="Missing Assembly-CSharp reference: $(GameAssemblyDll)" />
+    <Error Condition="!Exists('$(S1CoreDll)')" Text="Missing Il2CppScheduleOne.Core reference: $(S1CoreDll)" />
+    <Error Condition="!Exists('$(SteamworksInteropDll)')" Text="Missing Il2CppSteamworks reference: $(SteamworksInteropDll)" />
+    <Error Condition="!Exists('$(Il2CppInteropRuntimeDll)')" Text="Missing Il2CppInterop.Runtime reference: $(Il2CppInteropRuntimeDll)" />
+    <Error Condition="!Exists('$(Il2CppInteropCommonDll)')" Text="Missing Il2CppInterop.Common reference: $(Il2CppInteropCommonDll)" />
+    <Error Condition="!Exists('$(Il2CppFishNetDll)')" Text="Missing Il2CppFishNet.Runtime reference: $(Il2CppFishNetDll)" />
+    <Error Condition="!Exists('$(S1ApiDll)')" Text="Missing S1API IL2CPP reference: $(S1ApiDll). Install S1API 3.2.2 first." />
+    <Error Condition="!Exists('$(SteamNetworkLibDll)')" Text="Missing SteamNetworkLib 1.6.0 IL2CPP DLL: $(SteamNetworkLibDll)" />
+  </Target>
+
+  <Target Name="DeployGameIntegration" AfterTargets="Build" Condition="'$(GameDir)' != '' and Exists('$(GameDir)')">
+    <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(GameDir)\Mods\ScheduleIMegaExpansion.GameIntegration.dll" />
+    <Copy SourceFiles="$(OutDir)ScheduleIMegaExpansion.Core.dll" DestinationFiles="$(GameDir)\Mods\ScheduleIMegaExpansion.Core.dll" Condition="Exists('$(OutDir)ScheduleIMegaExpansion.Core.dll')" />
+    <Copy SourceFiles="../../assets/ui/SIME_HylandNetwork.png" DestinationFiles="$(GameDir)\Mods\SIME_HylandNetwork.png" />
   </Target>
 </Project>
