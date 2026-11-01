@@ -1,7 +1,8 @@
 namespace ScheduleIMegaExpansion.Core;
 
 /// <summary>
-/// Idempotent reputation ledger. Use separate keys for player, crew, business and province scopes.
+/// Idempotent ledger for expansion-specific standing (crew, business, faction or province).
+/// Do not use it for ordinary player-to-NPC relationships; those belong to Schedule I's native NPCRelationship system.
 /// </summary>
 public sealed class ReputationLedger
 {
