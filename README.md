@@ -31,7 +31,7 @@ NPC role a cílové počty jsou v `packs/Harborline/roster.json`: nově 42 fyzic
 - **MelonLoader + S1API Forked** – základní mod runtime a herní API.
 - **S1MAPI** – budovy a interiéry pouze pro prvky, které nelze vhodně znovu použít z původní hry.
 
-Verze závislostí se uzamknou až při prvním sestavitelném runtime projektu. Viz [S1API Custom NPCs](https://ifbars.github.io/S1API/docs/custom-npcs.html), [NPCAppearance](https://ifbars.github.io/S1API/api/S1API.Entities.NPCAppearance.html) a [S1MAPI](https://ifbars.github.io/S1MAPI/).
+Diagnostický IL2CPP projekt je zatím připraven proti S1API.Forked 3.1.6 a MelonLoader 0.7.3. Build musí být ověřen proti skutečně nainstalované verzi S1API v cílové hře. Viz [S1API Custom NPCs](https://ifbars.github.io/S1API/docs/custom-npcs.html), [NPCAppearance](https://ifbars.github.io/S1API/api/S1API.Entities.NPCAppearance.html) a [S1MAPI](https://ifbars.github.io/S1MAPI/).
 
 ## Aktuální stav a limity
 
