@@ -99,7 +99,8 @@
       "reputation": {
         "scope": "per_player_and_crew",
         "initialValue": 0
-      }
+      },
+      "scheduleId": "sime.schedule.ridgeview.quarry_day"
     },
     {
       "id": "sime.npc.ridgeview.avery_cole",
@@ -176,7 +177,8 @@
       "reputation": {
         "scope": "per_player_and_crew",
         "initialValue": 0
-      }
+      },
+      "scheduleId": "sime.schedule.lakeside.investor_afternoon"
     },
     {
       "id": "sime.npc.lakeside.riley_morgan",
