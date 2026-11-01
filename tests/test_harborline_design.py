@@ -56,7 +56,9 @@ class HarborlineDesignTests(unittest.TestCase):
 
     def test_native_npc_random_appearance_is_required(self):
         npc = self.roster["npcImplementation"]
-        self.assertEqual(npc["appearanceApi"], "S1API.Entities.NPCAppearance.GenerateRandomAppearance()")
+        self.assertEqual(npc["appearanceApi"], "On the NPC instance: Appearance.GenerateRandomAppearance() followed by Appearance.Build()")
+        self.assertIn("Appearance.GenerateRandomAppearance()", self.roster["appearanceRules"]["system"])
+        self.assertIn("Appearance.Build()", self.roster["appearanceRules"]["system"])
         self.assertFalse(npc["externalNpcPackFrameworkRequired"])
         self.assertFalse(self.roster["appearanceRules"]["usePersonnelFramework"])
         self.assertTrue(self.roster["appearanceRules"]["useNativeRandomizer"])
