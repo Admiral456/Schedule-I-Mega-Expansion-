@@ -100,6 +100,62 @@ public sealed class ShopPurchaseService
     {
         lock (_gate) return _balances.TryGetValue(buyerId, out long balance) ? balance : 0;
     }
+    public bool TryGetBalance(string accountId, out long balance)
+    {
+        if (string.IsNullOrWhiteSpace(accountId))
+        {
+            balance = 0;
+            return false;
+        }
+
+        lock (_gate) return _balances.TryGetValue(accountId, out balance);
+    }
+
+    public IReadOnlyList<ShopProductSnapshot> GetProductsForShop(string shopId)
+    {
+        if (!IsValidKeyPart(shopId))
+            return Array.Empty<ShopProductSnapshot>();
+
+        lock (_gate)
+        {
+            ShopProductSnapshot[] products = _productIdentity
+                .Where(pair => string.Equals(pair.Value.ShopId, shopId, StringComparison.Ordinal))
+                .OrderBy(pair => pair.Value.ProductId, StringComparer.Ordinal)
+                .Select(pair => new ShopProductSnapshot(
+                    pair.Value.ShopId, pair.Value.ProductId, _prices[pair.Key], _stock[pair.Key]))
+                .ToArray();
+
+            return Array.AsReadOnly(products);
+        }
+    }
+
+    /// <summary>Credits an expansion ledger account with overflow protection.</summary>
+    public bool TryCreditBalance(string accountId, long amount, out long newBalance)
+    {
+        newBalance = 0;
+        if (!IsValidKeyPart(accountId) || amount <= 0)
+            return false;
+
+        lock (_gate)
+        {
+            long current = GetBuyerBalance(accountId);
+            try
+            {
+                newBalance = checked(current + amount);
+            }
+            catch (OverflowException)
+            {
+                return false;
+            }
+
+            if (_worldRevision == long.MaxValue)
+                return false;
+
+            _balances[accountId] = newBalance;
+            _worldRevision++;
+            return true;
+        }
+    }
 
     public int GetStock(string shopId, string productId)
     {

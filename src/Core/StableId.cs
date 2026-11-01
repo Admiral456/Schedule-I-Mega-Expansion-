@@ -19,5 +19,15 @@ public static class StableId
         value.Length <= 160;
 
     public static string NewOrderId() => $"{OrderPrefix}{Guid.NewGuid():N}";
+    /// <summary>Returns the same order ID for the same host-validated request key.</summary>
+    public static string FromOrderRequest(string requestKey)
+    {
+        if (string.IsNullOrWhiteSpace(requestKey))
+            throw new ArgumentException("Order request key is required.", nameof(requestKey));
+
+        byte[] hash = System.Security.Cryptography.SHA256.HashData(
+            System.Text.Encoding.UTF8.GetBytes(requestKey));
+        return OrderPrefix + Convert.ToHexString(hash.AsSpan(0, 16)).ToLowerInvariant();
+    }
     public static string NewContractId() => $"{ContractPrefix}{Guid.NewGuid():N}";
 }
