@@ -38,6 +38,7 @@ Verze závislostí se uzamknou až při prvním sestavitelném runtime projektu.
 - `docs/architecture.md` – technická architektura a pořadí implementace.
 - `docs/prefab-reuse-rules.md` – pravidla pro opakované použití vanilla prefabů a multiplayer.
 - `world/harborline/anchors.json` – seznam lokalit a míst k zaměření.
+- `world/harborline/prefabs.json` – katalog původních prefabů ověřených přímo ve hře.
 - `packs/Harborline/roster.json` – role a cílové počty NPC.
 - `tools/validate_personnel_pack.py` – validace skutečného Personnel manifestu.
 - `tests/` – testy validátoru.
