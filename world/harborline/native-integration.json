@@ -16,13 +16,15 @@
     "normalInGameMapVisible": true,
     "connectTo": "Docks",
     "requiresTerrainRoadsCollisionNavigation": true,
-    "requiresNativeRegionRegistration": true,
+    "requiresNativeRegionRegistration": false,
     "requiresExistingMapCanvasExtension": true,
     "standaloneMapOrPOIsAreInsufficient": true,
     "mapBounds": null,
     "worldToMapTransform": null,
-    "regionId": null,
-    "status": "not-verified; target-build runtime inspection required"
+    "regionId": "Docks",
+    "status": "not-verified; target-build runtime inspection required",
+    "existingNativeRegion": "Docks",
+    "regionRequirement": "Harborline is a named subdistrict. Extend/check map, navigation and dispatch coverage inside Docks; do not register a fabricated new enum value."
   },
   "mapIcons": {
     "source": "native building/property map classification",
@@ -114,11 +116,21 @@
       "registered enterable buildings",
       "native properties and ownership state",
       "native businesses and ownership state",
-      "standalone phone-map POIs when available"
+      "standalone phone-map POIs when available",
+      "metadata-only native map/property/business API surface report"
     ],
     "output": "UserData/ScheduleIMegaExpansion/Diagnostics/<timestamp>",
     "mutatesGameState": false,
     "compileTarget": "IL2CPP net6.0",
-    "status": "source added; build and in-game execution not yet verified"
+    "status": "source added; build and in-game execution not yet verified",
+    "outputFiles": [
+      "summary.txt",
+      "native-regions.csv",
+      "native-buildings.csv",
+      "native-properties.csv",
+      "native-businesses.csv",
+      "standalone-phone-map-pois.csv",
+      "native-map-property-api.txt"
+    ]
   }
 }
