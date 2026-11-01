@@ -1,7 +1,7 @@
 using System;
-using System.IO;
+using System.Linq;
+using System.Reflection;
 using MelonLoader;
-using S1API.Lifecycle;
 using ScheduleIMegaExpansion.Diagnostics;
 
 [assembly: MelonInfo(typeof(ScheduleIMegaExpansion.Core), "Schedule I Mega Expansion", "0.1.0", "Admiral456")]
@@ -10,18 +10,87 @@ using ScheduleIMegaExpansion.Diagnostics;
 namespace ScheduleIMegaExpansion
 {
     /// <summary>
-    /// First runtime milestone. This mod only reads the native world registries
-    /// and exports diagnostic files. It does not mutate game or save state.
+    /// Runtime diagnostic bootstrap. S1API is discovered dynamically so this
+    /// project can compile without shipping or referencing game assemblies.
     /// </summary>
     public sealed class Core : MelonMod
     {
+        private EventInfo? _preLoadEvent;
+        private EventInfo? _loadCompleteEvent;
+        private Delegate? _preLoadHandler;
+        private Delegate? _loadCompleteHandler;
+        private bool _subscribed;
         private bool _exportedForCurrentLoad;
+        private bool _loggedMissingApi;
 
         public override void OnInitializeMelon()
         {
-            GameLifecycle.OnPreLoad += OnPreLoad;
-            GameLifecycle.OnLoadComplete += OnLoadComplete;
-            MelonLogger.Msg("[Schedule I Mega Expansion] Read-only world survey mode initialized.");
+            MelonLogger.Msg("[Schedule I Mega Expansion] Read-only world survey initialized.");
+        }
+
+        public override void OnUpdate()
+        {
+            if (!_subscribed)
+                TrySubscribeToS1ApiLifecycle();
+        }
+
+        private void TrySubscribeToS1ApiLifecycle()
+        {
+            Type? lifecycleType = AppDomain.CurrentDomain.GetAssemblies()
+                .Select(assembly =>
+                {
+                    try { return assembly.GetType("S1API.Lifecycle.GameLifecycle", false); }
+                    catch { return null; }
+                })
+                .FirstOrDefault(type => type != null);
+
+            if (lifecycleType == null)
+            {
+                if (!_loggedMissingApi)
+                {
+                    _loggedMissingApi = true;
+                    MelonLogger.Warning("[Schedule I Mega Expansion] Waiting for S1API lifecycle API.");
+                }
+                return;
+            }
+
+            try
+            {
+                EventInfo? preLoad = lifecycleType.GetEvent(
+                    "OnPreLoad",
+                    BindingFlags.Public | BindingFlags.Static);
+                EventInfo? loadComplete = lifecycleType.GetEvent(
+                    "OnLoadComplete",
+                    BindingFlags.Public | BindingFlags.Static);
+
+                MethodInfo preMethod = typeof(Core).GetMethod(
+                    nameof(OnPreLoad),
+                    BindingFlags.Instance | BindingFlags.NonPublic)!;
+                MethodInfo loadMethod = typeof(Core).GetMethod(
+                    nameof(OnLoadComplete),
+                    BindingFlags.Instance | BindingFlags.NonPublic)!;
+
+                if (loadComplete?.EventHandlerType == null)
+                    throw new MissingMemberException("S1API GameLifecycle.OnLoadComplete event was not found.");
+
+                _loadCompleteHandler = Delegate.CreateDelegate(loadComplete.EventHandlerType, this, loadMethod);
+                loadComplete.AddEventHandler(null, _loadCompleteHandler);
+                _loadCompleteEvent = loadComplete;
+
+                if (preLoad?.EventHandlerType != null)
+                {
+                    _preLoadHandler = Delegate.CreateDelegate(preLoad.EventHandlerType, this, preMethod);
+                    preLoad.AddEventHandler(null, _preLoadHandler);
+                    _preLoadEvent = preLoad;
+                }
+
+                _subscribed = true;
+                MelonLogger.Msg("[Schedule I Mega Expansion] Connected to native S1API save lifecycle.");
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning("[Schedule I Mega Expansion] Could not connect to S1API lifecycle: " + ex.Message);
+            }
         }
 
         private void OnPreLoad()
@@ -39,7 +108,7 @@ namespace ScheduleIMegaExpansion
             try
             {
                 string gameRoot = AppDomain.CurrentDomain.BaseDirectory;
-                string outputRoot = Path.Combine(
+                string outputRoot = System.IO.Path.Combine(
                     gameRoot,
                     "UserData",
                     "ScheduleIMegaExpansion",
@@ -60,8 +129,17 @@ namespace ScheduleIMegaExpansion
 
         public override void OnApplicationQuit()
         {
-            GameLifecycle.OnPreLoad -= OnPreLoad;
-            GameLifecycle.OnLoadComplete -= OnLoadComplete;
+            try
+            {
+                if (_preLoadEvent != null && _preLoadHandler != null)
+                    _preLoadEvent.RemoveEventHandler(null, _preLoadHandler);
+                if (_loadCompleteEvent != null && _loadCompleteHandler != null)
+                    _loadCompleteEvent.RemoveEventHandler(null, _loadCompleteHandler);
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning("[Schedule I Mega Expansion] Lifecycle unsubscription warning: " + ex.Message);
+            }
         }
     }
 }
