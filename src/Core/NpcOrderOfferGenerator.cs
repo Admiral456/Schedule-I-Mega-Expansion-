@@ -25,8 +25,8 @@ public sealed record NpcOrderGenerationResult(
 }
 
 /// <summary>
-/// Creates a deterministic order offer from the products a resident actually likes or tolerates.
-/// It has no Unity/Steam dependencies; the multiplayer host must persist accepted offers.
+/// Creates a deterministic draft for expansion-only remote/online order rules from products a resident likes or tolerates.
+/// Native in-world contracts belong to Schedule I's NPCCustomer component. This class has no Unity/Steam dependencies.
 /// </summary>
 public static class NpcOrderOfferGenerator
 {
@@ -37,7 +37,7 @@ public static class NpcOrderOfferGenerator
         NpcCustomerProfile? profile,
         IReadOnlyCollection<NpcOrderProductStock>? products,
         long worldInterval,
-        int playerReputation,
+        int expansionStanding,
         int maximumLines = DefaultMaximumLines,
         int maximumUnitsPerProduct = DefaultMaximumUnitsPerProduct)
     {
@@ -95,7 +95,7 @@ public static class NpcOrderOfferGenerator
             {
                 new CustomerOrderLine(candidate.Product.ProductId, 1, candidate.Product.UnitPrice)
             });
-            CustomerAcceptanceResult evaluation = NpcCustomerAcceptance.Evaluate(profile, oneLineOffer, playerReputation);
+            CustomerAcceptanceResult evaluation = NpcCustomerAcceptance.Evaluate(profile, oneLineOffer, expansionStanding);
             if (evaluation.Accepted)
             {
                 acceptable.Add((candidate.Product, candidate.MaximumQuantity, candidate.PreferenceTier, candidate.TieBreak, evaluation));
@@ -127,7 +127,7 @@ public static class NpcOrderOfferGenerator
             };
 
             CustomerAcceptanceResult evaluation = NpcCustomerAcceptance.Evaluate(
-                profile, new CustomerOrderOffer(proposed), playerReputation);
+                profile, new CustomerOrderOffer(proposed), expansionStanding);
             if (!evaluation.Accepted)
                 continue;
 
@@ -137,7 +137,7 @@ public static class NpcOrderOfferGenerator
                 quantity++;
                 proposed[^1] = proposed[^1] with { Quantity = quantity };
                 CustomerAcceptanceResult larger = NpcCustomerAcceptance.Evaluate(
-                    profile, new CustomerOrderOffer(proposed), playerReputation);
+                    profile, new CustomerOrderOffer(proposed), expansionStanding);
                 if (!larger.Accepted)
                 {
                     quantity--;
