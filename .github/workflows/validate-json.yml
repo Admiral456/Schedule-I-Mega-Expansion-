@@ -16,29 +16,5 @@ jobs:
           python-version: "3.12"
       - name: Install JSON schema validator
         run: python -m pip install jsonschema
-      - name: Validate JSON data and schemas
-        run: |
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          from jsonschema import Draft202012Validator
-
-          for path in Path(".").rglob("*.json"):
-              if ".git" not in path.parts:
-                  json.loads(path.read_text(encoding="utf-8"))
-
-          pairs = {
-              "data/provinces.json": "schemas/provinces.schema.json",
-              "data/businesses.json": "schemas/businesses.schema.json",
-              "data/npc_profiles.json": "schemas/npc_profiles.schema.json"
-          }
-          for data_path, schema_path in pairs.items():
-              data = json.loads(Path(data_path).read_text(encoding="utf-8"))
-              schema = json.loads(Path(schema_path).read_text(encoding="utf-8"))
-              errors = list(Draft202012Validator(schema).iter_errors(data))
-              if errors:
-                  for error in errors:
-                      print(f"{data_path}: {list(error.path)}: {error.message}")
-                  raise SystemExit(1)
-          print("JSON and schema validation passed.")
-          PY
+      - name: Validate schemas and cross-file references
+        run: python scripts/validate_project_data.py
