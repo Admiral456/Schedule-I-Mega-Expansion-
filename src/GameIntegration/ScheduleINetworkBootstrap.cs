@@ -1,4 +1,5 @@
 using MelonLoader;
+using ScheduleIMegaExpansion.Core;
 using SteamNetworkLib;
 using SteamNetworkLib.Core;
 using SteamNetworkLib.Models;
@@ -86,10 +87,12 @@ public sealed class ScheduleINetworkBootstrap : MelonMod
     private const int SupportedProtocolVersion = 1;
     private const string SupportedModVersion = "0.0.2";
     private static readonly TimeSpan RetryInterval = TimeSpan.FromSeconds(2);
+    private const float OrderExpirySweepIntervalSeconds = 5f;
 
     private SteamNetworkClient? _client;
     private bool _networkReady;
     private float _nextRetryAt;
+    private float _nextOrderExpirySweepAt;
     private string? _lastInitializationWarning;
     private readonly HashSet<ulong> _helloSentTo = new();
     private readonly HashSet<ulong> _compatiblePeers = new();
@@ -131,6 +134,7 @@ public sealed class ScheduleINetworkBootstrap : MelonMod
         {
             _client.ProcessIncomingMessages();
             SendHelloToNewPeers();
+            SweepExpiredNpcOrders();
         }
         catch (Exception exception)
         {
@@ -141,6 +145,32 @@ public sealed class ScheduleINetworkBootstrap : MelonMod
     }
 
     public bool IsPeerProtocolCompatible(ulong steamId64) => _compatiblePeers.Contains(steamId64);
+
+    /// <summary>
+    /// Host-only entry point for NPC/shop gameplay adapters to complete, cancel or fail
+    /// an order after the actual in-game interaction has been verified.
+    /// </summary>
+    public bool TryFinalizeNpcOrder(string orderId, OrderStatus targetStatus)
+    {
+        if (_client is null || !_networkReady || !_client.IsInitialized ||
+            !_client.IsInLobby || !_client.IsHost)
+        {
+            return false;
+        }
+
+        if (targetStatus is not (OrderStatus.Completed or OrderStatus.Cancelled or
+            OrderStatus.Expired or OrderStatus.Failed))
+        {
+            return false;
+        }
+
+        ExpansionSaveable? save = ExpansionSaveable.Instance;
+        ExpansionSaveDocument? snapshot = save?.GetDocumentSnapshot();
+        if (save is null || snapshot is null || save.IsReadOnly)
+            return false;
+
+        return save.TryFinalizeNpcOrder(orderId, targetStatus, snapshot.WorldRevision, _client);
+    }
 
     public async Task<bool> RequestNpcOrderAsync(string customerId, string shopId)
     {
@@ -321,6 +351,46 @@ public sealed class ScheduleINetworkBootstrap : MelonMod
         _lastInitializationWarning = null;
         LoggerInstance.Msg("SteamNetworkLib initialized. Waiting for co-op peers.");
         SendHelloToNewPeers();
+    }
+
+    private void SweepExpiredNpcOrders()
+    {
+        if (_client is null || !_client.IsInitialized || !_client.IsInLobby || !_client.IsHost ||
+            Time.realtimeSinceStartup < _nextOrderExpirySweepAt)
+        {
+            return;
+        }
+
+        _nextOrderExpirySweepAt = Time.realtimeSinceStartup + OrderExpirySweepIntervalSeconds;
+
+        ExpansionSaveable? save = ExpansionSaveable.Instance;
+        if (save is null || !save.IsLoaded || save.IsReadOnly)
+            return;
+
+        ExpansionSaveDocument? snapshot = save.GetDocumentSnapshot();
+        if (snapshot?.Data.Orders is null)
+            return;
+
+        long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        var expiredOrderIds = snapshot.Data.Orders
+            .Where(entry =>
+                entry.Value.DeadlineWorldTime.HasValue &&
+                entry.Value.DeadlineWorldTime.Value <= now &&
+                Enum.TryParse(entry.Value.Status, ignoreCase: true, out OrderStatus status) &&
+                OrderState.CanTransition(status, OrderStatus.Expired))
+            .Select(entry => entry.Key)
+            .OrderBy(orderId => orderId, StringComparer.Ordinal)
+            .ToArray();
+
+        foreach (string orderId in expiredOrderIds)
+        {
+            snapshot = save.GetDocumentSnapshot();
+            if (snapshot is null)
+                return;
+
+            if (save.TryFinalizeNpcOrder(orderId, OrderStatus.Expired, snapshot.WorldRevision, _client))
+                LoggerInstance.Msg("NPC order expired and customer funds/stock were refunded: " + orderId + ".");
+        }
     }
 
     private void SendHelloToNewPeers()
