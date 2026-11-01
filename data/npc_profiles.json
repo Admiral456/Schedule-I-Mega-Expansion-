@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "profiles": [
     {
       "id": "sime.npc.harborline.morgan_reed",
@@ -21,9 +21,9 @@
         "budgetBand": "medium",
         "budgetLimit": 1200
       },
-      "reputation": {
-        "scope": "per_player_and_crew",
-        "initialValue": 0
+      "relationship": {
+        "provider": "schedule_i_native",
+        "initialization": "use_native_default"
       },
       "scheduleId": "sime.schedule.harborline.shopkeeper_day"
     },
@@ -47,9 +47,9 @@
         "budgetBand": "low",
         "budgetLimit": 850
       },
-      "reputation": {
-        "scope": "per_player_and_crew",
-        "initialValue": 0
+      "relationship": {
+        "provider": "schedule_i_native",
+        "initialization": "use_native_default"
       },
       "scheduleId": "sime.schedule.harborline.dockworker_early"
     },
@@ -71,9 +71,9 @@
         "budgetBand": "medium",
         "budgetLimit": 3500
       },
-      "reputation": {
-        "scope": "per_player_and_crew",
-        "initialValue": 0
+      "relationship": {
+        "provider": "schedule_i_native",
+        "initialization": "use_native_default"
       },
       "scheduleId": "sime.schedule.harborline.warehouse_afternoon"
     },
@@ -96,9 +96,9 @@
         "budgetBand": "high",
         "budgetLimit": 4000
       },
-      "reputation": {
-        "scope": "per_player_and_crew",
-        "initialValue": 0
+      "relationship": {
+        "provider": "schedule_i_native",
+        "initialization": "use_native_default"
       },
       "scheduleId": "sime.schedule.ridgeview.quarry_day"
     },
@@ -122,9 +122,9 @@
         "budgetBand": "medium",
         "budgetLimit": 2100
       },
-      "reputation": {
-        "scope": "per_player_and_crew",
-        "initialValue": 0
+      "relationship": {
+        "provider": "schedule_i_native",
+        "initialization": "use_native_default"
       },
       "scheduleId": "sime.schedule.ridgeview.workshop_evening"
     },
@@ -148,9 +148,9 @@
         "budgetBand": "very_high",
         "budgetLimit": 5200
       },
-      "reputation": {
-        "scope": "per_player_and_crew",
-        "initialValue": 0
+      "relationship": {
+        "provider": "schedule_i_native",
+        "initialization": "use_native_default"
       },
       "scheduleId": "sime.schedule.ridgeview.research_day"
     },
@@ -174,9 +174,9 @@
         "budgetBand": "very_high",
         "budgetLimit": 9000
       },
-      "reputation": {
-        "scope": "per_player_and_crew",
-        "initialValue": 0
+      "relationship": {
+        "provider": "schedule_i_native",
+        "initialization": "use_native_default"
       },
       "scheduleId": "sime.schedule.lakeside.investor_afternoon"
     },
@@ -200,9 +200,9 @@
         "budgetBand": "medium",
         "budgetLimit": 2800
       },
-      "reputation": {
-        "scope": "per_player_and_crew",
-        "initialValue": 0
+      "relationship": {
+        "provider": "schedule_i_native",
+        "initialization": "use_native_default"
       },
       "scheduleId": "sime.schedule.lakeside.marina_morning"
     },
@@ -226,9 +226,9 @@
         "budgetBand": "medium",
         "budgetLimit": 1650
       },
-      "reputation": {
-        "scope": "per_player_and_crew",
-        "initialValue": 0
+      "relationship": {
+        "provider": "schedule_i_native",
+        "initialization": "use_native_default"
       },
       "scheduleId": "sime.schedule.lakeside.restaurant_evening"
     }
