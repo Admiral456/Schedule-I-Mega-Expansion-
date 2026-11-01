@@ -12,4 +12,10 @@
 
 The method does not create a persistent order or change inventory or money. The host must still validate the request, assign an order ID/deadline, reserve or decrement stock transactionally, persist it and replicate it to the co-op client.
 
+## Runtime boundary: native customers own native contracts
+
+Ordinary in-world customer offers and contracts must be created and progressed by Schedule I's native `NPCCustomer` component (for example its native offer path and contract events). This generator is not a replacement for `NPCCustomer`, does not create a vanilla customer contract and must not be used to simulate one in parallel.
+
+Keep this deterministic domain generator for unit tests, simulations and expansion-only remote/online order rules that the native customer workflow does not provide. When a profile is bound to a real game NPC, the adapter should configure native customer defaults/affinities and let the game's own customer component decide and own the in-world offer, contract, delivery and relationship lifecycle. Any expansion-only online order must be visibly separated from native in-world customer contracts and use its own ledger/transaction IDs.
+
 Default caps: 3 unique product lines, up to 3 units per product. These are safe prototype defaults; balancing should move to configuration after the Schedule I economy/item adapter exists.
