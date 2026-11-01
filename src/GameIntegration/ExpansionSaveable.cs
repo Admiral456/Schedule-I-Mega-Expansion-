@@ -216,11 +216,139 @@ public sealed class ExpansionSaveable : Saveable
         return TryReplaceWorldState(updated.Data, network);
     }
 
+    public bool TryGetProcessedOrderRequest(string requestId, string requestFingerprint, out ExpansionOrderRecord? order, out bool fingerprintConflict)
+    {
+        order = null;
+        fingerprintConflict = false;
+        if (string.IsNullOrWhiteSpace(requestId) || string.IsNullOrWhiteSpace(requestFingerprint) ||
+            _document?.Data is null || _document.Data.ProcessedOrderRequests is null || _document.Data.Orders is null)
+            return false;
+
+        if (!_document.Data.ProcessedOrderRequests.TryGetValue(requestId, out ExpansionProcessedOrderRequest? processed))
+            return false;
+        if (!string.Equals(processed.RequestFingerprint, requestFingerprint, StringComparison.Ordinal))
+        {
+            fingerprintConflict = true;
+            return true;
+        }
+        if (!_document.Data.Orders.TryGetValue(processed.OrderId, out ExpansionOrderRecord? savedOrder))
+        {
+            fingerprintConflict = true;
+            return true;
+        }
+
+        order = JsonSerializer.Deserialize<ExpansionOrderRecord>(
+            JsonSerializer.Serialize(savedOrder, JsonOptions), JsonOptions);
+        return order is not null;
+    }
+
+    /// <summary>
+    /// Commits the shop ledger, reserved stock, escrow balance, order and idempotency
+    /// receipt under one host save revision. A rejected game-save request restores the
+    /// previous in-memory document.
+    /// </summary>
+    public bool TryCommitNpcOrderTransaction(
+        ShopPurchaseService service,
+        NpcOrderDraft draft,
+        long expectedWorldRevision,
+        SteamNetworkClient? network)
+    {
+        if (service is null || draft is null || !IsAuthoritativeHost(network) ||
+            IsReadOnly || !IsLoaded || _document is null ||
+            expectedWorldRevision != _document.WorldRevision ||
+            !StableId.HasPrefix(draft.OrderId, StableId.OrderPrefix) ||
+            string.IsNullOrWhiteSpace(draft.RequestId) ||
+            string.IsNullOrWhiteSpace(draft.RequestFingerprint) ||
+            !StableId.HasPrefix(draft.CustomerId, StableId.NpcPrefix) ||
+            !StableId.HasPrefix(draft.ProvinceId, StableId.ProvincePrefix) ||
+            !StableId.HasPrefix(draft.ShopId, StableId.BusinessPrefix) ||
+            draft.TotalPrice <= 0 || draft.Items is null || draft.Items.Count == 0 ||
+            !string.Equals(draft.Status, "offered", StringComparison.Ordinal))
+            return false;
+
+        long verifiedTotal = 0;
+        try
+        {
+            foreach (NpcOrderDraftLine line in draft.Items)
+            {
+                if (line is null || string.IsNullOrWhiteSpace(line.ProductId) ||
+                    line.Quantity <= 0 || line.UnitPrice <= 0)
+                    return false;
+                verifiedTotal = checked(verifiedTotal + checked(line.UnitPrice * line.Quantity));
+            }
+        }
+        catch (OverflowException)
+        {
+            return false;
+        }
+        if (verifiedTotal != draft.TotalPrice)
+            return false;
+
+        ExpansionSaveDocument? updated = GetDocumentSnapshot();
+        if (updated is null || updated.WorldRevision != expectedWorldRevision || updated.Data is null)
+            return false;
+
+        updated.Data.Orders ??= new Dictionary<string, ExpansionOrderRecord>(StringComparer.Ordinal);
+        updated.Data.ProcessedOrderRequests ??= new Dictionary<string, ExpansionProcessedOrderRequest>(StringComparer.Ordinal);
+        updated.Data.ProcessedRequestIds ??= new HashSet<string>(StringComparer.Ordinal);
+        if (updated.Data.Orders.ContainsKey(draft.OrderId) ||
+            updated.Data.ProcessedOrderRequests.ContainsKey(draft.RequestId))
+            return false;
+
+        var validator = new ShopPurchaseService();
+        if (!validator.TryRestoreSnapshot(service.CreateSnapshot()))
+            return false;
+
+        var record = new ExpansionOrderRecord
+        {
+            RequestId = draft.RequestId,
+            RequesterId = draft.RequesterId,
+            CustomerId = draft.CustomerId,
+            ProvinceId = draft.ProvinceId,
+            ShopId = draft.ShopId,
+            BuyerAccountId = draft.BuyerAccountId,
+            EscrowAccountId = draft.EscrowAccountId,
+            Status = draft.Status,
+            Items = draft.Items.Select(item => new ExpansionOrderLine
+            {
+                ProductId = item.ProductId,
+                Quantity = item.Quantity,
+                UnitPrice = item.UnitPrice
+            }).ToList(),
+            DeadlineWorldTime = draft.DeadlineUnixSeconds,
+            CreatedAtUnixSeconds = draft.CreatedAtUnixSeconds,
+            WorldInterval = draft.WorldInterval,
+            TotalPrice = draft.TotalPrice,
+            Reward = draft.TotalPrice,
+            AcceptanceScore = draft.AcceptanceScore,
+            Version = 1
+        };
+
+        updated.Data.ShopPurchaseState = validator.CreateSnapshot();
+        updated.Data.Orders.Add(draft.OrderId, record);
+        updated.Data.ProcessedOrderRequests.Add(draft.RequestId, new ExpansionProcessedOrderRequest
+        {
+            RequestFingerprint = draft.RequestFingerprint,
+            OrderId = draft.OrderId
+        });
+        updated.Data.ProcessedRequestIds.Add(draft.RequestId);
+
+        ExpansionSaveDocument previousDocument = _document;
+        string previousRawDocument = _rawDocument;
+        if (!TryReplaceWorldState(updated.Data, network))
+            return false;
+        if (RequestHostSave(network))
+            return true;
+
+        _document = previousDocument;
+        _rawDocument = previousRawDocument;
+        return false;
+    }
+
     public bool RequestHostSave(SteamNetworkClient? network)
     {
         if (!IsAuthoritativeHost(network) || IsReadOnly || _document is null)
             return false;
-
         return Saveable.RequestGameSave();
     }
 
@@ -269,22 +397,39 @@ public sealed class ExpansionWorldState
     public Dictionary<string, ExpansionOrderRecord> Orders { get; set; } = new(StringComparer.Ordinal);
     public Dictionary<string, Dictionary<string, int>> ShopStockByInventoryId { get; set; } = new(StringComparer.Ordinal);
     public HashSet<string> ProcessedRequestIds { get; set; } = new(StringComparer.Ordinal);
+    public Dictionary<string, ExpansionProcessedOrderRequest> ProcessedOrderRequests { get; set; } = new(StringComparer.Ordinal);
     public ShopPurchaseServiceSnapshot? ShopPurchaseState { get; set; }
 }
 
 public sealed class ExpansionOrderRecord
 {
+    public string RequestId { get; set; } = string.Empty;
+    public string RequesterId { get; set; } = string.Empty;
     public string CustomerId { get; set; } = string.Empty;
     public string ProvinceId { get; set; } = string.Empty;
+    public string ShopId { get; set; } = string.Empty;
+    public string BuyerAccountId { get; set; } = string.Empty;
+    public string EscrowAccountId { get; set; } = string.Empty;
     public string Status { get; set; } = "offered";
     public List<ExpansionOrderLine> Items { get; set; } = new();
     public long? DeadlineWorldTime { get; set; }
+    public long CreatedAtUnixSeconds { get; set; }
+    public long WorldInterval { get; set; }
+    public long TotalPrice { get; set; }
     public long Reward { get; set; }
+    public int AcceptanceScore { get; set; }
     public long Version { get; set; } = 1;
+}
+
+public sealed class ExpansionProcessedOrderRequest
+{
+    public string RequestFingerprint { get; set; } = string.Empty;
+    public string OrderId { get; set; } = string.Empty;
 }
 
 public sealed class ExpansionOrderLine
 {
     public string ProductId { get; set; } = string.Empty;
     public int Quantity { get; set; }
+    public long UnitPrice { get; set; }
 }
