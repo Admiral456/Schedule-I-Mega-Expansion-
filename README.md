@@ -36,7 +36,7 @@ The host order pipeline now includes expansion-side customer budgets, escrow set
 - SteamNetworkLib 1.6.0 — Steam lobby and typed P2P.
 - .NET 6.0 game-facing IL2CPP target.
 
-See docs/FRAMEWORK_INTEGRATION.md, docs/PHONE_APP_IMPLEMENTATION.md, docs/SHOP_PURCHASE_SNAPSHOTS.md and docs/COMPATIBILITY_AND_DEPENDENCIES.md.
+See docs/FRAMEWORK_INTEGRATION.md, docs/PHONE_APP_IMPLEMENTATION.md, docs/NPC_ORDER_TRANSACTIONS.md, docs/GAME_ECONOMY_ADAPTER.md, docs/SHOP_PURCHASE_SNAPSHOTS.md and docs/COMPATIBILITY_AND_DEPENDENCIES.md.
 
 ## CI
 GitHub Actions validates data registries and runs game-independent domain tests. Game-facing integration requires local Schedule I IL2CPP assemblies and installed dependencies.
