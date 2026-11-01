@@ -38,7 +38,7 @@ public sealed record CustomerAcceptanceResult(
 
 /// <summary>
 /// Deterministic NPC order evaluation. Each profile supplies its own budget and
-/// product preferences; the current player-specific reputation is provided by the caller.
+/// product preferences; an optional expansion-specific standing modifier is provided by the caller. It is not the native NPC relationship.
 /// This class contains no game or Steam dependencies.
 /// </summary>
 public static class NpcCustomerAcceptance
@@ -56,7 +56,7 @@ public static class NpcCustomerAcceptance
     public static CustomerAcceptanceResult Evaluate(
         NpcCustomerProfile? profile,
         CustomerOrderOffer? offer,
-        int playerReputation)
+        int expansionStanding)
     {
         if (!IsValidProfile(profile))
             return Invalid(CustomerAcceptanceReason.InvalidProfile);
@@ -129,13 +129,13 @@ public static class NpcCustomerAcceptance
             profile.PriceSensitivity * budgetUse * MaximumPricePenalty,
             MidpointRounding.AwayFromZero);
 
-        int clampedReputation = Math.Clamp(playerReputation, ReputationLedger.Minimum, ReputationLedger.Maximum);
-        int reputationModifier = (int)Math.Round(
-            clampedReputation * ReputationScale,
+        int clampedStanding = Math.Clamp(expansionStanding, ReputationLedger.Minimum, ReputationLedger.Maximum);
+        int standingModifier = (int)Math.Round(
+            clampedStanding * ReputationScale,
             MidpointRounding.AwayFromZero);
 
         int score = Math.Clamp(
-            BaseScore + preferredBonus + neutralBonus - pricePenalty + reputationModifier,
+            BaseScore + preferredBonus + neutralBonus - pricePenalty + standingModifier,
             0,
             100);
 
