@@ -475,7 +475,28 @@ public sealed class ExpansionSaveable : Saveable
             operationId);
 
         if (!settlement.Success || settlement.LedgerResult is null)
+        {
+            // Persist the first failed operation receipt too. A retry after a restart
+            // must replay the same failure instead of applying a different outcome.
+            ShopEscrowOperationResult failedReceipt = settlement.LedgerResult;
+            if (failedReceipt.IsReplay ||
+                failedReceipt.Outcome == ShopEscrowOperationOutcome.OperationIdConflict)
+            {
+                return false;
+            }
+
+            updated.Data.ShopPurchaseState = economy.CreateSnapshot();
+            ExpansionSaveDocument previousFailureDocument = _document;
+            string previousFailureRawDocument = _rawDocument;
+            if (!TryReplaceWorldState(updated.Data, network))
+                return false;
+            if (RequestHostSave(network))
+                return false;
+
+            _document = previousFailureDocument;
+            _rawDocument = previousFailureRawDocument;
             return false;
+        }
 
         order.Status = targetStatus.ToString().ToLowerInvariant();
         order.Version++;
