@@ -242,7 +242,7 @@ namespace ScheduleIMegaExpansion.Runtime
 
             SetProperty(transform, "localPosition", NewVector3(x, y, z));
             SetProperty(transform, "localScale", NewVector3(sx, sy, sz));
-            SetProperty(transform, "localRotation", GetStaticProperty(_quaternionType!, "identity"));
+            SetProperty(transform, "localRotation", NewYawQuaternion(0f));
             SetMaterialColor(cube, r, g, b);
         }
 
