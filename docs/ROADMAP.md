@@ -13,9 +13,9 @@
 2. Map the persistent order escrow to actual Schedule I player cash settlement and item inventory delivery APIs.
 3. Seed Portside Supply from real Schedule I item definitions and verify physical/online stock consistency.
 4. Connect one real NPC profile and generated order to a spawned NPC identity and in-game schedule.
-5. Add escrow settlement/refund for completed, cancelled and expired orders.
+5. Bind completed-order revenue settlement to real Schedule I cash, and bind refunds to actual item/restock APIs where required.
 6. Integrate one physical shop and one Realtor listing.
-7. Run a two-player request/replay/restart/reconnect test and implement late-join order snapshots.
+7. Run a two-player request/replay/finalize/restart/reconnect test and implement late-join order snapshots.
 ## World construction
 - Survey vanilla world bounds and candidate exits in-game.
 - Build Harborline as a greybox first, including road/terrain/colliders.
