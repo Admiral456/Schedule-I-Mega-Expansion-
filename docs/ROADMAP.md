@@ -7,17 +7,27 @@
 - Native S1API phone navigation shell.
 - S1API per-slot Saveable adapter scaffold.
 - SteamNetworkLib initialization and protocol compatibility handshake.
+- Native-system reuse audit: `NATIVE_SYSTEM_REUSE_AUDIT.md`.
 
-## First integrated vertical slice
-1. Compile the game-facing project against the exact local IL2CPP dependency set and verify the host request/result handlers in a live co-op lobby.
-2. Map the persistent order escrow to actual Schedule I player cash settlement and item inventory delivery APIs.
-3. Seed Portside Supply from real Schedule I item definitions and verify physical/online stock consistency.
-4. Connect one real NPC profile and generated order to a spawned NPC identity and in-game schedule.
-5. Bind completed-order revenue settlement to real Schedule I cash, and bind refunds to actual item/restock APIs where required.
-6. Integrate one physical shop and one Realtor listing.
-7. Run a two-player request/replay/finalize/restart/reconnect test and implement late-join order snapshots.
+## First native gameplay vertical slice
+1. Compile the game-facing project against the exact local Schedule I IL2CPP assemblies, S1API 3.2.2 and SteamNetworkLib binaries. Documentation review is not a build result.
+2. Spawn or bind one expansion resident to the native NPC lifecycle and native `NPCCustomer` component. Use `WithCustomerDefaults`, native product affinities/preferences, native budget/standards and native schedule/relationship behavior where available.
+3. Verify the native customer offer/contract path, product request and delivery events, relationship progression, save/load and two-player late join. Do not call `NpcOrderOfferGenerator` to create a parallel in-world customer contract.
+4. Add one competing dealer through native `NPCDealer` using the correct `DealerType` (for example `RivalDealer`) and verify its native contracts, recommendations, cash and unlock lifecycle.
+5. Evaluate one native `NPCSupplier` for wholesale replenishment. Reuse its shop, stash, meeting and delivery flow where it fits; do not confuse supplier logistics with the Portside public retail shop.
+6. Verify the live item definition, cash, inventory debit/delivery, storage quantity and save/reload compensation path before enabling any Portside checkout or expansion online purchase.
+7. Integrate a physical expansion business through the original property/Business/Realtor lifecycle only after registration and purchase are proven on a copied save.
+8. Enumerate loaded vanilla police routes and validate `LawManager`/ `LawController` behavior before adding new-province patrol routes or checkpoint triggers. Law intensity is global; do not use it as a local province toggle.
+9. Run two-player spawn/request/contract/complete/restart/reconnect tests and implement expansion-specific late-join snapshots only for the state that is not already synchronized by the game's native systems.
+
+## Expansion-only systems
+- Keep Hyland Network for province directory, expansion-specific online services, business overview and cross-province information not already represented by the native phone.
+- Keep the custom order domain/escrow only for expansion-only remote/online order rules. Native customer contracts, supplier deliveries, player cash and physical inventory remain owned by the game adapters.
+- Keep separate reputation only for faction/crew/product-specific standing that native NPC relationships do not represent.
+- Add new item definitions only for genuinely new expansion products; reuse vanilla item IDs and definitions elsewhere.
+
 ## World construction
-- Survey vanilla world bounds and candidate exits in-game.
-- Build Harborline as a greybox first, including road/terrain/colliders.
-- Validate vehicle and pedestrian navigation.
-- Only after the first province works, build Ridgeview and Lakeside using the shared systems.
+- Survey vanilla world bounds, elevations, existing POIs, police stations, road graph, navigation and candidate exits in-game.
+- Build Harborline as a greybox first, including road/terrain/colliders; validate native pedestrian and vehicle AI before population.
+- Add Ridgeview and Lakeside only after shared geometry, save, navigation and native NPC integration are proven.
+- Use native police patrol route objects where possible; create new route content only when the map/navigation spike proves it safe.
