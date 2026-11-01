@@ -125,15 +125,15 @@ public sealed class HylandNetworkPhoneApp : PhoneApp
 
         AddCard("WORLD REVISION", snapshot.WorldRevision.ToString());
         AddCard("ACTIVE PROVINCES", snapshot.Data.EnabledProvinceIds.Count.ToString());
-        AddCard("OPEN ORDERS", snapshot.Data.Orders.Values.Count(order =>
+        AddCard("OPEN EXPANSION ORDERS", snapshot.Data.Orders.Values.Count(order =>
             !string.Equals(order.Status, "completed", StringComparison.OrdinalIgnoreCase) &&
             !string.Equals(order.Status, "cancelled", StringComparison.OrdinalIgnoreCase)).ToString());
-        AddCard("OWNED BUSINESSES", snapshot.Data.BusinessOwners.Count.ToString());
+        AddCard("OWNED EXPANSION BUSINESSES", snapshot.Data.BusinessOwners.Count.ToString());
     }
 
     private void BuildContacts()
     {
-        AddCard("RESIDENT NETWORK", "Nine named expansion residents have individual budgets, price sensitivity, product preferences and availability windows. Profiles are ready for runtime NPC binding; live spawned-NPC linking is still pending.");
+        AddCard("RESIDENT NETWORK", "Nine expansion resident profiles are defined with individual preferences, budgets, price sensitivity and availability. When the residents are bound to live NPCs, Schedule I's native Customer component will own ordinary in-world offers and contracts. This directory does not create duplicate customer contracts.");
 
         foreach (NpcCustomerDirectoryEntry resident in NpcCustomerDirectory.All)
         {
@@ -150,35 +150,12 @@ public sealed class HylandNetworkPhoneApp : PhoneApp
                 "\nAvoids: " + avoided;
 
             AddCard(resident.DisplayName.ToUpperInvariant(), body);
-            AddOrderRequestButton(resident);
         }
-    }
-
-    private void AddOrderRequestButton(NpcCustomerDirectoryEntry resident)
-    {
-        if (_content == null)
-            return;
-
-        string safeId = resident.Profile.NpcId.Replace(".", "_", StringComparison.Ordinal);
-        var (_, button, _) = UIFactory.RoundedButtonWithLabel(
-            "RequestNpcOrder_" + safeId,
-            "REQUEST CUSTOMER ORDER",
-            _content,
-            new Color(0.08f, 0.20f, 0.28f, 1f),
-            190, 34, 11, Color.white);
-
-        ButtonUtils.AddListener(button, () =>
-        {
-            ScheduleINetworkBootstrap? bootstrap = ScheduleINetworkBootstrap.Instance;
-            if (bootstrap is not null)
-                _ = bootstrap.RequestNpcOrderAsync(
-                    resident.Profile.NpcId,
-                    "sime.business.harborline.portside_supply");
-        });
     }
 
     private void BuildOrders()
     {
+        AddCard("EXPANSION ORDER STATUS", "This page shows only expansion-side orders persisted by the Mega Expansion host ledger. It does not replace Schedule I's native customer contract and delivery interfaces.");
         ExpansionSaveDocument? snapshot = ExpansionSaveable.Instance?.GetDocumentSnapshot();
         var renderedOrderIds = new HashSet<string>(StringComparer.Ordinal);
         int rendered = 0;
@@ -191,7 +168,7 @@ public sealed class HylandNetworkPhoneApp : PhoneApp
                 string items = string.Join("\n", order.Items.Select(item => item.ProductId + "  x" + item.Quantity));
                 AddCard(entry.Key, order.Status.ToUpperInvariant() + "  /  " + order.ProvinceId +
                     "\nCustomer: " + order.CustomerId +
-                    "\nEscrowed payment: $" + order.TotalPrice +
+                    "\nExpansion escrow: $" + order.TotalPrice +
                     "\n" + items);
                 renderedOrderIds.Add(entry.Key);
                 rendered++;
@@ -206,37 +183,37 @@ public sealed class HylandNetworkPhoneApp : PhoneApp
             string items = string.Join("\n", order.Items.Select(item => item.ProductId + "  x" + item.Quantity));
             AddCard(order.OrderId, order.Status.ToUpperInvariant() + "  /  " + order.ProvinceId +
                 "\nCustomer: " + order.CustomerId +
-                "\nEscrowed payment: $" + order.TotalPrice +
+                "\nExpansion escrow: $" + order.TotalPrice +
                 "\n" + items);
             rendered++;
         }
 
         if (rendered == 0)
         {
-            AddCard("NO ORDERS YET", snapshot is null
-                ? "The expansion save has not loaded. Host-confirmed orders will appear here."
-                : "No NPC customer orders have been committed yet. Request one from Contacts after shop stock is registered.");
+            AddCard("NO EXPANSION ORDERS", snapshot is null
+                ? "The expansion save has not loaded. Native Schedule I customer contracts remain in the game's own interface."
+                : "No expansion online orders have been committed. Native in-world customer offers are handled by Schedule I.");
         }
     }
 
     private void BuildShop()
     {
-        AddCard("PORTSIDE SUPPLY", "The online catalogue will use the same inventory ID and price authority as the physical shop.");
-        AddCard("CHECKOUT STATUS", "Purchases are disabled until host-authoritative checkout is connected to Schedule I cash, item delivery and persistent stock.");
-        AddCard("DELIVERY", "Pickup and delivery are planned fulfilment methods. This prototype screen does not place orders.");
+        AddCard("PORTSIDE SUPPLY", "The online catalogue will use the same item IDs and authoritative prices as its physical shop. Existing Schedule I item and shop definitions are reused wherever possible.");
+        AddCard("CHECKOUT STATUS", "Purchases remain disabled until host-authoritative checkout is connected to verified Schedule I cash, inventory delivery and persistent physical stock operations.");
+        AddCard("DELIVERY", "Native supplier and delivery flows will be reused for wholesale replenishment where they fit. This prototype screen does not create a second delivery vehicle system or place orders.");
     }
 
     private void BuildBusinesses()
     {
         ExpansionSaveDocument? snapshot = ExpansionSaveable.Instance?.GetDocumentSnapshot();
-        AddCard("REALTOR INTEGRATION", "Every purchasable expansion business must be registered in the vanilla Realtor flow. The runtime adapter is still pending.");
+        AddCard("REALTOR INTEGRATION", "Expansion businesses must use the existing Schedule I property and Realtor flow. Native property/business wrappers are being inspected; no parallel purchase menu is enabled.");
         if (snapshot == null || snapshot.Data.BusinessOwners.Count == 0)
         {
             AddCard("OWNERSHIP", "No expansion business ownership records are saved yet.");
             return;
         }
         foreach (var entry in snapshot.Data.BusinessOwners.OrderBy(pair => pair.Key, StringComparer.Ordinal))
-            AddCard(entry.Key, "Owner: " + entry.Value);
+            AddCard(entry.Key, "Expansion owner record: " + entry.Value);
     }
 
     private void BuildMap()
