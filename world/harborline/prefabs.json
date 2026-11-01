@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "status": "empty-until-runtime-survey",
+  "purpose": "Registry of exact Schedule I prefabs and meshes verified in the current game build.",
+  "entries": [],
+  "rules": [
+    "Record exact asset names from runtime discovery; do not guess names.",
+    "Check for NetworkObject before choosing an instantiation path.",
+    "Use server-side network spawning for interactive networked prefabs.",
+    "Use InteriorBuilder or mesh references for static decoration."
+  ],
+  "documentedExamplesToVerify": [
+    { "name": "ATM", "networked": true },
+    { "name": "ModularSwitch", "networked": true },
+    { "name": "SlidingDoors", "networked": true },
+    { "name": "Door", "networked": true },
+    { "name": "Storage", "networked": true }
+  ]
+}
