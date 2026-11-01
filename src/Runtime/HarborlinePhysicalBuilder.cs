@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -9,12 +10,12 @@ using MelonLoader;
 namespace ScheduleIMegaExpansion.Runtime
 {
     /// <summary>
-    /// Builds a first physical Harborline dockyard slice from Unity primitives.
-    /// Every block is a real GameObject with a MeshRenderer and primitive collider.
-    /// The slice is deliberately placed from a player-captured anchor instead of
-    /// guessing world coordinates from a 2D map.
+    /// Automatically builds a first physical Harborline dockyard slice.
+    /// The location is anchored to the native Docks Warehouse property position,
+    /// then selected from nearby flat, ground-collidable and unoccupied patches.
+    /// No player hotkey or user-supplied coordinates are required.
     ///
-    /// This is a geometry milestone, not yet a native registered Building/Property.
+    /// This remains a geometry milestone, not yet a native registered Building/Property.
     /// It is intentionally disabled in multiplayer until network spawning is added.
     /// </summary>
     internal static class HarborlinePhysicalBuilder
@@ -42,75 +43,67 @@ namespace ScheduleIMegaExpansion.Runtime
             public float Yaw { get; }
         }
 
+        private static int _placementAttempts;
+        private static bool _reportedMissingDocksAnchor;
+        private static bool _reportedNoClearSite;
+        private static string? _selectedPlacement;
+
         public static void ResetForNewSave()
         {
             _built = false;
             _rootTransform = null;
+            _placementAttempts = 0;
+            _reportedMissingDocksAnchor = false;
+            _reportedNoClearSite = false;
+            _selectedPlacement = null;
         }
 
-        public static void CaptureAnchor(string outputDirectory, Action<string> log, Action<string> warn)
-        {
-            try
-            {
-                if (!TryGetCameraPose(out Anchor anchor))
-                    throw new InvalidOperationException("Main camera is not available. Load into the playable world first.");
-
-                Directory.CreateDirectory(outputDirectory);
-                string path = Path.Combine(outputDirectory, "harborline-anchor.json");
-                var payload = new
-                {
-                    schemaVersion = 1,
-                    capturedUtc = DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture),
-                    source = "Main camera position; floor height approximated by cameraY - 1.6m",
-                    nativeRegionTarget = "Docks",
-                    x = anchor.X,
-                    y = anchor.Y,
-                    z = anchor.Z,
-                    rotationY = anchor.Yaw,
-                    note = "Capture while standing at the intended Harborline connection point inside Docks. This is a measured in-game anchor, not an inferred map coordinate."
-                };
-
-                File.WriteAllText(path, JsonSerializer.Serialize(payload, new JsonSerializerOptions { WriteIndented = true }));
-                log("Harborline anchor captured at X=" + F(anchor.X) + " Y=" + F(anchor.Y) + " Z=" + F(anchor.Z) + " yaw=" + F(anchor.Yaw));
-                log("Anchor file: " + path);
-            }
-            catch (Exception ex)
-            {
-                warn("Could not capture Harborline anchor: " + ex.Message);
-            }
-        }
-
-        public static void BuildPhysicalSlice(string outputDirectory, Action<string> log, Action<string> warn)
+        public static bool TryAutoGenerate(string gameRoot, Action<string> log, Action<string> warn)
         {
             if (_built)
-            {
-                warn("Harborline physical slice is already built in this session. Reload the save before rebuilding.");
-                return;
-            }
+                return true;
 
+            _placementAttempts++;
             try
             {
                 if (IsMultiplayerSession())
                 {
-                    warn("Physical prototype is currently single-player only. No unsynchronized world geometry was spawned.");
-                    return;
+                    if (_placementAttempts == 1)
+                        warn("Harborline auto-generation is disabled in multiplayer until all geometry is spawned through the host network.");
+                    return false;
                 }
 
-                Anchor anchor;
-                string anchorPath = Path.Combine(outputDirectory, "harborline-anchor.json");
-                if (!TryReadAnchor(anchorPath, out anchor))
+                if (FindExistingRoot())
                 {
-                    if (!TryGetCameraPose(out anchor))
-                        throw new InvalidOperationException("No anchor file and no playable main camera. Press F6 in the target Docks location first.");
-                    warn("No saved anchor was found; using the current player-facing direction as a temporary prototype anchor.");
+                    _built = true;
+                    log("Existing Harborline world root found; skipped duplicate generation.");
+                    return true;
+                }
+
+                if (!TryFindDocksWarehouseAnchor(out Anchor docksAnchor))
+                {
+                    if (!_reportedMissingDocksAnchor)
+                    {
+                        _reportedMissingDocksAnchor = true;
+                        warn("Waiting for the native Docks Warehouse property position. Harborline will build automatically when the property registry is ready.");
+                    }
+                    return false;
                 }
 
                 EnsureUnityTypes();
-                CreateRoot(anchor, out object rootObject, out object rootTransform);
+                if (!TryFindClearPlacement(docksAnchor, out Anchor placement))
+                {
+                    if (!_reportedNoClearSite)
+                    {
+                        _reportedNoClearSite = true;
+                        warn("Docks Warehouse was found, but no safe flat unoccupied ground patch was found in the nearby search radius. No geometry was placed.");
+                    }
+                    return false;
+                }
+
+                CreateRoot(placement, out object rootObject, out object rootTransform);
                 _rootTransform = rootTransform;
 
-                // The center is intentionally offset forward so the player does not
-                // spawn inside the footprint when capturing the anchor.
                 Add("Dockyard ground slab", 0f, -0.28f, 0f, 54f, 0.55f, 28f, 0.34f, 0.36f, 0.37f);
                 Add("Quayside asphalt road", 10.4f, 0.035f, 0f, 6.2f, 0.07f, 28f, 0.12f, 0.13f, 0.14f);
                 Add("Road edge line left", 7.15f, 0.09f, 0f, 0.12f, 0.025f, 27f, 0.85f, 0.78f, 0.46f);
@@ -124,9 +117,25 @@ namespace ScheduleIMegaExpansion.Runtime
                 BuildQuay();
 
                 _built = true;
-                log("Harborline physical dockyard slice spawned. Real Unity GameObjects, visible meshes and primitive colliders were created.");
+                Directory.CreateDirectory(Path.Combine(gameRoot, "UserData", "ScheduleIMegaExpansion", "Harborline"));
+                File.WriteAllText(
+                    Path.Combine(gameRoot, "UserData", "ScheduleIMegaExpansion", "Harborline", "last-generation.json"),
+                    JsonSerializer.Serialize(new
+                    {
+                        generatedUtc = DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture),
+                        anchorSource = "S1API.Property.PropertyManager Docks Warehouse ExteriorSpawnPosition",
+                        nativeRegion = "Docks",
+                        x = placement.X,
+                        y = placement.Y,
+                        z = placement.Z,
+                        rotationY = placement.Yaw,
+                        root = RootName,
+                        placement = _selectedPlacement
+                    }, new JsonSerializerOptions { WriteIndented = true }));
+                log("Harborline generated automatically from the native Docks Warehouse property anchor.");
+                log("Physical slice spawned at X=" + F(placement.X) + " Y=" + F(placement.Y) + " Z=" + F(placement.Z) + " yaw=" + F(placement.Yaw));
                 log("Created under root object: " + RootName);
-                log("This first slice is physical geometry only; native building/property/shop registration, doors, NPCs and multiplayer replication are separate implementation stages.");
+                log("This stage is physical geometry only; native property/shop registration, doors, NPCs and multiplayer replication remain separate implementation stages.");
             }
             catch (Exception ex)
             {
@@ -250,7 +259,7 @@ namespace ScheduleIMegaExpansion.Runtime
         {
             rootObject = Activator.CreateInstance(_gameObjectType!, new object[] { RootName })!;
             rootTransform = GetProperty(rootObject, "transform")!;
-            SetProperty(rootTransform, "position", NewVector3(anchor.X + ForwardX(anchor.Yaw) * 22f, anchor.Y, anchor.Z + ForwardZ(anchor.Yaw) * 22f));
+            SetProperty(rootTransform, "position", NewVector3(anchor.X, anchor.Y, anchor.Z));
             SetProperty(rootTransform, "rotation", NewYawQuaternion(anchor.Yaw));
         }
 
@@ -277,64 +286,23 @@ namespace ScheduleIMegaExpansion.Runtime
             return method.Invoke(gameObject, new object[] { componentType })!;
         }
 
-        private static bool TryGetCameraPose(out Anchor anchor)
-        {
-            anchor = default;
-            Type? cameraType = FindType("UnityEngine.Camera");
-            if (cameraType == null)
-                return false;
-
-            object? camera = GetStaticProperty(cameraType, "main");
-            if (camera == null)
-                return false;
-
-            object? transform = GetProperty(camera, "transform");
-            if (transform == null)
-                return false;
-
-            object? position = GetProperty(transform, "position");
-            object? euler = GetProperty(transform, "eulerAngles");
-            if (position == null || euler == null)
-                return false;
-
-            float x = ReadFloat(position, "x");
-            float y = ReadFloat(position, "y") - 1.6f;
-            float z = ReadFloat(position, "z");
-            float yaw = ReadFloat(euler, "y");
-            anchor = new Anchor(x, y, z, yaw);
-            return true;
-        }
-
-        private static bool TryReadAnchor(string path, out Anchor anchor)
-        {
-            anchor = default;
-            if (!File.Exists(path))
-                return false;
-
-            using JsonDocument document = JsonDocument.Parse(File.ReadAllText(path));
-            JsonElement root = document.RootElement;
-            anchor = new Anchor(
-                root.GetProperty("x").GetSingle(),
-                root.GetProperty("y").GetSingle(),
-                root.GetProperty("z").GetSingle(),
-                root.GetProperty("rotationY").GetSingle());
-            return true;
-        }
-
         private static bool IsMultiplayerSession()
         {
             // Be conservative: any connected player list with more than one
             // participant means a local-only preview would desynchronize clients.
-            Type? playerType = FindType("Player");
+            Type? playerType = FindType("Il2CppScheduleOne.PlayerScripts.Player")
+                ?? FindType("ScheduleOne.PlayerScripts.Player")
+                ?? FindType("Player");
             if (playerType == null)
-                return false;
+                return true;
 
-            object? players = GetStaticProperty(playerType, "PlayerList");
+            object? players = GetStaticProperty(playerType, "PlayerList")
+                ?? playerType.GetField("PlayerList", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)?.GetValue(null);
             if (players == null)
-                return false;
+                return true;
 
-            object? count = GetProperty(players, "Count");
-            return count != null && Convert.ToInt32(count, CultureInfo.InvariantCulture) > 1;
+            object? count = GetMemberValue(players, "Count");
+            return count == null || Convert.ToInt32(count, CultureInfo.InvariantCulture) > 1;
         }
 
         private static void EnsureUnityTypes()
