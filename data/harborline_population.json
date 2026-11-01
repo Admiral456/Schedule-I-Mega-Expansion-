@@ -242,9 +242,18 @@
       "system": "native NPCCustomer affinity configuration",
       "runtimeCatalog": "DrugType enum values discovered from the installed S1API/game build",
       "assignmentAlgorithm": "save-seeded deterministic per-NPC affinity vectors with uniqueness enforced within the Harborline customer roster",
-      "favoriteAffinityRange": [0.70, 1.00],
-      "dislikeAffinityRange": [-1.00, -0.70],
-      "otherAffinityRange": [-0.45, 0.55],
+      "favoriteAffinityRange": [
+        0.7,
+        1
+      ],
+      "dislikeAffinityRange": [
+        -1,
+        -0.7
+      ],
+      "otherAffinityRange": [
+        -0.45,
+        0.55
+      ],
       "assignmentTiming": "once when the host initializes a new world/save roster, then persisted and synchronized",
       "notes": [
         "Do not use the expansion-only sime.product.batch.* order tiers as DrugType affinities.",
@@ -253,17 +262,21 @@
       ]
     },
     "appearance": {
-      "system": "S1API NPCAppearance.GenerateRandomAppearance followed by Appearance.Build",
+      "system": "S1API GenerateRandomAppearance plus the seeded NpcAppearanceProfileRandomizer overlay and Appearance.Build",
       "randomizationTiming": "once per NPC identity, not on every schedule tick",
       "required": [
-        "Generate appearance through the native S1API appearance pipeline.",
-        "Do not replace vanilla avatar systems with custom NPC meshes when a native avatar setting is available.",
-        "Use per-NPC stable identity and host-owned generation data so co-op peers resolve the same NPC prefab.",
-        "Before release, verify appearance persistence across save/load and ensure no duplicate appearance signature exists among Harborline NPCs.",
-        "Check whether a supported runtime AvatarSettings signature/readback is available before implementing automatic duplicate rejection."
+        "Call NPCAppearance.GenerateRandomAppearance() in the native OnCreated lifecycle.",
+        "Apply the NPC's deterministic NpcAppearanceProfile using documented native customization fields and layer APIs.",
+        "Call Appearance.Build() after the final appearance fields are applied.",
+        "Use one stable appearance profile per NPC ID and persist it with the host save; never reroll during update ticks or schedule changes.",
+        "Verify all selected native asset paths in the installed game build and compare rendered appearances in-game before release."
       ],
-      "publicApiLimit": "The documented NPCAppearance API exposes random generation and Build, but does not document a public appearance-signature readback or seeded GenerateRandomAppearance overload. Visual no-duplicate enforcement is therefore an explicit in-game integration gate, not yet a proven feature."
-    }
+      "publicApiLimit": "S1API exposes native random generation and explicit avatar fields/layers but no documented appearance-signature readback. The mod therefore prevents descriptor collisions within its own roster before applying them; visual collisions against vanilla or other mods must be inspected in-game.",
+      "assignmentAlgorithm": "SHA-256 save-seeded, per-NPC unique appearance descriptors across all 42 Harborline physical NPC IDs",
+      "uniquenessScope": "All expansion-owned appearance descriptors in the 42-person Harborline roster are unique; comparison against vanilla and third-party NPCs remains an in-game compatibility check",
+      "profileGenerator": "ScheduleIMegaExpansion.Core.NpcAppearanceProfileRandomizer"
+    },
+    "rosterFile": "data/harborline_npc_roster.json"
   },
   "releaseGates": [
     "Capture real world-space anchors, elevations, entrances and road connections in the target game build.",
@@ -272,6 +285,8 @@
     "Prove distinct randomized appearance settings remain stable after save/load and are not duplicated in the generated Harborline roster.",
     "Prove two native police patrol routes and all three checkpoint anchors without altering unrelated vanilla districts.",
     "Prove new property candidates through the original Realtor UI and native purchase lifecycle.",
-    "Record host/client performance at 5, 10, 16 and 20 simultaneously active NPCs."
+    "Record host/client performance at 5, 10, 16 and 20 simultaneously active NPCs.",
+    "Apply all 42 unique appearance profiles through the live S1API avatar wrapper and verify the selected asset paths render correctly.",
+    "Compare active Harborline appearance results against visible vanilla NPCs and other installed S1API NPC mods where the running API permits inspection."
   ]
 }
