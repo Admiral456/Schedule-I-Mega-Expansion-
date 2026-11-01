@@ -36,7 +36,17 @@
       "rotationY": null,
       "sourcePrefab": null,
       "interiorAnchor": null,
-      "surveyStatus": "not-surveyed"
+      "surveyStatus": "not-surveyed",
+      "purchasableThroughExistingRealtor": true,
+      "propertyListingGroup": "Harborline",
+      "commerce": {
+        "channels": [
+          "in-person",
+          "hyland-network-mobile"
+        ],
+        "inventorySource": "shared-native-shop-catalog",
+        "notes": "Mobile orders must reserve/decrement the same inventory as in-person purchases."
+      }
     },
     {
       "id": "harbor_freight_warehouse",
@@ -47,7 +57,9 @@
       "rotationY": null,
       "sourcePrefab": null,
       "interiorAnchor": null,
-      "surveyStatus": "not-surveyed"
+      "surveyStatus": "not-surveyed",
+      "purchasableThroughExistingRealtor": true,
+      "propertyListingGroup": "Harborline"
     },
     {
       "id": "harbor_market",
@@ -58,7 +70,16 @@
       "rotationY": null,
       "sourcePrefab": null,
       "interiorAnchor": null,
-      "surveyStatus": "not-surveyed"
+      "surveyStatus": "not-surveyed",
+      "purchasableThroughExistingRealtor": true,
+      "propertyListingGroup": "Harborline",
+      "commerce": {
+        "channels": [
+          "in-person",
+          "hyland-network-mobile"
+        ],
+        "inventorySource": "shared-native-market-catalog"
+      }
     },
     {
       "id": "harbor_auto_works",
@@ -69,7 +90,9 @@
       "rotationY": null,
       "sourcePrefab": null,
       "interiorAnchor": null,
-      "surveyStatus": "not-surveyed"
+      "surveyStatus": "not-surveyed",
+      "purchasableThroughExistingRealtor": true,
+      "propertyListingGroup": "Harborline"
     },
     {
       "id": "harbor_offices",
@@ -80,7 +103,9 @@
       "rotationY": null,
       "sourcePrefab": null,
       "interiorAnchor": null,
-      "surveyStatus": "not-surveyed"
+      "surveyStatus": "not-surveyed",
+      "purchasableThroughExistingRealtor": true,
+      "propertyListingGroup": "Harborline"
     },
     {
       "id": "harbor_power_plant",
@@ -91,7 +116,9 @@
       "rotationY": null,
       "sourcePrefab": null,
       "interiorAnchor": null,
-      "surveyStatus": "not-surveyed"
+      "surveyStatus": "not-surveyed",
+      "purchasableThroughExistingRealtor": true,
+      "propertyListingGroup": "Harborline"
     },
     {
       "id": "pier_promenade",
@@ -117,10 +144,77 @@
     }
   ],
   "environmentAnchors": [
-    { "id": "container_yard", "purpose": "Kontejnery a nákladní plocha", "position": null, "surveyStatus": "not-surveyed" },
-    { "id": "quay_cranes", "purpose": "Jeřáby, mola a lodní rampa", "position": null, "surveyStatus": "not-surveyed" },
-    { "id": "promenade_path", "purpose": "Trasa chodců a rybářů", "position": null, "surveyStatus": "not-surveyed" },
-    { "id": "truck_parking", "purpose": "Parkování a otočka nákladních vozidel", "position": null, "surveyStatus": "not-surveyed" },
-    { "id": "market_square", "purpose": "Veřejný prostor tržnice", "position": null, "surveyStatus": "not-surveyed" }
-  ]
+    {
+      "id": "container_yard",
+      "purpose": "Kontejnery a nákladní plocha",
+      "position": null,
+      "surveyStatus": "not-surveyed"
+    },
+    {
+      "id": "quay_cranes",
+      "purpose": "Jeřáby, mola a lodní rampa",
+      "position": null,
+      "surveyStatus": "not-surveyed"
+    },
+    {
+      "id": "promenade_path",
+      "purpose": "Trasa chodců a rybářů",
+      "position": null,
+      "surveyStatus": "not-surveyed"
+    },
+    {
+      "id": "truck_parking",
+      "purpose": "Parkování a otočka nákladních vozidel",
+      "position": null,
+      "surveyStatus": "not-surveyed"
+    },
+    {
+      "id": "market_square",
+      "purpose": "Veřejný prostor tržnice",
+      "position": null,
+      "surveyStatus": "not-surveyed"
+    }
+  ],
+  "policeInfrastructure": {
+    "system": "existing-game-police-and-crime-response",
+    "doNotCreateSeparatePoliceAi": true,
+    "checkpoints": [
+      {
+        "id": "checkpoint_harbor_entry",
+        "purpose": "Control vehicles entering from Docks",
+        "position": null,
+        "surveyStatus": "not-surveyed"
+      },
+      {
+        "id": "checkpoint_freight_road",
+        "purpose": "Random freight and cargo inspections",
+        "position": null,
+        "surveyStatus": "not-surveyed"
+      },
+      {
+        "id": "checkpoint_market_exit",
+        "purpose": "Patrol/spot checks near the market and promenade",
+        "position": null,
+        "surveyStatus": "not-surveyed"
+      }
+    ],
+    "patrolRoute": {
+      "id": "harborline_police_patrol",
+      "waypoints": [],
+      "surveyStatus": "not-surveyed"
+    }
+  },
+  "businessIntegration": {
+    "listingSystem": "existing-Realtor",
+    "customRealtorUi": false,
+    "purchasableSiteIds": [
+      "portside_supply",
+      "harbor_freight_warehouse",
+      "harbor_market",
+      "harbor_auto_works",
+      "harbor_offices",
+      "harbor_power_plant"
+    ],
+    "rule": "All purchasable Harborline businesses must be registered in the existing Realtor/property listing flow."
+  }
 }
