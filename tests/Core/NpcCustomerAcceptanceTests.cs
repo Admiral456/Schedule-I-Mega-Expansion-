@@ -116,7 +116,7 @@ public sealed class NpcCustomerAcceptanceTests
         CustomerAcceptanceResult lowExpansionStanding = NpcCustomerAcceptance.Evaluate(Morgan, offer, -100);
         CustomerAcceptanceResult highExpansionStanding = NpcCustomerAcceptance.Evaluate(Morgan, offer, 100);
 
-        Assert.True(goodRelationship.Score > poorRelationship.Score);
+        Assert.True(highExpansionStanding.Score > lowExpansionStanding.Score);
         Assert.Equal(Industrial, Morgan.NeutralProductIds.Single());
     }
 
