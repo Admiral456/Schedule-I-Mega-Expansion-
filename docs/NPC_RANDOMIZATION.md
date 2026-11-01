@@ -37,7 +37,7 @@ The core helper is independent of Unity and receives:
 
 It returns one affinity per available drug type. Every customer gets at least one strong favourite (0.70–1.00) and one strong dislike (-1.00 to -0.70). Other values vary. A vector is unique within the generated Harborline customer roster. If the installed build exposes too few drug types/combinations, generation fails closed rather than silently giving several customers the same profile.
 
-The game-facing adapter maps each returned `DrugTypeName` to the actual enum value and calls native `WithAffinities(...)` inside `WithCustomerDefaults(...)`. The regular Schedule I customer contract generator remains in charge of in-world offers, budgets, product availability and deliveries.
+The game-facing adapter enumerates the installed `S1API.Products.DrugType` values through `NativeDrugAffinityAdapter.GetRuntimeDrugTypeNames()`, generates the per-customer vector, maps names back to the native enum with `ToNativeAffinities()`, and passes those tuples to native `WithAffinities(...)` inside `WithCustomerDefaults(...)`. The documented S1API baseline enum exposes Marijuana, Methamphetamine, Cocaine, MDMA, Shrooms and Heroin; the running enum remains the source of truth. The regular Schedule I customer contract generator remains in charge of in-world offers, budgets, product availability and deliveries.
 
 Do not confuse expansion-only online-order product tiers (`sime.product.batch.*`) with the native drug type enum.
 
