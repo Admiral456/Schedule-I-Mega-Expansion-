@@ -262,7 +262,7 @@
       ]
     },
     "appearance": {
-      "system": "S1API GenerateRandomAppearance plus the seeded NpcAppearanceProfileRandomizer overlay and Appearance.Build",
+      "system": "S1API NPCAppearance typed customization builder with deterministic seeded profile selection",
       "randomizationTiming": "once per NPC identity, not on every schedule tick",
       "required": [
         "Call NPCAppearance.GenerateRandomAppearance() in the native OnCreated lifecycle.",
@@ -272,9 +272,16 @@
         "Verify all selected native asset paths in the installed game build and compare rendered appearances in-game before release."
       ],
       "publicApiLimit": "S1API exposes native random generation and explicit avatar fields/layers but no documented appearance-signature readback. The mod therefore prevents descriptor collisions within its own roster before applying them; visual collisions against vanilla or other mods must be inspected in-game.",
-      "assignmentAlgorithm": "SHA-256 save-seeded, per-NPC unique appearance descriptors across all 42 Harborline physical NPC IDs",
+      "assignmentAlgorithm": "SHA-256 save-seeded, per-NPC unique visual profiles applied with native NPCAppearance.Set, WithFaceLayer, WithBodyLayer and WithAccessoryLayer; do not reroll locally on each peer",
       "uniquenessScope": "All expansion-owned appearance descriptors in the 42-person Harborline roster are unique; comparison against vanilla and third-party NPCs remains an in-game compatibility check",
-      "profileGenerator": "ScheduleIMegaExpansion.Core.NpcAppearanceProfileRandomizer"
+      "profileGenerator": "ScheduleIMegaExpansion.Core.NpcAppearanceProfileRandomizer",
+      "notes": [
+        "Generate each full appearance profile from the persisted host-owned seed before NPC creation.",
+        "Apply the saved profile via the native NPCAppearance typed customization API in OnCreated, then call Build.",
+        "Do not call GenerateRandomAppearance independently on every client after a saved deterministic profile exists; that can create host/client visual divergence.",
+        "On a missing asset or API error, keep/build the native default avatar and log the failure; do not roll a local random fallback.",
+        "Visual comparison with vanilla and third-party NPCs still requires in-game testing."
+      ]
     },
     "rosterFile": "data/harborline_npc_roster.json"
   },
