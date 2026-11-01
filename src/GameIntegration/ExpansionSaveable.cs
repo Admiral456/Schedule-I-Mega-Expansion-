@@ -1,5 +1,6 @@
 using System.Text.Json;
 using MelonLoader;
+using ScheduleIMegaExpansion.Core;
 using S1API.Internal.Abstraction;
 using S1API.Saveables;
 using SteamNetworkLib;
@@ -150,6 +151,71 @@ public sealed class ExpansionSaveable : Saveable
         }
     }
 
+    /// <summary>
+    /// Loads the persisted shop economy as a detached domain service and returns the
+    /// save revision that the caller must present when committing. Corrupt snapshots
+    /// make the expansion save read-only rather than silently resetting the economy.
+    /// </summary>
+    public bool TryLoadShopPurchaseService(
+        out ShopPurchaseService? service,
+        out long expectedWorldRevision)
+    {
+        service = null;
+        expectedWorldRevision = 0;
+
+        if (!IsLoaded || IsReadOnly || _document is null)
+            return false;
+
+        ExpansionSaveDocument? snapshot = GetDocumentSnapshot();
+        if (snapshot is null)
+            return false;
+
+        var restored = new ShopPurchaseService();
+        if (snapshot.Data.ShopPurchaseState is not null &&
+            !restored.TryRestoreSnapshot(snapshot.Data.ShopPurchaseState))
+        {
+            MarkReadOnly("Saved shop purchase state failed validation. Original expansion data was preserved.");
+            return false;
+        }
+
+        service = restored;
+        expectedWorldRevision = snapshot.WorldRevision;
+        return true;
+    }
+
+    /// <summary>
+    /// Persists a shop service snapshot only if the save revision has not changed
+    /// since TryLoadShopPurchaseService. This prevents a stale service instance from
+    /// overwriting a newer host update. It stores domain economy data only; callers
+    /// must still integrate real Schedule I cash and item inventory transactions.
+    /// </summary>
+    public bool TryCommitShopPurchaseService(
+        ShopPurchaseService service,
+        long expectedWorldRevision,
+        SteamNetworkClient? network)
+    {
+        if (service is null ||
+            !IsAuthoritativeHost(network) ||
+            IsReadOnly ||
+            !IsLoaded ||
+            _document is null ||
+            expectedWorldRevision != _document.WorldRevision)
+        {
+            return false;
+        }
+
+        ExpansionSaveDocument? updated = GetDocumentSnapshot();
+        if (updated is null || updated.WorldRevision != expectedWorldRevision)
+            return false;
+
+        var validator = new ShopPurchaseService();
+        if (!validator.TryRestoreSnapshot(service.CreateSnapshot()))
+            return false;
+
+        updated.Data.ShopPurchaseState = validator.CreateSnapshot();
+        return TryReplaceWorldState(updated.Data, network);
+    }
+
     public bool RequestHostSave(SteamNetworkClient? network)
     {
         if (!IsAuthoritativeHost(network) || IsReadOnly || _document is null)
@@ -203,6 +269,7 @@ public sealed class ExpansionWorldState
     public Dictionary<string, ExpansionOrderRecord> Orders { get; set; } = new(StringComparer.Ordinal);
     public Dictionary<string, Dictionary<string, int>> ShopStockByInventoryId { get; set; } = new(StringComparer.Ordinal);
     public HashSet<string> ProcessedRequestIds { get; set; } = new(StringComparer.Ordinal);
+    public ShopPurchaseServiceSnapshot? ShopPurchaseState { get; set; }
 }
 
 public sealed class ExpansionOrderRecord

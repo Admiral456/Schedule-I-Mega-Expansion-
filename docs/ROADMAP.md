@@ -10,11 +10,11 @@
 
 ## First integrated vertical slice
 1. Compile the game-facing project against the exact local IL2CPP dependency set.
-2. Implement host-authoritative Portside Supply checkout against real game cash and inventory.
-3. Persist stock, order and transaction IDs in the S1API Saveable.
-4. Connect one real NPC profile and generated order.
+2. Connect the persisted shop snapshot to actual Schedule I cash and item inventory transactions.
+3. Seed Portside Supply from a shared product/price registry and verify online/physical stock consistency.
+4. Connect one real NPC profile and generated order to spawned NPC identity and schedule.
 5. Integrate one physical shop and one Realtor listing.
-6. Run a two-player host/client test, reconnect and late-join snapshot.
+6. Run a two-player host/client purchase test, reconnect and late-join snapshot.
 
 ## World construction
 - Survey vanilla world bounds and candidate exits in-game.

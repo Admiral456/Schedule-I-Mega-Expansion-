@@ -18,16 +18,25 @@ Preserve vanilla Hyland Point and add three major provinces:
 - New dealers, police patrols and checkpoints across the expansion provinces.
 - Host-authoritative co-op for shared world state, orders, stock, reputation and ownership.
 
+## Implemented domain foundation
+- Nine resident profiles (three per province), preference evaluation and deterministic accepted-order generation.
+- NPC order offers reject unknown/unliked products and respect stock, budget, reputation and deterministic world intervals.
+- ShopPurchaseService performs atomic in-memory purchases, prevents request replay/double charges and can export/restore validated economy snapshots.
+- Snapshot data includes balances, prices, stock, processed successful and failed requests, enabling reliable recovery after a host save/load.
+- S1API Saveable now contains the optional shop snapshot and exposes host-only load/commit methods with optimistic world-revision checks to reject stale writes.
+
+These are domain/save foundations, not a working in-game checkout. Real Schedule I cash and inventory APIs, shop stock seeding, NPC bindings and live networking still require integration.
+
 ## Technical baseline
 - S1API 3.2.2 — native phone apps and per-save-slot Saveables.
 - S1MAPI 2.0.1 — geometry/building/GLTF prototype candidate.
 - SteamNetworkLib 1.6.0 — Steam lobby and typed P2P.
 - .NET 6.0 game-facing IL2CPP target.
 
-See docs/FRAMEWORK_INTEGRATION.md, docs/PHONE_APP_IMPLEMENTATION.md and docs/COMPATIBILITY_AND_DEPENDENCIES.md.
+See docs/FRAMEWORK_INTEGRATION.md, docs/PHONE_APP_IMPLEMENTATION.md, docs/SHOP_PURCHASE_SNAPSHOTS.md and docs/COMPATIBILITY_AND_DEPENDENCIES.md.
 
 ## CI
 GitHub Actions validates data registries and runs game-independent domain tests. Game-facing integration requires local Schedule I IL2CPP assemblies and installed dependencies.
 
 ## Safety and status
-Use a copied save for first in-game tests. Unsupported/newer save schemas are preserved read-only. The phone app is a navigation/read-only status shell; contacts, shop checkout, Realtor, NPC AI, world streaming and live co-op gameplay are not yet integrated.
+Use a copied save for first in-game tests. Unsupported/newer save schemas are preserved read-only. The phone app is still a read-only status shell; contacts, real cash/item checkout, Realtor, NPC AI, world streaming and live co-op gameplay are not yet integrated.

@@ -22,6 +22,7 @@ The app uses S1API PhoneApp auto-discovery, UIFactory, ButtonUtils and a scrolla
 1. Connect NPC profiles to S1API NPC identity and schedule APIs.
 2. Build a host-only shop checkout request/response using SteamNetworkLib.
 3. Bind checkout to actual Schedule I cash and item inventory transactions.
-4. Persist committed stock, delivery and order state through ExpansionSaveable.
-5. Hook expansion Realtor listings into the existing vanilla listing UI and purchase flow.
-6. Implement a world greybox and validate collision/navigation before enabling a province.
+4. Load and commit the domain shop snapshot through ExpansionSaveable's host-only, optimistic-revision methods.
+5. Bind the committed purchase to actual Schedule I cash and item inventory transactions.
+6. Hook expansion Realtor listings into the existing vanilla listing UI and purchase flow.
+7. Implement a world greybox and validate collision/navigation before enabling a province.
