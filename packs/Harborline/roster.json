@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "packId": "harborline",
+  "region": "Harborline",
+  "status": "design-only; final Personnel manifest requires in-game survey",
+  "personnelTarget": {
+    "physicalNpcCount": 18,
+    "targetSimultaneousActive": 10,
+    "uniqueCustomerProfiles": 14,
+    "newDealers": 1,
+    "contactOnlyOptional": 4
+  },
+  "groups": [
+    {
+      "idPrefix": "harborline_dockworker",
+      "role": "port-worker",
+      "targetCount": 4,
+      "physical": true,
+      "primaryAnchor": "harbor_freight_warehouse",
+      "scheduleProfile": "day-shift",
+      "gameSystems": ["Personnel spawn", "Personnel schedule", "S1API NPC"]
+    },
+    {
+      "idPrefix": "harborline_driver",
+      "role": "cargo-driver",
+      "targetCount": 2,
+      "physical": true,
+      "primaryAnchor": "truck_parking",
+      "scheduleProfile": "rotating-shift",
+      "gameSystems": ["Personnel spawn", "Personnel route", "vehicle route only after compatibility check"]
+    },
+    {
+      "idPrefix": "harborline_fisher",
+      "role": "fisher",
+      "targetCount": 2,
+      "physical": true,
+      "primaryAnchor": "pier_promenade",
+      "scheduleProfile": "early-morning-and-evening",
+      "gameSystems": ["Personnel spawn", "Personnel schedule"]
+    },
+    {
+      "idPrefix": "harborline_vendor",
+      "role": "market-vendor",
+      "targetCount": 3,
+      "physical": true,
+      "primaryAnchor": "harbor_market",
+      "scheduleProfile": "market-opening-hours",
+      "gameSystems": ["Personnel spawn", "Personnel schedule", "customer profile where applicable"]
+    },
+    {
+      "idPrefix": "harborline_mechanic",
+      "role": "mechanic",
+      "targetCount": 2,
+      "physical": true,
+      "primaryAnchor": "harbor_auto_works",
+      "scheduleProfile": "workshop-shift",
+      "gameSystems": ["Personnel spawn", "Personnel schedule"]
+    },
+    {
+      "idPrefix": "harborline_tourist",
+      "role": "tourist",
+      "targetCount": 3,
+      "physical": true,
+      "primaryAnchor": "pier_promenade",
+      "scheduleProfile": "daytime-and-evening",
+      "gameSystems": ["Personnel spawn", "Personnel route", "customer profile where applicable"]
+    },
+    {
+      "idPrefix": "harborline_security",
+      "role": "port-security",
+      "targetCount": 2,
+      "physical": true,
+      "primaryAnchor": "police_checkpoint",
+      "scheduleProfile": "rotating-security-shift",
+      "gameSystems": ["Personnel spawn", "Personnel schedule", "existing police/crime systems only"]
+    }
+  ],
+  "customerProfileRules": {
+    "targetCount": 14,
+    "uniquePerNpc": true,
+    "mustDefineIndividually": [
+      "budget",
+      "ordersPerWeek",
+      "preferredDay",
+      "orderTime",
+      "productOrEffectPreferences",
+      "standards",
+      "relationshipRequirements"
+    ],
+    "notes": [
+      "Use the current Personnel Pack Format names and value ranges; do not invent undocumented JSON keys.",
+      "Profiles may be attached to physical residents or contact-only NPCs.",
+      "Preference values must be valid game products/effects and should differ by NPC."
+    ]
+  },
+  "dealerProfile": {
+    "id": "harborline_port_dealer",
+    "role": "specialist-dealer",
+    "count": 1,
+    "primaryAnchor": "harbor_offices",
+    "spawnPosition": null,
+    "schedule": [],
+    "notes": "Create through Personnel dealer data; exact fields to be filled from Pack Format and tested in game."
+  },
+  "releaseRules": [
+    "Use stable explicit NPC ids before the first public save.",
+    "Never publish a physical NPC without measured spawn coordinates.",
+    "Keep the first in-game test pack to 3-5 NPCs; expand only after spawn, schedule, persistence, multiplayer and performance checks pass.",
+    "The target counts are design goals, not a promise that every NPC will be active simultaneously."
+  ]
+}
