@@ -36,7 +36,8 @@
     "customPropertyHookVerified": false,
     "realEstateFlow": "must register through the native property/realtor registry before marking any site purchasable",
     "ownedMapState": "must be read from the native property ownership state",
-    "status": "blocked pending target-build verification"
+    "status": "public S1API managers provide read-only enumeration; new property registration remains unverified and must be discovered via target game build/runtime investigation",
+    "evidence": "PropertyManager.GetAllProperties/GetOwnedProperties/FindPropertyByName and BusinessManager.GetAllBusinesses/GetOwnedBusinesses/FindBusinessByName only enumerate existing static game collections in the inspected source."
   },
   "buildings": {
     "nativePrefabFirst": true,
@@ -82,15 +83,42 @@
     "save/load and late join create no duplicates"
   ],
   "regionIntegration": {
-    "npcRegionApi": "S1API NPC prefab builder accepts the game's Region enum (documented examples include existing values such as Uptown and Northtown).",
-    "newRegionApiVerified": false,
-    "requirement": "Do not pass an arbitrary Harborline string as a region. Verify the target game's native region registration hook; otherwise use an existing native region only if the actual world coordinates and police/navigation semantics correctly belong to it.",
+    "npcRegionApi": "NPCPrefabBuilder.WithRegion(Region region) sets the native NPC region from the game Region enum.",
+    "availableNativeRegionValues": [
+      "Northtown",
+      "Westville",
+      "Downtown",
+      "Docks",
+      "Suburbia",
+      "Uptown"
+    ],
+    "nativeRegionEnumVerified": true,
+    "harborlineDisplayDistrict": "Harborline",
+    "harborlineParentNativeRegion": "Docks",
+    "harborlineIsSubdistrict": true,
+    "customRegionEnumRequired": false,
+    "requirement": "Assign new Harborline NPC prefabs using the existing Region.Docks enum. Never pass an arbitrary Harborline string or cast an unsupported enum value. Verify that captured world positions lie within the Docks map/dispatch/navigation bounds.",
     "affects": [
       "NPC WithRegion assignment",
       "police dispatch and patrol eligibility",
       "region-aware gameplay systems",
       "map labels and region bounds"
     ],
-    "status": "not-verified; blocking requirement before region-aware NPC/police behavior is enabled"
+    "status": "native enum is confirmed; Docks spatial bounds and dispatch/nav coverage still require in-game verification"
+  },
+  "runtimeDiagnostics": {
+    "project": "src/ScheduleIMegaExpansion.csproj",
+    "mode": "read-only",
+    "exports": [
+      "native Region enum values",
+      "registered enterable buildings",
+      "native properties and ownership state",
+      "native businesses and ownership state",
+      "standalone phone-map POIs when available"
+    ],
+    "output": "UserData/ScheduleIMegaExpansion/Diagnostics/<timestamp>",
+    "mutatesGameState": false,
+    "compileTarget": "IL2CPP net6.0",
+    "status": "source added; build and in-game execution not yet verified"
   }
 }
