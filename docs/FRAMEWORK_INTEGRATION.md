@@ -67,6 +67,12 @@ Reference:
 - https://github.com/ifBars/S1MAPI
 - https://ifbars.github.io/S1MAPI/docs/getting-started.html
 
+## Schedule I money, shops and item delivery
+
+The public S1API Money documentation currently lists `GetCashBalance()` and `ChangeCashBalance(float amount, ...)`. The Shops API lists resolving existing shops and adding/removing sale catalogue entries, while ItemManager resolves item definitions. These APIs are useful building blocks, but they do not alone prove an atomic player purchase or a physical stock transfer. In particular, a catalogue listing is not a quantity-bearing stock reservation, and an add-to-inventory helper does not prove a safe matching removal API.
+
+The expansion therefore keeps player cash, live player inventory and physical store stock behind an explicit integration boundary. Do not enable checkout by combining a one-way item grant with a money debit. The required host transaction, compensation and local-assembly inspection are documented in [GAME_ECONOMY_ADAPTER.md](GAME_ECONOMY_ADAPTER.md).
+
 ## Local developer prerequisites
 
 Install matching dependencies for the same Schedule I public build and Steam Default / IL2CPP branch. Do not commit game assemblies or third-party DLLs.
