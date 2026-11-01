@@ -42,6 +42,9 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn('FindLoadedType("S1API.Property.BusinessManager")', self.exporter)
         self.assertIn('FindLoadedType("S1API.Map.Region")', self.exporter)
         self.assertIn("NativeApiSurfaceScanner.Export(", self.exporter)
+        self.assertIn("native-game-api-surface.txt", self.scanner)
+        for token in ("Door", "Police", "Navigation", "NPC", "Avatar", "Schedule", "Customer", "Dealer"):
+            self.assertIn('"'+token+'"', self.scanner)
 
     def test_diagnostic_does_not_mutate_game_state(self):
         combined = self.core + self.exporter + self.scanner
