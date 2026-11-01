@@ -1,6 +1,6 @@
 # Harborline runtime prototype
 
-This is the first compiled physical runtime prototype for Schedule I Mega Expansion. It includes a read-only native registry survey and an opt-in physical dockyard geometry slice.
+This is the first compiled physical runtime prototype for Schedule I Mega Expansion. It includes a read-only native registry survey and an automatic physical dockyard geometry slice.
 
 ## What it does
 
@@ -12,7 +12,7 @@ After a save finishes loading, the mod discovers S1API dynamically and exports n
 - standalone phone-map POIs, when the installed S1API assembly exposes that optional API;
 - a metadata-only report of native map, region, property, business, NPC, avatar, schedule, door, navigation and law-enforcement types and member signatures.
 
-The diagnostic survey does not mutate native registries. The separate F7 prototype action creates real Unity GameObjects with renderers and primitive colliders. It does not yet register a native Building, Property, Business or Shop, and it does not create native doors, NPCs, map icons, inventories or police behaviors.
+The diagnostic survey does not mutate native registries. After a save loads, the automatic generator locates the native Docks Warehouse property, searches nearby for flat unobstructed ground and creates real Unity GameObjects with renderers and primitive colliders. It does not yet register a native Building, Property, Business or Shop, and it does not create native doors, NPCs, map icons, inventories or police behaviors.
 
 ## Build
 
@@ -37,7 +37,7 @@ Copy bin/Release/net6.0/ScheduleIMegaExpansion.dll into the game's Mods folder, 
 .\install.ps1 -GameDir "C:\Program Files (x86)\Steam\steamapps\common\Schedule I"
 ```
 
-The game must already have MelonLoader and S1API installed. The mod discovers S1API dynamically at runtime and uses its save lifecycle to enable the F6/F7 tools.
+The game must already have MelonLoader and S1API installed. The mod discovers S1API dynamically and starts the automatic generation attempt after the native save lifecycle reports that the save is loaded.
 
 ## Diagnostic output
 
@@ -82,5 +82,6 @@ Important limits:
 - The current prototype is intentionally single-player only. It is not replicated to multiplayer clients.
 - The generated geometry is session-local and is not saved into the vanilla save.
 - Native doors, NPCs, functional business systems, Realtor registration, map projection/icons, police dispatch and multiplayer replication are not yet implemented.
-- Capture the anchor in Docks and leave enough clear space in front of it. The prototype is large and can overlap existing structures if placed carelessly.
-- Reload the save to reset the one-build-per-session guard.
+- The generator is a first-pass placement heuristic. It must be verified in the actual game for the selected footprint, road access and collision. If all candidate areas are blocked or no ground collider is found, it intentionally skips generation.
+- The geometry is session-local and is regenerated after loading a save; it is not yet saved as native world objects.
+- Reloading a save will not create duplicates if the named root is still present in the loaded scene.
