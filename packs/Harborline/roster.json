@@ -1,23 +1,36 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "packId": "harborline",
   "region": "Harborline",
-  "status": "design-only; final Personnel manifest requires in-game survey",
+  "status": "design-only; final Personnel manifest requires in-game survey and target-version schema validation",
   "personnelTarget": {
-    "physicalNpcCount": 18,
-    "targetSimultaneousActive": 10,
-    "uniqueCustomerProfiles": 14,
-    "newDealers": 1,
-    "contactOnlyOptional": 4
+    "physicalNpcCount": 42,
+    "targetSimultaneousActive": 18,
+    "uniqueCustomerProfiles": 30,
+    "newDealers": 2,
+    "contactOnlyOptional": 8,
+    "policeNpcPopulation": "native-game police spawns; not counted as custom roster NPCs"
+  },
+  "expansion": {
+    "scale": "large-district",
+    "subdistricts": [
+      "Port District",
+      "Freight & Industrial Quarter",
+      "Harbor Market & Commercial Street",
+      "Waterfront Promenade",
+      "Residential Backstreets"
+    ],
+    "designRule": "Extend outward from Docks and connect to existing roads; do not place a disconnected island district.",
+    "environment": "Reuse vanilla buildings, props, road pieces, lighting, interiors and interaction prefabs wherever possible."
   },
   "groups": [
     {
       "idPrefix": "harborline_dockworker",
       "role": "port-worker",
-      "targetCount": 4,
+      "targetCount": 8,
       "physical": true,
       "primaryAnchor": "harbor_freight_warehouse",
-      "scheduleProfile": "day-shift",
+      "scheduleProfile": "staggered-day-and-night-shifts",
       "gameSystems": [
         "Personnel spawn",
         "Personnel schedule",
@@ -27,7 +40,7 @@
     {
       "idPrefix": "harborline_driver",
       "role": "cargo-driver",
-      "targetCount": 2,
+      "targetCount": 5,
       "physical": true,
       "primaryAnchor": "truck_parking",
       "scheduleProfile": "rotating-shift",
@@ -40,7 +53,7 @@
     {
       "idPrefix": "harborline_fisher",
       "role": "fisher",
-      "targetCount": 2,
+      "targetCount": 4,
       "physical": true,
       "primaryAnchor": "pier_promenade",
       "scheduleProfile": "early-morning-and-evening",
@@ -52,7 +65,7 @@
     {
       "idPrefix": "harborline_vendor",
       "role": "market-vendor",
-      "targetCount": 3,
+      "targetCount": 5,
       "physical": true,
       "primaryAnchor": "harbor_market",
       "scheduleProfile": "market-opening-hours",
@@ -65,7 +78,7 @@
     {
       "idPrefix": "harborline_mechanic",
       "role": "mechanic",
-      "targetCount": 2,
+      "targetCount": 4,
       "physical": true,
       "primaryAnchor": "harbor_auto_works",
       "scheduleProfile": "workshop-shift",
@@ -77,7 +90,7 @@
     {
       "idPrefix": "harborline_tourist",
       "role": "tourist",
-      "targetCount": 3,
+      "targetCount": 6,
       "physical": true,
       "primaryAnchor": "pier_promenade",
       "scheduleProfile": "daytime-and-evening",
@@ -90,7 +103,7 @@
     {
       "idPrefix": "harborline_security",
       "role": "port-security",
-      "targetCount": 2,
+      "targetCount": 4,
       "physical": true,
       "primaryAnchor": "police_checkpoint",
       "scheduleProfile": "rotating-security-shift",
@@ -99,11 +112,36 @@
         "Personnel schedule",
         "existing police/crime systems only"
       ]
+    },
+    {
+      "idPrefix": "harborline_resident",
+      "role": "local-resident",
+      "targetCount": 6,
+      "physical": true,
+      "primaryAnchor": "residential_backstreets",
+      "scheduleProfile": "home-work-evening-cycle",
+      "gameSystems": [
+        "Personnel spawn",
+        "Personnel schedule",
+        "S1API NPC"
+      ]
     }
   ],
   "customerProfileRules": {
-    "targetCount": 14,
+    "targetCount": 30,
     "uniquePerNpc": true,
+    "randomizePerNpc": true,
+    "randomizedFields": [
+      "drug affinities",
+      "product affinities",
+      "standards",
+      "budget tier",
+      "orders per week",
+      "preferred order day and time"
+    ],
+    "persistence": "Generate once from a stable per-NPC seed and save the resolved values; never reroll on reload or client join.",
+    "validity": "Choose only product/effect identifiers verified in the target game and Personnel schema. Avoid impossible or empty preference sets.",
+    "uniqueness": "Use weighted random selection with duplicate-profile detection; if a collision occurs, reroll only the conflicting profile.",
     "mustDefineIndividually": [
       "spending",
       "orders per week",
@@ -117,35 +155,70 @@
       "affinities",
       "preferred properties"
     ],
+    "designSource": "packs/Harborline/customer-designs.json",
     "notes": [
-      "customer-designs.json is the project's design source, not a raw Personnel manifest.",
-      "Map each design field into the current Personnel customer schema; do not copy design-only keys into manifest.json.",
-      "All preference values must be valid in-game products/effects and verified in a live save."
-    ],
-    "designSource": "packs/Harborline/customer-designs.json"
-  },
-  "dealerProfile": {
-    "id": "harborline_port_dealer",
-    "role": "specialist-dealer",
-    "count": 1,
-    "primaryAnchor": "harbor_offices",
-    "spawnPosition": null,
-    "schedule": [],
-    "notes": "Set the Personnel dealer conversation role and dealer configuration so the NPC uses the real dealer prefab/economy.",
-    "requiredBehaviorConversation": "dealer",
-    "fieldsToMap": [
-      "dealer type",
-      "cut",
-      "signing fee",
-      "home",
-      "completed-deals variable",
-      "quality tolerances"
+      "customer-designs.json remains design input, not a raw Personnel manifest.",
+      "Randomized resolved values must be exported into the final manifest and remain stable across saves."
     ]
   },
+  "appearanceRules": {
+    "system": "Personnel avatar settings and vanilla avatar layer library",
+    "randomize": true,
+    "fields": [
+      "body/gender presentation",
+      "height and weight within vanilla-safe ranges",
+      "skin tone",
+      "face layers",
+      "hair style and color",
+      "eyebrows and eyes where supported",
+      "clothing layers",
+      "accessories"
+    ],
+    "uniqueness": "Build an appearance fingerprint from all resolved appearance fields. Reject duplicates within Harborline and reroll from available vanilla avatar assets; never rely on random chance alone.",
+    "constraints": [
+      "Use only avatar layer paths confirmed to exist in the installed game version.",
+      "Do not create custom PNG layers unless needed; vanilla layers improve compatibility.",
+      "Keep stable appearance seed per NPC so save/load and co-op clients render the same character."
+    ],
+    "fallback": "If the available vanilla avatar pool cannot guarantee uniqueness, expand the valid combinations or reduce simultaneous roster size; do not silently reuse a full appearance."
+  },
+  "dealerProfiles": [
+    {
+      "id": "harborline_port_dealer",
+      "anchor": "harbor_offices",
+      "role": "dealer"
+    },
+    {
+      "id": "harborline_market_dealer",
+      "anchor": "harbor_market",
+      "role": "dealer"
+    }
+  ],
+  "policeIntegration": {
+    "system": "existing-game-police-and-crime-response",
+    "customPoliceAi": false,
+    "spawnPolicy": "Allow the game's native police spawn/dispatch logic to select Harborline as a valid region after its region and road/navigation registration is verified.",
+    "checkpoints": [
+      "harborline_entry",
+      "freight_road",
+      "market_exit"
+    ],
+    "patrols": "Use existing police patrol/vehicle/response systems; do not create client-only police or duplicate dispatch logic."
+  },
+  "multiplayer": {
+    "authority": "server-host-authoritative",
+    "npcSpawn": "one authoritative registration/spawn per save and stable NPC id",
+    "state": "Persist customer preferences, appearance seed, schedule and relevant NPC state on host/save; clients consume replicated state.",
+    "lateJoin": "Late joiners receive the same NPC state without creating another copy.",
+    "dependencies": "All players must install the same mod version and required Personnel/S1API dependencies; validate version/hash mismatch and fail safely.",
+    "conflicts": "Use namespaced IDs, additive hooks, feature detection and optional integrations; never replace vanilla singleton systems or hard-depend on unrelated mods.",
+    "degradedMode": "If optional integration is absent, disable only that integration and log a clear warning."
+  },
   "releaseRules": [
-    "Use stable explicit NPC ids before the first public save.",
+    "Stable explicit NPC ids before first public save.",
     "Never publish a physical NPC without measured spawn coordinates.",
-    "Keep the first in-game test pack to 3-5 NPCs; expand only after spawn, schedule, persistence, multiplayer and performance checks pass.",
-    "The target counts are design goals, not a promise that every NPC will be active simultaneously."
+    "Start with 3-5 NPCs, then scale after spawn, schedule, persistence, multiplayer, police and performance tests.",
+    "Target population is a design goal, not a guarantee all NPCs are active simultaneously.",
+    "Native police population is additional to the custom NPC target and is governed by the game's own police system."
   ]
 }
