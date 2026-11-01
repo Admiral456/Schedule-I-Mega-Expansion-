@@ -3,6 +3,10 @@
 ## Zásada
 Harborline nesmí být samostatná obrazovka, oddělená mapa ani sada dekorací mimo svět hry. Musí jít o fyzické rozšíření Hyland Pointu, propojené s Docks, silnicemi, navigací, mapou telefonu, budovami a původními herními systémy.
 
+## Původní region hry
+
+Harborline je pojmenovaná podčtvrť fyzicky rozšířená v rámci původního regionu `Docks`. Aktuální S1API `Region` enum obsahuje pouze `Northtown`, `Westville`, `Downtown`, `Docks`, `Suburbia` a `Uptown`. Nepoužívat vymyšlené `Region.Harborline`; nové NPC nastavovat přes existující `Region.Docks`. Souřadnice oblasti musí být zaměřeny a potvrzeny v rámci hranic Docks.
+
 ## NPC: původní systém postav
 - Vytvářet fyzické postavy jako S1API.Entities.NPC, tedy přes NPC prefab, schedule, customer/dealer, save/load a síťovací cestu Schedule I.
 - Vzhled generovat výhradně nativním avatar systémem přes S1API.Entities.NPCAppearance.GenerateRandomAppearance() a následné Build().
