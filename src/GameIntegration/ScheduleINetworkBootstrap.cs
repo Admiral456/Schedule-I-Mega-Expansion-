@@ -17,6 +17,52 @@ public sealed class ExpansionHelloPayload
     public int RequiredPlayerCount { get; set; } = 2;
 }
 
+public sealed class ExpansionNpcOrderRequestPayload
+{
+    public string RequestId { get; set; } = string.Empty;
+    public string CustomerId { get; set; } = string.Empty;
+    public string ShopId { get; set; } = string.Empty;
+}
+
+public sealed class ExpansionNpcOrderRequestMessage : TypedP2PMessage<ExpansionNpcOrderRequestPayload>
+{
+    public override string MessageType => "SIME_NPC_ORDER_REQUEST_V1";
+    public ExpansionNpcOrderRequestMessage() { Payload = new ExpansionNpcOrderRequestPayload(); }
+    public ExpansionNpcOrderRequestMessage(ExpansionNpcOrderRequestPayload payload) : base(payload) { }
+}
+
+public sealed class ExpansionNpcOrderResultLinePayload
+{
+    public string ProductId { get; set; } = string.Empty;
+    public int Quantity { get; set; }
+    public long UnitPrice { get; set; }
+}
+
+public sealed class ExpansionNpcOrderResultPayload
+{
+    public bool Success { get; set; }
+    public string Code { get; set; } = string.Empty;
+    public string ClientRequestId { get; set; } = string.Empty;
+    public string OrderId { get; set; } = string.Empty;
+    public string CustomerId { get; set; } = string.Empty;
+    public string ProvinceId { get; set; } = string.Empty;
+    public string ShopId { get; set; } = string.Empty;
+    public string Status { get; set; } = string.Empty;
+    public long TotalPrice { get; set; }
+    public long Reward { get; set; }
+    public long DeadlineUnixSeconds { get; set; }
+    public long WorldRevision { get; set; }
+    public bool IsReplay { get; set; }
+    public List<ExpansionNpcOrderResultLinePayload> Items { get; set; } = new();
+}
+
+public sealed class ExpansionNpcOrderResultMessage : TypedP2PMessage<ExpansionNpcOrderResultPayload>
+{
+    public override string MessageType => "SIME_NPC_ORDER_RESULT_V1";
+    public ExpansionNpcOrderResultMessage() { Payload = new ExpansionNpcOrderResultPayload(); }
+    public ExpansionNpcOrderResultMessage(ExpansionNpcOrderResultPayload payload) : base(payload) { }
+}
+
 public sealed class ExpansionHelloMessage : TypedP2PMessage<ExpansionHelloPayload>
 {
     public override string MessageType => "SIME_HELLO_V1";
@@ -47,6 +93,7 @@ public sealed class ScheduleINetworkBootstrap : MelonMod
     private string? _lastInitializationWarning;
     private readonly HashSet<ulong> _helloSentTo = new();
     private readonly HashSet<ulong> _compatiblePeers = new();
+    private readonly Dictionary<ulong, float> _lastOrderRequestAt = new();
 
     public static ScheduleINetworkBootstrap? Instance { get; private set; }
     public SteamNetworkClient? Client => _client;
@@ -95,11 +142,51 @@ public sealed class ScheduleINetworkBootstrap : MelonMod
 
     public bool IsPeerProtocolCompatible(ulong steamId64) => _compatiblePeers.Contains(steamId64);
 
+    public async Task<bool> RequestNpcOrderAsync(string customerId, string shopId)
+    {
+        if (_client is null || !_networkReady || !_client.IsInitialized || !_client.IsInLobby)
+            return false;
+
+        var payload = new ExpansionNpcOrderRequestPayload
+        {
+            RequestId = Guid.NewGuid().ToString("N"),
+            CustomerId = customerId,
+            ShopId = shopId
+        };
+
+        if (_client.IsHost)
+        {
+            ExpansionNpcOrderResultPayload localResult =
+                new NpcOrderTransactionCoordinator().HandleRequest(payload, 0, _client);
+            if (!localResult.Success)
+                LoggerInstance.Warning("NPC order request was not committed: " + localResult.Code);
+            return localResult.Success;
+        }
+
+        List<SteamMemberInfo> remoteMembers = _client.GetRemoteMembers();
+        if (remoteMembers.Count != 1 || !_compatiblePeers.Contains(remoteMembers[0].SteamId64))
+            return false;
+
+        try
+        {
+            return await _client.SendMessageToPlayerAsync(
+                remoteMembers[0].SteamId,
+                new ExpansionNpcOrderRequestMessage(payload));
+        }
+        catch (Exception exception)
+        {
+            LoggerInstance.Warning("Could not send NPC order request to the host: " + exception.Message);
+            return false;
+        }
+    }
+
     public override void OnDeinitializeMelon()
     {
         _networkReady = false;
         _helloSentTo.Clear();
         _compatiblePeers.Clear();
+        _lastOrderRequestAt.Clear();
+        ExpansionOrderSyncCache.Clear();
 
         try
         {
@@ -183,6 +270,53 @@ public sealed class ScheduleINetworkBootstrap : MelonMod
             LoggerInstance.Msg("Compatible Mega Expansion co-op peer detected: " + peerId + ".");
         });
 
+        _client.RegisterMessageHandler<ExpansionNpcOrderRequestMessage>((message, senderId) =>
+        {
+            ulong peerId = senderId.m_SteamID;
+            if (!_client.IsHost ||
+                !_client.IsInLobby ||
+                !_compatiblePeers.Contains(peerId) ||
+                !_client.GetRemoteMembers().Any(member => member.SteamId64 == peerId))
+            {
+                LoggerInstance.Warning("Ignored NPC order request from a non-authoritative or incompatible peer: " + peerId);
+                return;
+            }
+
+            float now = Time.realtimeSinceStartup;
+            if (_lastOrderRequestAt.TryGetValue(peerId, out float lastRequestAt) && now - lastRequestAt < 3f)
+            {
+                _ = SendNpcOrderResultAsync(peerId, new ExpansionNpcOrderResultPayload
+                {
+                    Success = false,
+                    ClientRequestId = message.Payload?.RequestId ?? string.Empty,
+                    Code = "RateLimited"
+                });
+                return;
+            }
+
+            _lastOrderRequestAt[peerId] = now;
+            ExpansionNpcOrderResultPayload result =
+                new NpcOrderTransactionCoordinator().HandleRequest(message.Payload, peerId, _client);
+            _ = SendNpcOrderResultAsync(peerId, result);
+        });
+
+        _client.RegisterMessageHandler<ExpansionNpcOrderResultMessage>((message, senderId) =>
+        {
+            ulong peerId = senderId.m_SteamID;
+            List<SteamMemberInfo> remotes = _client.GetRemoteMembers();
+            if (_client.IsHost ||
+                !_client.IsInLobby ||
+                remotes.Count != 1 ||
+                remotes[0].SteamId64 != peerId ||
+                !_compatiblePeers.Contains(peerId))
+            {
+                LoggerInstance.Warning("Ignored NPC order result not received from the sole compatible co-op host.");
+                return;
+            }
+
+            ExpansionOrderSyncCache.Upsert(message.Payload);
+        });
+
         _networkReady = true;
         _lastInitializationWarning = null;
         LoggerInstance.Msg("SteamNetworkLib initialized. Waiting for co-op peers.");
@@ -208,6 +342,31 @@ public sealed class ScheduleINetworkBootstrap : MelonMod
                 continue;
 
             _ = SendHelloAsync(member);
+        }
+    }
+
+    private async Task SendNpcOrderResultAsync(ulong peerId, ExpansionNpcOrderResultPayload payload)
+    {
+        if (_client is null || !_client.IsInitialized || !_client.IsInLobby)
+            return;
+
+        List<SteamMemberInfo> matchingMembers = _client.GetRemoteMembers()
+            .Where(member => member.SteamId64 == peerId)
+            .ToList();
+        if (matchingMembers.Count != 1)
+            return;
+
+        try
+        {
+            bool sent = await _client.SendMessageToPlayerAsync(
+                matchingMembers[0].SteamId,
+                new ExpansionNpcOrderResultMessage(payload));
+            if (!sent)
+                LoggerInstance.Warning("Could not deliver NPC order result to co-op peer " + peerId + ".");
+        }
+        catch (Exception exception)
+        {
+            LoggerInstance.Warning("NPC order result delivery failed for " + peerId + ": " + exception.Message);
         }
     }
 
