@@ -119,7 +119,7 @@
           },
           "scheduleId": {
             "type": "string",
-            "pattern": "^sime\\\\.schedule\\\\."
+            "pattern": "^sime\\.schedule\\."
           }
         },
         "additionalProperties": false
