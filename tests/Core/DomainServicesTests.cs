@@ -107,6 +107,8 @@ public sealed class DomainServicesTests
     {
         Assert.True(OrderState.CanTransition(OrderStatus.Offered, OrderStatus.Accepted));
         Assert.True(OrderState.CanTransition(OrderStatus.Ready, OrderStatus.Delivered));
+        Assert.True(OrderState.CanTransition(OrderStatus.Accepted, OrderStatus.Expired));
+        Assert.True(OrderState.CanTransition(OrderStatus.Preparing, OrderStatus.Expired));
         Assert.True(OrderState.CanTransition(OrderStatus.Delivered, OrderStatus.Completed));
         Assert.False(OrderState.CanTransition(OrderStatus.Offered, OrderStatus.Completed));
         Assert.False(OrderState.CanTransition(OrderStatus.Completed, OrderStatus.Accepted));
