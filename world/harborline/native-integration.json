@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "region": "Harborline",
+  "status": "design-contract; not a runtime implementation",
+  "npc": {
+    "system": "S1API.Entities.NPC",
+    "appearance": "S1API.Entities.NPCAppearance.GenerateRandomAppearance() followed by Build()",
+    "externalNpcPackFrameworkRequired": false,
+    "useCustomAppearanceGenerator": false,
+    "useVanillaAvatarLayers": true,
+    "saveAndNetwork": "native Schedule I/S1API NPC lifecycle",
+    "appearanceRegeneration": "never on load or client join"
+  },
+  "worldMap": {
+    "extendPlayableWorld": true,
+    "normalInGameMapVisible": true,
+    "connectTo": "Docks",
+    "requiresTerrainRoadsCollisionNavigation": true,
+    "requiresNativeRegionRegistration": true,
+    "requiresExistingMapCanvasExtension": true,
+    "standaloneMapOrPOIsAreInsufficient": true,
+    "mapBounds": null,
+    "worldToMapTransform": null,
+    "regionId": null,
+    "status": "not-verified; target-build runtime inspection required"
+  },
+  "mapIcons": {
+    "source": "native building/property map classification",
+    "customSpriteOverride": false,
+    "ownershipIconSource": "native property ownership state",
+    "ownedMarker": "house/home marker as used by the corresponding vanilla property type",
+    "poiUsage": "S1API.Map.MapPOI only for public landmarks without a native building/property"
+  },
+  "propertyRegistration": {
+    "apiSurface": "S1API exposes Building lookup and property wrappers/PropertyManager for existing properties",
+    "customPropertyHookVerified": false,
+    "realEstateFlow": "must register through the native property/realtor registry before marking any site purchasable",
+    "ownedMapState": "must be read from the native property ownership state",
+    "status": "blocked pending target-build verification"
+  },
+  "buildings": {
+    "nativePrefabFirst": true,
+    "buildingBuilderRole": "geometry fallback only; not sufficient to register a game Building, Property, Shop or Business",
+    "allMustHaveFunctionalInteriors": true,
+    "requirements": [
+      "correct native building classification",
+      "working entrance",
+      "colliders",
+      "traversable navigation",
+      "native gameplay interactions",
+      "save/load",
+      "multiplayer replication"
+    ]
+  },
+  "doors": {
+    "system": "native interactive door prefab/controller",
+    "networkObjectRequired": true,
+    "spawnAuthority": "host/server",
+    "hostClientTestsRequired": true,
+    "knownS1MAPILimit": "BuildingBuilder.AddSlidingDoors currently documents host-only proximity automation; client manual handle interaction is supported via ServerRpc. Test every door in co-op and prefer verified vanilla door prefabs for production."
+  },
+  "interiors": {
+    "decoration": "S1MAPI InteriorBuilder for static decoration only",
+    "interactiveObjects": "original game prefabs/components with NetworkObject and native interactions",
+    "npcNavigation": "verified doorway/nav link and native StayInBuilding schedule",
+    "functionalExamples": [
+      "checkout/register",
+      "stocked shelf/shop inventory",
+      "networked storage",
+      "vendor/workbench interaction",
+      "office access/interaction points"
+    ]
+  },
+  "validation": [
+    "new area visible on normal map",
+    "world geometry and map projection align",
+    "correct native category icon per building",
+    "owned property icon follows purchase state",
+    "all doors usable by host and client",
+    "NPCs traverse and enter interiors",
+    "key interior objects perform native interactions",
+    "save/load and late join create no duplicates"
+  ]
+}
