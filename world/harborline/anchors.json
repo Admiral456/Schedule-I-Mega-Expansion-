@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "region": "Harborline",
+  "status": "survey-required",
+  "coordinateSystem": "Unity world coordinates captured in Schedule I at runtime",
+  "rules": [
+    "Never use 2D map pixels as Unity world coordinates.",
+    "Capture each anchor in game and preserve the Personnel command output.",
+    "Do not enable runtime spawning for entries whose position is null."
+  ],
+  "connections": [
+    {
+      "id": "docks_connection",
+      "name": "Napojení na Docks",
+      "purpose": "Vstupní silnice a pěší propojení s původním přístavním distriktem",
+      "position": null,
+      "rotationY": null,
+      "surveyStatus": "not-surveyed"
+    },
+    {
+      "id": "harborline_entry",
+      "name": "Vstupní bod Harborline",
+      "purpose": "Hranice nové oblasti a první navigační uzel",
+      "position": null,
+      "rotationY": null,
+      "surveyStatus": "not-surveyed"
+    }
+  ],
+  "sites": [
+    {
+      "id": "portside_supply",
+      "name": "Portside Supply",
+      "role": "shop",
+      "reuseStrategy": "reuse-vanilla-shop-prefab-first",
+      "position": null,
+      "rotationY": null,
+      "sourcePrefab": null,
+      "interiorAnchor": null,
+      "surveyStatus": "not-surveyed"
+    },
+    {
+      "id": "harbor_freight_warehouse",
+      "name": "Harbor Freight Warehouse",
+      "role": "warehouse-business",
+      "reuseStrategy": "reuse-vanilla-industrial-building-first",
+      "position": null,
+      "rotationY": null,
+      "sourcePrefab": null,
+      "interiorAnchor": null,
+      "surveyStatus": "not-surveyed"
+    },
+    {
+      "id": "harbor_market",
+      "name": "Harbor Market",
+      "role": "market",
+      "reuseStrategy": "reuse-vanilla-stalls-and-props-first",
+      "position": null,
+      "rotationY": null,
+      "sourcePrefab": null,
+      "interiorAnchor": null,
+      "surveyStatus": "not-surveyed"
+    },
+    {
+      "id": "harbor_auto_works",
+      "name": "Harbor Auto Works",
+      "role": "vehicle-service-business",
+      "reuseStrategy": "reuse-vanilla-garage-and-workshop-assets-first",
+      "position": null,
+      "rotationY": null,
+      "sourcePrefab": null,
+      "interiorAnchor": null,
+      "surveyStatus": "not-surveyed"
+    },
+    {
+      "id": "harbor_offices",
+      "name": "Harbor Offices",
+      "role": "business-office",
+      "reuseStrategy": "reuse-vanilla-office-assets-first",
+      "position": null,
+      "rotationY": null,
+      "sourcePrefab": null,
+      "interiorAnchor": null,
+      "surveyStatus": "not-surveyed"
+    },
+    {
+      "id": "harbor_power_plant",
+      "name": "Harbor Power Plant",
+      "role": "industrial-site",
+      "reuseStrategy": "reuse-vanilla-industrial-assets-first",
+      "position": null,
+      "rotationY": null,
+      "sourcePrefab": null,
+      "interiorAnchor": null,
+      "surveyStatus": "not-surveyed"
+    },
+    {
+      "id": "pier_promenade",
+      "name": "Pier Promenade",
+      "role": "public-space",
+      "reuseStrategy": "reuse-vanilla-promenade-props-first",
+      "position": null,
+      "rotationY": null,
+      "sourcePrefab": null,
+      "interiorAnchor": null,
+      "surveyStatus": "not-surveyed"
+    },
+    {
+      "id": "police_checkpoint",
+      "name": "Harbor Police Checkpoint",
+      "role": "police-checkpoint",
+      "reuseStrategy": "reuse-vanilla-police-and-roadside-assets-first",
+      "position": null,
+      "rotationY": null,
+      "sourcePrefab": null,
+      "interiorAnchor": null,
+      "surveyStatus": "not-surveyed"
+    }
+  ],
+  "environmentAnchors": [
+    { "id": "container_yard", "purpose": "Kontejnery a nákladní plocha", "position": null, "surveyStatus": "not-surveyed" },
+    { "id": "quay_cranes", "purpose": "Jeřáby, mola a lodní rampa", "position": null, "surveyStatus": "not-surveyed" },
+    { "id": "promenade_path", "purpose": "Trasa chodců a rybářů", "position": null, "surveyStatus": "not-surveyed" },
+    { "id": "truck_parking", "purpose": "Parkování a otočka nákladních vozidel", "position": null, "surveyStatus": "not-surveyed" },
+    { "id": "market_square", "purpose": "Veřejný prostor tržnice", "position": null, "surveyStatus": "not-surveyed" }
+  ]
+}
