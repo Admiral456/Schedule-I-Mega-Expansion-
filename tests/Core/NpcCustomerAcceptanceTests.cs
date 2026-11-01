@@ -41,9 +41,9 @@ public sealed class NpcCustomerAcceptanceTests
             new CustomerOrderLine(Standard, Quantity: 1, UnitPrice: 600)
         });
 
-        CustomerAcceptanceResult morgan = NpcCustomerAcceptance.Evaluate(Morgan, standardOffer, playerReputation: 0);
-        CustomerAcceptanceResult jordan = NpcCustomerAcceptance.Evaluate(Jordan, standardOffer, playerReputation: 0);
-        CustomerAcceptanceResult taylor = NpcCustomerAcceptance.Evaluate(Taylor, standardOffer, playerReputation: 0);
+        CustomerAcceptanceResult morgan = NpcCustomerAcceptance.Evaluate(Morgan, standardOffer, expansionStanding: 0);
+        CustomerAcceptanceResult jordan = NpcCustomerAcceptance.Evaluate(Jordan, standardOffer, expansionStanding: 0);
+        CustomerAcceptanceResult taylor = NpcCustomerAcceptance.Evaluate(Taylor, standardOffer, expansionStanding: 0);
 
         Assert.True(morgan.Accepted);
         Assert.True(jordan.Accepted);
@@ -106,15 +106,15 @@ public sealed class NpcCustomerAcceptanceTests
     }
 
     [Fact]
-    public void PlayerSpecificReputationModifiesDecisionWithoutChangingProductProfile()
+    public void ExpansionStandingModifiesOnlineOfferScoreWithoutChangingProductProfile()
     {
         var offer = new CustomerOrderOffer(new[]
         {
             new CustomerOrderLine(Industrial, Quantity: 1, UnitPrice: 1_000)
         });
 
-        CustomerAcceptanceResult poorRelationship = NpcCustomerAcceptance.Evaluate(Morgan, offer, -100);
-        CustomerAcceptanceResult goodRelationship = NpcCustomerAcceptance.Evaluate(Morgan, offer, 100);
+        CustomerAcceptanceResult lowExpansionStanding = NpcCustomerAcceptance.Evaluate(Morgan, offer, -100);
+        CustomerAcceptanceResult highExpansionStanding = NpcCustomerAcceptance.Evaluate(Morgan, offer, 100);
 
         Assert.True(goodRelationship.Score > poorRelationship.Score);
         Assert.Equal(Industrial, Morgan.NeutralProductIds.Single());
