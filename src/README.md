@@ -27,7 +27,7 @@ dotnet restore .\ScheduleIMegaExpansion.csproj
 dotnet build .\ScheduleIMegaExpansion.csproj -c Release --no-restore
 ```
 
-The GitHub Actions workflow also builds this project and uploads a ZIP artifact named ScheduleIMegaExpansion-runtime-diagnostic.
+The GitHub Actions workflow also builds this project and uploads a ZIP artifact named ScheduleIMegaExpansion-harborline-prototype.
 
 ## Install
 
@@ -37,7 +37,7 @@ Copy bin/Release/net6.0/ScheduleIMegaExpansion.dll into the game's Mods folder, 
 .\install.ps1 -GameDir "C:\Program Files (x86)\Steam\steamapps\common\Schedule I"
 ```
 
-The game must already have MelonLoader installed. S1API is detected when present for the diagnostic survey.
+The game must already have MelonLoader and S1API installed. The mod discovers S1API dynamically at runtime and uses its save lifecycle to enable the F6/F7 tools.
 
 ## Diagnostic output
 
