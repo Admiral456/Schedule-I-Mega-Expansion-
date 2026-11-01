@@ -22,16 +22,26 @@ namespace ScheduleIMegaExpansion
         private bool _subscribed;
         private bool _exportedForCurrentLoad;
         private bool _loggedMissingApi;
+        private bool _loggedLifecycleError;
+        private int _subscriptionPollFrames;
 
         public override void OnInitializeMelon()
         {
             MelonLogger.Msg("[Schedule I Mega Expansion] Read-only world survey initialized.");
+            TrySubscribeToS1ApiLifecycle();
         }
 
         public override void OnUpdate()
         {
-            if (!_subscribed)
-                TrySubscribeToS1ApiLifecycle();
+            if (_subscribed)
+                return;
+
+            _subscriptionPollFrames++;
+            if (_subscriptionPollFrames < 120)
+                return;
+
+            _subscriptionPollFrames = 0;
+            TrySubscribeToS1ApiLifecycle();
         }
 
         private void TrySubscribeToS1ApiLifecycle()
@@ -89,7 +99,11 @@ namespace ScheduleIMegaExpansion
             }
             catch (Exception ex)
             {
-                MelonLogger.Warning("[Schedule I Mega Expansion] Could not connect to S1API lifecycle: " + ex.Message);
+                if (!_loggedLifecycleError)
+                {
+                    _loggedLifecycleError = true;
+                    MelonLogger.Warning("[Schedule I Mega Expansion] Could not connect to S1API lifecycle: " + ex.Message);
+                }
             }
         }
 
