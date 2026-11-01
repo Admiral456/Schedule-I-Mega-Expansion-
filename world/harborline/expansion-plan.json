@@ -104,5 +104,20 @@
     "functionalInteriorsRequired": true,
     "doors": "native interactive networked door prefab/controller",
     "navigation": "colliders plus verified navmesh/NavigationBuilder doorway links; NPCs must traverse entrances and use native StayInBuilding schedules"
+  },
+  "nativeRegion": "Docks",
+  "regionIdentity": {
+    "displayDistrict": "Harborline",
+    "nativeGameRegion": "Docks",
+    "isNewNativeRegion": false,
+    "allowedNativeRegionEnums": [
+      "Northtown",
+      "Westville",
+      "Downtown",
+      "Docks",
+      "Suburbia",
+      "Uptown"
+    ],
+    "rule": "Do not invent Region.Harborline. Keep Harborline as a named subdistrict in Docks; verify its coordinates, map bounds, navigation and police coverage against the native Docks area."
   }
 }
