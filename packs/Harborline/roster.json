@@ -12,7 +12,7 @@
       "Waterfront Promenade",
       "Residential Backstreets"
     ],
-    "designRule": "Extend outward from Docks and connect to existing roads; do not place a disconnected island district.",
+    "designRule": "Harborline is a large physical subdistrict inside the native Docks region. Extend from the existing Docks world area and connect to the actual road/navigation graph.",
     "environment": "Reuse vanilla buildings, props, road pieces, lighting, interiors and interaction prefabs wherever possible."
   },
   "groups": [
@@ -218,6 +218,10 @@
     "appearanceApi": "S1API.Entities.NPCAppearance.GenerateRandomAppearance()",
     "appearanceAssets": "vanilla game avatar layers only unless later explicitly required",
     "appearancePersistence": "Build the random appearance once when the authoritative host creates the NPC; preserve it through native NPC save/load and networking.",
-    "duplicatePolicy": "Compare resolved native avatar settings for Harborline; reroll exact duplicates through GenerateRandomAppearance(), not a custom appearance generator."
-  }
+    "duplicatePolicy": "Compare resolved native avatar settings for Harborline; reroll exact duplicates through GenerateRandomAppearance(), not a custom appearance generator.",
+    "nativeRegion": "Docks",
+    "nativeRegionNote": "Use the existing S1API Region.Docks enum in native NPC prefab configuration; never cast a custom Harborline integer into the game enum."
+  },
+  "nativeRegion": "Docks",
+  "nativeRegionPolicy": "Harborline is a physical subdistrict of the existing Docks region, not a new Region enum value. Confirm the final world coordinates fall within Docks bounds before enabling region-aware systems."
 }
