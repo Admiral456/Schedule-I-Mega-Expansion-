@@ -9,7 +9,7 @@ Westville, Northtown, Downtown, Uptown, Docks and Suburbia. Their exact boundari
 ## Province 1 — Harborline
 **Theme:** southern coast, cargo port, logistics, retail and industry.
 
-Harborline is now planned as seven connected subdistricts: Harbor Gate and Customs Approach; Container Port and Shipyard; Freight and Logistics Park; Harbor Market and High Street; Industrial and Vehicle Service Quarter; Workers' Residential Quarter; Waterfront, Marina and Pier Promenade.
+Harborline is now planned as seven connected subdistricts: Harbor Gate and Customs Approach (including a native Harbor Police Substation); Container Port and Shipyard; Freight and Logistics Park; Harbor Market and High Street; Industrial and Vehicle Service Quarter; Workers' Residential Quarter; Waterfront, Marina and Pier Promenade.
 
 The points of interest include the existing Portside Supply, Harbor Freight Warehouse, Harbor Market, Harbor Auto Works, Harbor Offices and Pier Promenade plus a container terminal, crane yard, ship repair, cold storage, freight depot, truck staging, market square, Harbor Diner, maintenance depot, worker apartments, laundromat, marina, bait shop and visitor services.
 
