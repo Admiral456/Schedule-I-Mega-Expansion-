@@ -93,4 +93,18 @@ public sealed class NpcOrderPlacementServiceTests
         Assert.Equal(first, second);
         Assert.NotEqual(first, another);
     }
+    [Fact]
+    public void CustomerBudgetAccountsAreIsolatedByPlayerAndWorldInterval()
+    {
+        string morganPlayerA = NpcOrderPlacementService.CreateBudgetAccountId(
+            Morgan.Profile.NpcId, "76561198000000001", 42);
+        string morganPlayerB = NpcOrderPlacementService.CreateBudgetAccountId(
+            Morgan.Profile.NpcId, "76561198000000002", 42);
+        string morganPlayerANextInterval = NpcOrderPlacementService.CreateBudgetAccountId(
+            Morgan.Profile.NpcId, "76561198000000001", 43);
+
+        Assert.NotEqual(morganPlayerA, morganPlayerB);
+        Assert.NotEqual(morganPlayerA, morganPlayerANextInterval);
+    }
+
 }
