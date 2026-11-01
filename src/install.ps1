@@ -29,5 +29,5 @@ New-Item -ItemType Directory -Path $modsDir -Force | Out-Null
 $target = Join-Path $modsDir "ScheduleIMegaExpansion.dll"
 Copy-Item -LiteralPath $DllPath -Destination $target -Force
 
-Write-Host "Installed diagnostic mod to $target"
-Write-Host "Load a saved game to create the read-only native registry report."
+Write-Host "Installed Schedule I Mega Expansion Harborline prototype to $target"
+Write-Host "Load a single-player save. Stand at the intended Harborline location inside Docks, press F6 to capture the anchor, then F7 to spawn the physical dockyard prototype."
