@@ -17,7 +17,7 @@ public sealed class NpcOrderOfferGeneratorTests
     [Fact]
     public void GeneratedOrderOnlyContainsPreferredOrNeutralProductsAndIsAccepted()
     {
-        NpcOrderGenerationResult result = NpcOrderOfferGenerator.Generate(Morgan, Stock, worldInterval: 12, playerReputation: 0);
+        NpcOrderGenerationResult result = NpcOrderOfferGenerator.Generate(Morgan, Stock, worldInterval: 12, expansionStanding: 0);
 
         Assert.True(result.Success);
         Assert.Equal(NpcOrderGenerationFailure.None, result.Failure);
@@ -32,7 +32,7 @@ public sealed class NpcOrderOfferGeneratorTests
     }
 
     [Fact]
-    public void SameProfileStockIntervalAndReputationProduceSameOffer()
+    public void SameProfileStockIntervalAndExpansionStandingProduceSameOffer()
     {
         NpcOrderGenerationResult first = NpcOrderOfferGenerator.Generate(Morgan, Stock, 55, 10);
         NpcOrderGenerationResult second = NpcOrderOfferGenerator.Generate(Morgan, Stock, 55, 10);
@@ -74,14 +74,14 @@ public sealed class NpcOrderOfferGeneratorTests
     }
 
     [Fact]
-    public void LowReputationAndExpensiveOffersCanPreventOrderGeneration()
+    public void LowExpansionStandingAndExpensiveOffersCanPreventOrderGeneration()
     {
         var candidates = new[]
         {
             new NpcOrderProductStock(NpcCustomerDirectory.StandardProductId, 1_000, 1)
         };
 
-        NpcOrderGenerationResult result = NpcOrderOfferGenerator.Generate(Morgan, candidates, 1, playerReputation: -100);
+        NpcOrderGenerationResult result = NpcOrderOfferGenerator.Generate(Morgan, candidates, 1, expansionStanding: -100);
 
         Assert.False(result.Success);
         Assert.Equal(NpcOrderGenerationFailure.NoAcceptedOffer, result.Failure);
