@@ -113,6 +113,22 @@ public sealed class NpcOrderSettlementServiceTests
         Assert.NotEqual(before, after); // the failed operation receipt is persisted for idempotent retry.
         var restored = new ShopPurchaseService();
         Assert.True(restored.TryRestoreSnapshot(economy.CreateSnapshot()));
+
+        ShopEscrowOperation repeatedFailure = new(
+            StableId.FromOrderRequest("settlement:" + OrderId + ":expired"),
+            OrderId,
+            EscrowId,
+            BuyerId,
+            500,
+            ShopEscrowOperationKind.Refund,
+            ShopId,
+            new[] { new ShopRefundLine(ProductId, 1) });
+        ShopEscrowOperationResult replay = restored.ProcessEscrowOperation(repeatedFailure);
+
+        Assert.Equal(ShopEscrowOperationOutcome.UnknownRestockProduct, replay.Outcome);
+        Assert.True(replay.IsReplay);
+        Assert.Equal(500, restored.GetBalance(EscrowId));
+        Assert.Equal(0, restored.GetBalance(BuyerId));
     }
 
     [Fact]
