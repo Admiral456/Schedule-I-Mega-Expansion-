@@ -26,6 +26,8 @@ namespace ScheduleIMegaExpansion
         private bool _loggedLifecycleError;
         private int _subscriptionPollFrames;
         private bool _saveLoaded;
+        private int _generationPollFrames;
+        private bool _harborlineGenerated;
 
         public override void OnInitializeMelon()
         {
@@ -35,13 +37,18 @@ namespace ScheduleIMegaExpansion
 
         public override void OnUpdate()
         {
-            if (_saveLoaded)
+            if (_saveLoaded && !_harborlineGenerated)
             {
-                string gameRoot = AppDomain.CurrentDomain.BaseDirectory;
-                HarborlineHotkeys.Update(
-                    gameRoot,
-                    message => MelonLogger.Msg("[Schedule I Mega Expansion] " + message),
-                    message => MelonLogger.Warning("[Schedule I Mega Expansion] " + message));
+                _generationPollFrames++;
+                if (_generationPollFrames >= 120)
+                {
+                    _generationPollFrames = 0;
+                    string gameRoot = AppDomain.CurrentDomain.BaseDirectory;
+                    _harborlineGenerated = HarborlinePhysicalBuilder.TryAutoGenerate(
+                        gameRoot,
+                        message => MelonLogger.Msg("[Schedule I Mega Expansion] " + message),
+                        message => MelonLogger.Warning("[Schedule I Mega Expansion] " + message));
+                }
             }
 
             if (_subscribed)
@@ -122,7 +129,9 @@ namespace ScheduleIMegaExpansion
         {
             _exportedForCurrentLoad = false;
             _saveLoaded = false;
-            HarborlineHotkeys.ResetForNewSave();
+            _harborlineGenerated = false;
+            _generationPollFrames = 0;
+            HarborlinePhysicalBuilder.ResetForNewSave();
         }
 
         private void OnLoadComplete()
