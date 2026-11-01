@@ -144,6 +144,218 @@ namespace ScheduleIMegaExpansion.Runtime
             }
         }
 
+        private static bool TryFindDocksWarehouseAnchor(out Anchor anchor)
+        {
+            anchor = default;
+            Type? managerType = FindType("S1API.Property.PropertyManager");
+            MethodInfo? getAll = managerType?.GetMethod("GetAllProperties", BindingFlags.Public | BindingFlags.Static);
+            if (getAll == null)
+                return false;
+
+            object? collection = getAll.Invoke(null, null);
+            if (!(collection is IEnumerable enumerable))
+                return false;
+
+            foreach (object? property in enumerable)
+            {
+                if (property == null)
+                    continue;
+
+                string name = Convert.ToString(GetMemberValue(property, "PropertyName"), CultureInfo.InvariantCulture) ?? string.Empty;
+                if (name.IndexOf("Docks Warehouse", StringComparison.OrdinalIgnoreCase) < 0)
+                    continue;
+
+                object? position = GetMemberValue(property, "ExteriorSpawnPosition");
+                if (position != null && TryReadVector(position, out float x, out float y, out float z))
+                {
+                    anchor = new Anchor(x, y, z, 0f);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool TryFindClearPlacement(Anchor origin, out Anchor placement)
+        {
+            placement = default;
+            Type physics = FindType("UnityEngine.Physics") ?? throw new TypeLoadException("UnityEngine.Physics was not found.");
+            Type rayType = FindType("UnityEngine.Ray") ?? throw new TypeLoadException("UnityEngine.Ray was not found.");
+            Type hitType = FindType("UnityEngine.RaycastHit") ?? throw new TypeLoadException("UnityEngine.RaycastHit was not found.");
+
+            MethodInfo? checkBox = physics.GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .Where(method => method.Name == "CheckBox")
+                .OrderBy(method => method.GetParameters().Length)
+                .FirstOrDefault(method =>
+                {
+                    ParameterInfo[] p = method.GetParameters();
+                    return p.Length >= 2 && p[0].ParameterType == _vector3Type && p[1].ParameterType == _vector3Type;
+                });
+            MethodInfo? raycast = physics.GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .FirstOrDefault(method =>
+                {
+                    ParameterInfo[] p = method.GetParameters();
+                    return method.Name == "Raycast" && p.Length >= 3 && p[0].ParameterType == rayType
+                        && p[1].ParameterType.IsByRef && p[1].ParameterType.GetElementType() == hitType
+                        && p[2].ParameterType == typeof(float);
+                });
+
+            if (checkBox == null || raycast == null)
+                throw new MissingMethodException("Required Physics.CheckBox or Physics.Raycast overload was not found.");
+
+            float[] radii = { 42f, 54f, 66f, 78f, 90f, 104f };
+            foreach (float radius in radii)
+            {
+                for (int angle = 0; angle < 360; angle += 30)
+                {
+                    float radians = angle * (float)Math.PI / 180f;
+                    float x = origin.X + (float)Math.Sin(radians) * radius;
+                    float z = origin.Z + (float)Math.Cos(radians) * radius;
+                    float yaw = angle;
+
+                    if (IsOccupied(checkBox, x, origin.Y, z, yaw))
+                        continue;
+                    if (!TrySampleGround(raycast, rayType, x, origin.Y, z, yaw, out float groundY))
+                        continue;
+
+                    placement = new Anchor(x, groundY, z, yaw);
+                    _selectedPlacement = "clear-ground candidate radius=" + F(radius) + " angle=" + F(yaw);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsOccupied(MethodInfo checkBox, float x, float y, float z, float yaw)
+        {
+            ParameterInfo[] parameters = checkBox.GetParameters();
+            object?[] args = new object?[parameters.Length];
+            args[0] = NewVector3(x, y + 9f, z);
+            args[1] = NewVector3(28f, 8f, 15f);
+
+            for (int i = 2; i < parameters.Length; i++)
+            {
+                Type t = parameters[i].ParameterType;
+                if (t == _quaternionType)
+                    args[i] = NewYawQuaternion(yaw);
+                else if (t == typeof(int))
+                    args[i] = -1;
+                else if (t.IsEnum)
+                {
+                    string choice = Enum.GetNames(t).Contains("Ignore") ? "Ignore" : Enum.GetNames(t)[0];
+                    args[i] = Enum.Parse(t, choice);
+                }
+                else if (parameters[i].HasDefaultValue)
+                    args[i] = parameters[i].DefaultValue;
+                else
+                    args[i] = t.IsValueType ? Activator.CreateInstance(t) : null;
+            }
+
+            return Convert.ToBoolean(checkBox.Invoke(null, args), CultureInfo.InvariantCulture);
+        }
+
+        private static bool TrySampleGround(MethodInfo raycast, Type rayType,
+            float x, float y, float z, float yaw, out float groundY)
+        {
+            groundY = y;
+            float radians = yaw * (float)Math.PI / 180f;
+            float[] lateral = { 0f, -23f, 23f };
+            float[] forward = { 0f, -11f, 11f };
+            var heights = new System.Collections.Generic.List<float>();
+
+            foreach (float side in lateral)
+            foreach (float along in forward)
+            {
+                if (side != 0f && along != 0f)
+                    continue;
+
+                float sx = x + side * (float)Math.Cos(radians) + along * (float)Math.Sin(radians);
+                float sz = z - side * (float)Math.Sin(radians) + along * (float)Math.Cos(radians);
+                object ray = Activator.CreateInstance(rayType, new object[]
+                {
+                    NewVector3(sx, y + 100f, sz), NewVector3(0f, -1f, 0f)
+                })!;
+
+                ParameterInfo[] parameters = raycast.GetParameters();
+                object?[] args = new object?[parameters.Length];
+                args[0] = ray;
+                args[1] = null;
+                args[2] = 200f;
+                for (int i = 3; i < parameters.Length; i++)
+                {
+                    Type t = parameters[i].ParameterType;
+                    if (t == typeof(int))
+                        args[i] = -1;
+                    else if (t.IsEnum)
+                    {
+                        string choice = Enum.GetNames(t).Contains("Ignore") ? "Ignore" : Enum.GetNames(t)[0];
+                        args[i] = Enum.Parse(t, choice);
+                    }
+                    else if (parameters[i].HasDefaultValue)
+                        args[i] = parameters[i].DefaultValue;
+                    else
+                        args[i] = t.IsValueType ? Activator.CreateInstance(t) : null;
+                }
+
+                bool hit = Convert.ToBoolean(raycast.Invoke(null, args), CultureInfo.InvariantCulture);
+                if (!hit || args[1] == null)
+                    return false;
+
+                object hitInfo = args[1]!;
+                object? point = GetMemberValue(hitInfo, "point");
+                object? normal = GetMemberValue(hitInfo, "normal");
+                if (point == null || normal == null
+                    || !TryReadVector(point, out _, out float hitY, out _)
+                    || !TryReadVector(normal, out _, out float normalY, out _)
+                    || normalY < 0.92f
+                    || Math.Abs(hitY - y) > 5f)
+                    return false;
+
+                heights.Add(hitY);
+            }
+
+            if (heights.Count < 5 || heights.Max() - heights.Min() > 1.5f)
+                return false;
+
+            groundY = heights.Average();
+            return true;
+        }
+
+        private static bool TryReadVector(object value, out float x, out float y, out float z)
+        {
+            x = y = z = 0f;
+            try
+            {
+                x = Convert.ToSingle(GetMemberValue(value, "x"), CultureInfo.InvariantCulture);
+                y = Convert.ToSingle(GetMemberValue(value, "y"), CultureInfo.InvariantCulture);
+                z = Convert.ToSingle(GetMemberValue(value, "z"), CultureInfo.InvariantCulture);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static object? GetMemberValue(object instance, string name)
+        {
+            Type type = instance.GetType();
+            PropertyInfo? property = type.GetProperty(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if (property?.CanRead == true)
+                return property.GetValue(instance, null);
+            FieldInfo? field = type.GetField(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            return field?.GetValue(instance);
+        }
+
+        private static bool FindExistingRoot()
+        {
+            Type? gameObject = FindType("UnityEngine.GameObject");
+            MethodInfo? find = gameObject?.GetMethod("Find", BindingFlags.Public | BindingFlags.Static,
+                null, new[] { typeof(string) }, null);
+            return find?.Invoke(null, new object[] { RootName }) != null;
+        }
+
         private static void BuildWarehouse()
         {
             // Open-front warehouse shell: a real walk-in space with a wide vehicle bay.
