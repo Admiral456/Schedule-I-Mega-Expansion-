@@ -45,4 +45,4 @@ See docs/FRAMEWORK_INTEGRATION.md, docs/PHONE_APP_IMPLEMENTATION.md, docs/NPC_OR
 GitHub Actions validates data registries and runs game-independent domain tests. Game-facing integration requires local Schedule I IL2CPP assemblies and installed dependencies.
 
 ## Safety and status
-Use a copied save for first in-game tests. Unsupported/newer save schemas are preserved read-only. The phone app has working local navigation and a resident directory; live NPC/customer binding is still pending, but remains a prototype: real cash/item checkout, Realtor integration, spawned-NPC AI, world streaming and late-join order snapshots are not yet integrated.
+Use a copied save for first in-game tests. Unsupported/newer save schemas are preserved read-only. The phone app has working local navigation and a resident directory. Live NPC/customer binding is still pending. Real cash/item checkout, Realtor registration, native NPC binding, world streaming and late-join expansion-order snapshots are not yet integrated.
