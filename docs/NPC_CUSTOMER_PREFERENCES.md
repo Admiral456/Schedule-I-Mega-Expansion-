@@ -2,7 +2,7 @@
 
 ## Goals
 
-Customers must not behave as interchangeable copies. Their profiles carry independent preferred, neutral and rejected product IDs, price sensitivity and a concrete maximum order budget. The player relationship is also supplied per player so co-op partners can receive different outcomes from the same NPC.
+Customers must not behave as interchangeable copies. Expansion profiles carry independent preferred, neutral and rejected product IDs, price sensitivity and a concrete maximum order budget. Ordinary in-world customer relationships, unlocks and contract decisions belong to Schedule I's native NPCRelationship and NPCCustomer systems; this document does not define a replacement for them.
 
 ## Example profiles
 
@@ -14,17 +14,17 @@ These are initial balance examples, not final in-game economy tuning. Product ID
 
 ## Evaluation rules
 
-The game-independent NpcCustomerAcceptance service evaluates one proposed order:
+The game-independent NpcCustomerAcceptance service evaluates one proposed expansion-only remote/online order or test offer. It is not used to create vanilla in-world customer contracts:
 
 1. Validate profile, product IDs, quantities, prices and offer lines.
 2. Reject immediately if any requested product is in that NPC's rejected list.
 3. Reject if the total exceeds that NPC's explicit budget limit.
 4. Count distinct preferred and neutral products; duplicate lines do not multiply preference bonuses.
 5. Apply a price penalty based on both offer/budget ratio and that customer's price sensitivity.
-6. Apply the current player-specific reputation modifier.
+6. Apply an optional expansion-specific standing modifier supplied by the online-order caller. This value is not a native NPC relationship.
 7. Clamp the final score to 0–100; score 50 or higher accepts the order.
 
-The evaluator is deterministic and uses no random rolls. The host must call it when generating or validating an order, then persist the accepted result through the host-authoritative order pipeline. A client cannot authoritatively accept an order by running this evaluator locally.
+The evaluator is deterministic and uses no random rolls. The host may call it for the expansion's online-order/test path, then persist the accepted result through the host-authoritative expansion ledger. A client cannot authoritatively accept an order by running this evaluator locally. Native in-world customer offers must instead use Schedule I's NPCCustomer component.
 
 ## Current scoring constants
 
@@ -32,11 +32,11 @@ The evaluator is deterministic and uses no random rolls. The host must call it w
 - Preferred product: +15 each, capped at +30.
 - Neutral product: +4 each, capped at +8.
 - Price penalty: up to 35 points, scaled by price sensitivity and budget usage.
-- Player-specific reputation: 0.10 points per reputation point, clamped to the ledger's -100 to +100 range.
+- Expansion standing modifier: 0.10 points per standing point, clamped to -100 to +100. The current host coordinator passes neutral 0 until a distinct online-standing system is justified.
 - Acceptance threshold: 50.
 
 These constants are testable tuning defaults, not final balancing values. They should move into configuration once the live order-generation adapter exists.
 
 ## Runtime status
 
-The data profiles and pure domain evaluator are implemented and tested. They are not yet connected to live NPC entities, dealer/customer AI, the in-game phone contacts list or live order spawning. Runtime product IDs must be mapped to actual Schedule I item definitions before the first in-game order is enabled.
+The data profiles and pure domain evaluator are implemented and tested. They are not yet bound to live NPC entities or native NPCCustomer components. Native customer offer/contract lifecycle is not implemented by this domain service. Runtime product IDs must be mapped to actual Schedule I item definitions before expansion online checkout is enabled.
