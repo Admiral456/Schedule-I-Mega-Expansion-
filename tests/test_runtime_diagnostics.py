@@ -28,6 +28,7 @@ class RuntimeDiagnosticTests(unittest.TestCase):
             for element in self.project.findall(".//PackageReference")
         }
         self.assertEqual(packages.get("LavaGang.MelonLoader"), "0.7.3")
+        self.assertEqual(packages.get("S1API.Forked"), None)
         self.assertNotIn("S1API.Forked", packages)
 
     def test_core_discovers_native_s1api_lifecycle_dynamically(self):
