@@ -26,8 +26,9 @@ Preserve vanilla Hyland Point and add three major provinces:
 - S1API Saveable now contains the optional shop snapshot and exposes host-only load/commit methods with optimistic world-revision checks to reject stale writes.
 - NPC order requests now run through a host-authoritative Steam request/response path. The host resolves the NPC profile, player reputation, stock and pricing; the transaction reserves stock, debits a player-specific customer budget, funds order escrow and saves the order plus an idempotency receipt under one world revision.
 - The Hyland Network Contacts screen exposes a request action and clients receive host-confirmed order results.
+- Order closure settles escrow into shop revenue on completion, or refunds the customer and restores reserved stock on cancellation, expiry or failure. Settlement receipts prevent duplicate transfers after retries and reloads.
 
-The host order pipeline currently uses an expansion-side customer budget and escrow ledger, not vanilla Schedule I player cash. Actual player-cash settlement, live item inventory delivery, Portside stock seeding from real game item definitions, spawned-NPC binding and late-join snapshots still require integration. The order deadline currently uses host UTC time until the game-clock adapter is connected.
+The host order pipeline now includes expansion-side customer budgets, escrow settlement to shop revenue, refunds and stock restoration. These are virtual ledger accounts, not vanilla Schedule I player cash. Actual player-cash payout, live item inventory delivery, Portside stock seeding from real game item definitions, spawned-NPC binding and late-join snapshots still require integration. The order deadline currently uses host UTC time until the game-clock adapter is connected.
 
 ## Technical baseline
 - S1API 3.2.2 — native phone apps and per-save-slot Saveables.
@@ -41,4 +42,4 @@ See docs/FRAMEWORK_INTEGRATION.md, docs/PHONE_APP_IMPLEMENTATION.md, docs/SHOP_P
 GitHub Actions validates data registries and runs game-independent domain tests. Game-facing integration requires local Schedule I IL2CPP assemblies and installed dependencies.
 
 ## Safety and status
-Use a copied save for first in-game tests. Unsupported/newer save schemas are preserved read-only. The phone app is still a read-only status shell; contacts, real cash/item checkout, Realtor, NPC AI, world streaming and live co-op gameplay are not yet integrated.
+Use a copied save for first in-game tests. Unsupported/newer save schemas are preserved read-only. The phone app has working local navigation and NPC order request actions, but remains a prototype: real cash/item checkout, Realtor integration, spawned-NPC AI, world streaming and late-join order snapshots are not yet integrated.
