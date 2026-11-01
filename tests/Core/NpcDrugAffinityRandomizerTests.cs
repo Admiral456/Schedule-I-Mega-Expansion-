@@ -50,7 +50,9 @@ public sealed class NpcDrugAffinityRandomizerTests
         var first = NpcDrugAffinityRandomizer.CreateAssignments("save-seed-A", NpcIds, DrugTypes);
         var second = NpcDrugAffinityRandomizer.CreateAssignments("save-seed-B", NpcIds, DrugTypes);
 
-        Assert.NotEqual(ToSignatures(first), ToSignatures(second));
+        Assert.NotEqual(
+    string.Join("|", ToSignatures(first).OrderBy(item => item.Key).Select(item => item.Value)),
+    string.Join("|", ToSignatures(second).OrderBy(item => item.Key).Select(item => item.Value)));
     }
 
     [Fact]
