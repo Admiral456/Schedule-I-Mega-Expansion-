@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using MelonLoader;
 using ScheduleIMegaExpansion.Diagnostics;
+using ScheduleIMegaExpansion.Runtime;
 
 [assembly: MelonInfo(typeof(ScheduleIMegaExpansion.MegaExpansionMod), "Schedule I Mega Expansion", "0.1.0", "Admiral456")]
 [assembly: MelonGame("TVGS", "Schedule I")]
@@ -24,6 +25,7 @@ namespace ScheduleIMegaExpansion
         private bool _loggedMissingApi;
         private bool _loggedLifecycleError;
         private int _subscriptionPollFrames;
+        private bool _saveLoaded;
 
         public override void OnInitializeMelon()
         {
@@ -33,6 +35,15 @@ namespace ScheduleIMegaExpansion
 
         public override void OnUpdate()
         {
+            if (_saveLoaded)
+            {
+                string gameRoot = AppDomain.CurrentDomain.BaseDirectory;
+                HarborlineHotkeys.Update(
+                    gameRoot,
+                    message => MelonLogger.Msg("[Schedule I Mega Expansion] " + message),
+                    message => MelonLogger.Warning("[Schedule I Mega Expansion] " + message));
+            }
+
             if (_subscribed)
                 return;
 
@@ -110,6 +121,8 @@ namespace ScheduleIMegaExpansion
         private void OnPreLoad()
         {
             _exportedForCurrentLoad = false;
+            _saveLoaded = false;
+            HarborlineHotkeys.ResetForNewSave();
         }
 
         private void OnLoadComplete()
@@ -118,6 +131,7 @@ namespace ScheduleIMegaExpansion
                 return;
 
             _exportedForCurrentLoad = true;
+            _saveLoaded = true;
 
             try
             {
