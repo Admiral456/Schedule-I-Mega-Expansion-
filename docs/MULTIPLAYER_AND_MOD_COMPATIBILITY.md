@@ -49,3 +49,12 @@ Universal compatibility cannot be guaranteed. Maintain a compatibility matrix of
 - Protocol mismatch: reject expansion mutation requests without touching the save.
 - Invalid or incompatible save schema: preserve source data read-only rather than resetting it.
 - Unknown prefab/route/DrugType: skip the dependent feature and write a clear diagnostic.
+
+
+## Native police activity in Harborline
+
+Harborline does not create replacement police NPCs or override law intensity. After the live world contains verified patrol routes, the game adapter discovers them through `LawManager.GetAllFootPatrolRoutes()` and `GetAllVehiclePatrolRoutes()` (or resolves exact names with `FindFootPatrolRoute` / `FindVehiclePatrolRoute`). The native `StartFootPatrol` and `StartVehiclePatrol` APIs draw officers from the nearest police station and fail if the required staff or vehicle is not available.
+
+Checkpoint activation stays inside `CheckpointManager` and the game's automatic evaluation rules. Its evaluation considers intensity, time, curfew, player distance and officer availability. As law intensity is global, Harborline must not set a district-specific intensity by changing the world-wide value. See the three planned Harbor Gate, Freight Depot and Market Square anchors in `data/harborline_population.json`.
+
+A patrol or checkpoint is not marked complete until its route/point exists in the live scene and a host/client test confirms the officers move, assign and release correctly.
