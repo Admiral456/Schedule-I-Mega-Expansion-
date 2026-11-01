@@ -20,9 +20,6 @@ public static class NpcCustomerDirectory
     public const string StandardProductId = "sime.product.batch.standard";
     public const string IndustrialProductId = "sime.product.batch.industrial";
     public const string PremiumProductId = "sime.product.batch.premium";
-    public const string MedicalProductId = "sime.product.batch.medical";
-    public const string OrganicProductId = "sime.product.batch.organic";
-    public const string ElectronicProductId = "sime.product.component.electronic";
 
     private static readonly IReadOnlyList<NpcCustomerDirectoryEntry> Entries =
         Array.AsReadOnly(new[]
@@ -30,16 +27,16 @@ public static class NpcCustomerDirectory
             Create(HarborlineProvinceId, "Morgan Reed", "Portside shopkeeper", "Weekdays / morning",
                 "sime.npc.harborline.morgan_reed", 1_200, 0.65,
                 new[] { StandardProductId }, new[] { IndustrialProductId },
-                new[] { PremiumProductId, ElectronicProductId }),
+                new[] { PremiumProductId }),
 
             Create(HarborlineProvinceId, "Casey Ward", "Dock worker", "Daily / early morning",
                 "sime.npc.harborline.casey_ward", 850, 0.82,
-                new[] { StandardProductId, OrganicProductId }, new[] { MedicalProductId },
+                new[] { StandardProductId }, new[] { IndustrialProductId },
                 new[] { PremiumProductId }),
 
             Create(HarborlineProvinceId, "Ellis Shaw", "Warehouse supervisor", "Weekdays / afternoon",
                 "sime.npc.harborline.ellis_shaw", 3_500, 0.28,
-                new[] { IndustrialProductId, ElectronicProductId }, new[] { StandardProductId },
+                new[] { IndustrialProductId }, new[] { StandardProductId },
                 Array.Empty<string>()),
 
             Create(RidgeviewProvinceId, "Jordan Pike", "Quarry contractor", "Weekdays / daytime",
@@ -49,28 +46,28 @@ public static class NpcCustomerDirectory
 
             Create(RidgeviewProvinceId, "Avery Cole", "Workshop mechanic", "Daily / evening",
                 "sime.npc.ridgeview.avery_cole", 2_100, 0.48,
-                new[] { ElectronicProductId, IndustrialProductId }, new[] { StandardProductId },
-                new[] { OrganicProductId }),
+                new[] { IndustrialProductId }, new[] { StandardProductId },
+                new[] { PremiumProductId }),
 
             Create(RidgeviewProvinceId, "Quinn Hayes", "Research technician", "Weekdays / late afternoon",
                 "sime.npc.ridgeview.quinn_hayes", 5_200, 0.22,
-                new[] { MedicalProductId, ElectronicProductId }, new[] { PremiumProductId },
+                new[] { PremiumProductId }, new[] { IndustrialProductId },
                 new[] { StandardProductId }),
 
             Create(LakesideProvinceId, "Taylor Brooks", "Resort investor", "Daily / afternoon",
                 "sime.npc.lakeside.taylor_brooks", 9_000, 0.15,
-                new[] { PremiumProductId, MedicalProductId }, new[] { IndustrialProductId },
+                new[] { PremiumProductId }, new[] { IndustrialProductId },
                 new[] { StandardProductId }),
 
             Create(LakesideProvinceId, "Riley Morgan", "Marina operator", "Daily / morning",
                 "sime.npc.lakeside.riley_morgan", 2_800, 0.42,
-                new[] { OrganicProductId, StandardProductId }, new[] { PremiumProductId },
-                new[] { ElectronicProductId }),
+                new[] { StandardProductId }, new[] { PremiumProductId },
+                new[] { IndustrialProductId }),
 
             Create(LakesideProvinceId, "Skylar James", "Restaurant owner", "Weekdays / evening",
                 "sime.npc.lakeside.skylar_james", 1_650, 0.72,
-                new[] { OrganicProductId, MedicalProductId }, new[] { StandardProductId },
-                new[] { ElectronicProductId })
+                new[] { PremiumProductId }, new[] { StandardProductId },
+                new[] { IndustrialProductId })
         });
 
     private static readonly IReadOnlyDictionary<string, NpcCustomerDirectoryEntry> ById =
