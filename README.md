@@ -14,7 +14,7 @@ Cílem je přirozeně rozšířit Hyland Point o nové obyvatelné a funkční o
 
 ## První oblast: Harborline
 
-Plánované dominanty: Portside Supply, Harbor Freight Warehouse, Harbor Market, Harbor Auto Works, Harbor Offices, Harbor Power Plant, Pier Promenade a policejní kontrolní bod. Seznam je v `world/harborline/anchors.json`; dosud neobsahuje herní souřadnice a není určen k přímému spawnu.
+Harborline je pojmenovaná podčtvrť původního herního regionu **Docks**; nevytváříme nepodporovanou novou hodnotu region enum. Plánované dominanty: Portside Supply, Harbor Freight Warehouse, Harbor Market, Harbor Auto Works, Harbor Offices, Harbor Power Plant, Pier Promenade a policejní kontrolní bod. Seznam je v `world/harborline/anchors.json`; dosud neobsahuje herní souřadnice a není určen k přímému spawnu.
 
 NPC role a cílové počty jsou v `packs/Harborline/roster.json`: nově 42 fyzických NPC, z toho zhruba 18 současně aktivních, 30 zákaznických profilů a 2 dealeři. Harborline je rozdělený do pěti propojených podčástí. Detail rozšíření je v `world/harborline/expansion-plan.json`.
 
@@ -38,7 +38,7 @@ Verze závislostí se uzamknou až při prvním sestavitelném runtime projektu.
 - Repozitář zatím neobsahoval herní kód; tato větev připravuje datovou a validační základnu.
 - Pozice budov, silnic a NPC musí být zachyceny v herním světě.
 - Nákup businessů, obchodní inventář, policie a Hyland Network se napojí na původní systémy až po ověření jejich API v cílové verzi hry.
-- Tato větev sama o sobě zatím není instalovatelným modem.
+- Tato větev nyní obsahuje základní diagnostický IL2CPP mod, ale zatím není ověřeně sestavený ani otestovaný ve hře. Diagnostický runtime nic nemění; jeho úkolem je vypsat původní registry pro další implementaci.
 
 ## Struktura
 
@@ -48,6 +48,7 @@ Verze závislostí se uzamknou až při prvním sestavitelném runtime projektu.
 - `docs/npc-generation-and-multiplayer.md` – náhodné preference, nativní generování vzhledu, policie a multiplayer.
 - `docs/native-map-buildings-interiors.md` – herní mapa, nativní ikony/vlastnictví, dveře a funkční interiéry.
 - `world/harborline/native-integration.json` – nativní integrační pravidla a kontrolní brány.
+- `src/` – první IL2CPP diagnostický runtime projekt v režimu pouze pro čtení; exportuje původní registry hry.
 - `world/harborline/anchors.json` – seznam lokalit a míst k zaměření.
 - `world/harborline/expansion-plan.json` – plán větší oblasti a pěti podčástí.
 - `world/harborline/prefabs.json` – katalog původních prefabů ověřených přímo ve hře.
