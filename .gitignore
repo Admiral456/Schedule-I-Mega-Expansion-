@@ -1,0 +1,6 @@
+# Local game-specific build settings
+src/local.build.props
+
+# Build output
+src/bin/
+src/obj/
