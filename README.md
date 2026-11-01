@@ -40,6 +40,7 @@ Verze závislostí se uzamknou až při prvním sestavitelném runtime projektu.
 - `world/harborline/anchors.json` – seznam lokalit a míst k zaměření.
 - `world/harborline/prefabs.json` – katalog původních prefabů ověřených přímo ve hře.
 - `packs/Harborline/roster.json` – role a cílové počty NPC.
+- `packs/Harborline/customer-designs.json` – 14 individuálních návrhů zákaznických preferencí.
 - `tools/validate_personnel_pack.py` – validace skutečného Personnel manifestu.
 - `tests/` – testy validátoru.
 
