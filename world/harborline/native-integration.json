@@ -136,11 +136,11 @@
     "compileRequiresGameAssemblies": false,
     "buildWorkflow": ".github/workflows/build-runtime.yml",
     "latestSuccessfulBuild": {
-      "commit": "cd0920edd5137cc75473931e7b9d4a6c33245794",
-      "workflowRunId": 41325943319,
-      "artifactId": 13091510887,
+      "commit": "b6980893e5657092b2bf3ffde76755f060945fac",
+      "workflowRunId": 41326124145,
+      "artifactId": 13091860050,
       "artifactName": "ScheduleIMegaExpansion-runtime-diagnostic",
-      "dllSha256": "ae3a8c8929ed467c04104128929040723946906735835136f7c89bb14b488a36",
+      "dllSha256": "13705821581789260b094da42210cf4b1ce1b0652b1e5effe9532c864231ebd0",
       "dllSizeBytes": 43520
     }
   }
