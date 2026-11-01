@@ -4,12 +4,13 @@
   "status": "design-contract; not a runtime implementation",
   "npc": {
     "system": "S1API.Entities.NPC",
-    "appearance": "S1API.Entities.NPCAppearance.GenerateRandomAppearance() followed by Build()",
+    "appearance": "On the NPC instance: Appearance.GenerateRandomAppearance() followed by Appearance.Build()",
     "externalNpcPackFrameworkRequired": false,
     "useCustomAppearanceGenerator": false,
     "useVanillaAvatarLayers": true,
     "saveAndNetwork": "native Schedule I/S1API NPC lifecycle",
-    "appearanceRegeneration": "never on load or client join"
+    "appearanceRegeneration": "never on load or client join",
+    "appearanceMethodKind": "instance method on the NPC's NPCAppearance object; not a static type method"
   },
   "worldMap": {
     "extendPlayableWorld": true,
