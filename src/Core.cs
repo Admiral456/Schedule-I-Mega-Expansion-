@@ -4,7 +4,7 @@ using System.Reflection;
 using MelonLoader;
 using ScheduleIMegaExpansion.Diagnostics;
 
-[assembly: MelonInfo(typeof(ScheduleIMegaExpansion.Core), "Schedule I Mega Expansion", "0.1.0", "Admiral456")]
+[assembly: MelonInfo(typeof(ScheduleIMegaExpansion.MegaExpansionMod), "Schedule I Mega Expansion", "0.1.0", "Admiral456")]
 [assembly: MelonGame("TVGS", "Schedule I")]
 
 namespace ScheduleIMegaExpansion
@@ -13,7 +13,7 @@ namespace ScheduleIMegaExpansion
     /// Runtime diagnostic bootstrap. S1API is discovered dynamically so this
     /// project can compile without shipping or referencing game assemblies.
     /// </summary>
-    public sealed class Core : MelonMod
+    public sealed class MegaExpansionMod : MelonMod
     {
         private EventInfo? _preLoadEvent;
         private EventInfo? _loadCompleteEvent;
