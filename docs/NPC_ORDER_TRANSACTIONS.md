@@ -21,3 +21,13 @@ The customer budget and escrow currently live in the expansion's persistent mone
 ## Multiplayer boundary
 
 Only an initialized SteamNetworkLib host in an active lobby may run the placement service or commit the save. The co-op client sends only a request ID, resident ID and shop ID. The host derives the requester identity from the Steam sender, reads reputation from its own save, generates the offer, persists the transaction and returns the committed order. A late-join snapshot and settlement/payout workflow remain separate follow-up work.
+
+## Steam request path
+
+The Contacts screen sends only a unique request ID, resident ID and shop ID. The host derives the requester from the Steam sender, reads reputation from its own save, chooses a host-time 30-minute interval and computes the deadline itself. The client accepts a response only from its sole compatible remote peer in the configured two-player lobby.
+
+The host persists an idempotency receipt with a fingerprint of requester, customer and shop. A retry with the same ID and same payload returns the saved order; reusing the ID for a different payload is rejected. A player can have at most one non-terminal order from the same resident within the same 30-minute interval.
+
+The customer budget account is isolated by NPC, Steam player and interval. This prevents one co-op partner from consuming another player's relationship-specific budget.
+
+The current client order mirror is session-local. The host save remains the durable source of truth; late-join order snapshots are not implemented yet. The order clock currently uses host UTC time until the in-game Schedule I world-clock adapter is available.
