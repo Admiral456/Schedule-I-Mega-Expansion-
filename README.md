@@ -7,7 +7,7 @@ Cílem je přirozeně rozšířit Hyland Point o nové obyvatelné a funkční o
 ## Principy
 
 1. **Nejdřív znovu použít hru.** Preferujeme existující prefaby, budovy, nábytek, světla, silniční prvky a herní interakce. Vlastní geometrii použijeme jen tam, kde ve hře vhodný prvek neexistuje.
-2. **NPC jako data.** NPC budou tvořena jako S1API.Entities.NPC přes původní herní NPC systém; vzhled generuje NPCAppearance.GenerateRandomAppearance(). Jejich zákaznické/dealerské vlastnosti, rozvrhy a kontakty budou definované v balíčku.
+2. **NPC jako data.** NPC budou tvořena jako S1API.Entities.NPC přes původní herní NPC systém; vzhled generuje instance `Appearance.GenerateRandomAppearance()` následované `Appearance.Build()`. Jejich zákaznické/dealerské vlastnosti, rozvrhy a kontakty budou definované v balíčku.
 3. **Žádné vymyšlené souřadnice.** Pozice se musí zachytit přímo ve hře. 2D mapové souřadnice z webového pomocníka nejsou Unity World X/Y/Z.
 4. **Host je autorita.** Síťové změny a stav světa musí respektovat síťové/ukládací mechanismy hry a S1API.
 5. **Po malých ověřitelných krocích.** Nejdřív funkční Harborline, až potom další provincie a rozšiřování mobilní sítě.
@@ -21,7 +21,7 @@ NPC role a cílové počty jsou v `packs/Harborline/roster.json`: nově 42 fyzic
 ## Generování NPC a multiplayer
 
 - Každý zákazník má vlastní náhodné preference, ale generování je deterministické podle stabilního ID a uložené do save; po načtení ani připojení hráče se znovu nelosuje.
-- Vzhledy generuje nativní NPCAppearance.GenerateRandomAppearance(); přesné duplicity se mají kontrolovat na skutečných AvatarSettings.
+- Vzhledy generuje nativní instance `Appearance.GenerateRandomAppearance()` a `Appearance.Build()`; přesné duplicity se mají kontrolovat na skutečných AvatarSettings.
 - Policie se nebude nahrazovat vlastním AI; Harborline se napojí na nativní policejní spawn/dispatch a navigaci.
 - Host je autorita pro spawn a stav NPC. Všichni hráči musí mít shodnou verzi modu a S1API.
 - Detailní kontrakt a testovací brány: `docs/npc-generation-and-multiplayer.md`.
@@ -31,14 +31,14 @@ NPC role a cílové počty jsou v `packs/Harborline/roster.json`: nově 42 fyzic
 - **MelonLoader + S1API Forked** – základní mod runtime a herní API.
 - **S1MAPI** – budovy a interiéry pouze pro prvky, které nelze vhodně znovu použít z původní hry.
 
-Diagnostický IL2CPP projekt je zatím připraven proti S1API.Forked 3.1.6 a MelonLoader 0.7.3. Build musí být ověřen proti skutečně nainstalované verzi S1API v cílové hře. Viz [S1API Custom NPCs](https://ifbars.github.io/S1API/docs/custom-npcs.html), [NPCAppearance](https://ifbars.github.io/S1API/api/S1API.Entities.NPCAppearance.html) a [S1MAPI](https://ifbars.github.io/S1MAPI/).
+Diagnostický IL2CPP projekt cílí na .NET 6 a MelonLoader 0.7.3; S1API se objevuje dynamicky až v běžící hře, takže sestavení nevyžaduje kopii herních DLL. Výstup musí být ověřen proti skutečně nainstalované verzi S1API v cílové hře. Viz [S1API Custom NPCs](https://ifbars.github.io/S1API/docs/custom-npcs.html), [NPCAppearance](https://ifbars.github.io/S1API/api/S1API.Entities.NPCAppearance.html) a [S1MAPI](https://ifbars.github.io/S1MAPI/).
 
 ## Aktuální stav a limity
 
-- Repozitář zatím neobsahoval herní kód; tato větev připravuje datovou a validační základnu.
+- Větev nyní obsahuje první sestavitelný, pouze diagnostický runtime mod. Neprovádí zatím změny světa ani spawn NPC.
 - Pozice budov, silnic a NPC musí být zachyceny v herním světě.
 - Nákup businessů, obchodní inventář, policie a Hyland Network se napojí na původní systémy až po ověření jejich API v cílové verzi hry.
-- Tato větev nyní obsahuje základní diagnostický IL2CPP mod, ale zatím není ověřeně sestavený ani otestovaný ve hře. Diagnostický runtime nic nemění; jeho úkolem je vypsat původní registry pro další implementaci.
+- GitHub Actions sestavuje diagnostický IL2CPP mod a balí DLL do artefaktu. Samotný běh ve hře a jeho výstup ještě nejsou ověřeny; diagnostický runtime nic nemění a vyčítá původní registry pro další implementaci.
 
 ## Struktura
 
