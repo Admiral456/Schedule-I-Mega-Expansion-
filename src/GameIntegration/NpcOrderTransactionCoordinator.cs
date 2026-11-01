@@ -4,8 +4,8 @@ using SteamNetworkLib;
 namespace ScheduleIMegaExpansion.GameIntegration;
 
 /// <summary>
-/// Converts untrusted network intent into a host-validated and persisted NPC order.
-/// Prices, stock, resident preferences, reputation and deadlines are resolved by the host.
+/// Converts untrusted network intent into a host-validated expansion-only online order.
+/// Ordinary in-world customer contracts and NPC relationships are owned by Schedule I.
 /// </summary>
 public sealed class NpcOrderTransactionCoordinator
 {
@@ -83,10 +83,11 @@ public sealed class NpcOrderTransactionCoordinator
             if (hasActiveOrder)
                 return Failure(payload.RequestId, "ActiveOrderAlreadyExists");
 
-            string reputationKey = "player:" + requesterId + ":npc:" + customer.Profile.NpcId;
-            int reputation = current.Data.ReputationByScope.TryGetValue(reputationKey, out int savedReputation)
-                ? savedReputation
-                : 0;
+            // Native NPCRelationship owns ordinary per-player NPC standing. Do not persist a
+            // shadow player:NPC reputation in the expansion ledger. Until a verified native
+            // relationship read adapter is connected, the online-order evaluator uses neutral
+            // expansion standing.
+            const int expansionStanding = 0;
 
             var request = new NpcOrderPlacementRequest(
                 requestKey,
@@ -96,7 +97,7 @@ public sealed class NpcOrderTransactionCoordinator
                 interval,
                 now,
                 checked(now + OrderLifetimeSeconds),
-                reputation);
+                expansionStanding);
 
             NpcOrderPlacementResult placement = NpcOrderPlacementService.Create(
                 shop,
