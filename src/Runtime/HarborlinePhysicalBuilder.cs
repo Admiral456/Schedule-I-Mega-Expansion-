@@ -111,7 +111,7 @@ namespace ScheduleIMegaExpansion.Runtime
 
                 // The center is intentionally offset forward so the player does not
                 // spawn inside the footprint when capturing the anchor.
-                Add("Dockyard ground slab", 0f, -0.28f, 0f, 32f, 0.55f, 28f, 0.34f, 0.36f, 0.37f);
+                Add("Dockyard ground slab", 0f, -0.28f, 0f, 54f, 0.55f, 28f, 0.34f, 0.36f, 0.37f);
                 Add("Quayside asphalt road", 10.4f, 0.035f, 0f, 6.2f, 0.07f, 28f, 0.12f, 0.13f, 0.14f);
                 Add("Road edge line left", 7.15f, 0.09f, 0f, 0.12f, 0.025f, 27f, 0.85f, 0.78f, 0.46f);
                 Add("Road edge line right", 13.65f, 0.09f, 0f, 0.12f, 0.025f, 27f, 0.85f, 0.78f, 0.46f);
