@@ -1,16 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using S1API.Map;
-using S1API.Property;
 
 namespace ScheduleIMegaExpansion.Diagnostics
 {
     /// <summary>
     /// Writes metadata-only reflection information for native map and property types.
-    /// No game methods are invoked and no game state is changed.
+    /// It inspects names and signatures only; no game methods or property setters are invoked.
     /// </summary>
     internal static class NativeApiSurfaceScanner
     {
@@ -30,99 +27,53 @@ namespace ScheduleIMegaExpansion.Diagnostics
             };
 
             int inspected = 0;
-
-            try
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies()
+                .Where(IsTargetAssembly)
+                .OrderBy(item => item.GetName().Name, StringComparer.Ordinal))
             {
-                List<PropertyWrapper> properties = PropertyManager.GetAllProperties();
-                if (properties.Count > 0)
+                lines.Add("ASSEMBLY " + assembly.GetName().FullName);
+                Type[] types;
+                try
                 {
-                    object? native = ReadWrapperField(properties[0], "InnerProperty");
-                    if (native != null)
-                    {
-                        inspected += WriteTypeSurface(lines, "NativeProperty", native.GetType());
-                    }
+                    types = assembly.GetTypes();
                 }
-            }
-            catch (Exception ex)
-            {
-                lines.Add("NativePropertyInspection=ERROR: " + ex.GetType().Name + ": " + ex.Message);
-                warn("Could not inspect the native Property type: " + ex.Message);
-            }
-
-            try
-            {
-                List<BusinessWrapper> businesses = BusinessManager.GetAllBusinesses();
-                if (businesses.Count > 0)
+                catch (ReflectionTypeLoadException ex)
                 {
-                    object? native = ReadWrapperField(businesses[0], "InnerBusiness");
-                    if (native != null)
-                    {
-                        inspected += WriteTypeSurface(lines, "NativeBusiness", native.GetType());
-                    }
+                    types = ex.Types.Where(type => type != null).Cast<Type>().ToArray();
+                    warn("Some types could not be loaded from " + assembly.GetName().Name);
                 }
-            }
-            catch (Exception ex)
-            {
-                lines.Add("NativeBusinessInspection=ERROR: " + ex.GetType().Name + ": " + ex.Message);
-                warn("Could not inspect the native Business type: " + ex.Message);
-            }
-
-            try
-            {
-                Assembly? gameAssembly = AppDomain.CurrentDomain.GetAssemblies()
-                    .FirstOrDefault(assembly =>
-                        string.Equals(assembly.GetName().Name, "Assembly-CSharp", StringComparison.OrdinalIgnoreCase));
-
-                if (gameAssembly == null)
+                catch (Exception ex)
                 {
-                    lines.Add("GameAssembly=not-loaded");
+                    lines.Add("TYPE_SCAN_ERROR " + ex.GetType().Name + ": " + ex.Message);
+                    continue;
                 }
-                else
+
+                int written = 0;
+                foreach (Type type in types
+                    .Where(IsRelevantMapOrPropertyType)
+                    .OrderBy(type => type.FullName, StringComparer.Ordinal)
+                    .Take(300))
                 {
-                    lines.Add("GameAssembly=" + gameAssembly.FullName);
-                    Type[] types;
-                    try
-                    {
-                        types = gameAssembly.GetTypes();
-                    }
-                    catch (ReflectionTypeLoadException ex)
-                    {
-                        types = ex.Types.Where(type => type != null).Cast<Type>().ToArray();
-                        warn("Some game types could not be loaded during metadata inspection.");
-                    }
-
-                    int matched = 0;
-                    foreach (Type type in types
-                        .Where(IsRelevantMapOrPropertyType)
-                        .OrderBy(type => type.FullName, StringComparer.Ordinal)
-                        .Take(300))
-                    {
-                        inspected += WriteTypeSurface(lines, "GameType", type);
-                        matched++;
-                    }
-
-                    lines.Add("RelevantGameTypesWritten=" + matched);
+                    inspected += WriteTypeSurface(lines, type);
+                    written++;
                 }
-            }
-            catch (Exception ex)
-            {
-                lines.Add("GameTypeScan=ERROR: " + ex.GetType().Name + ": " + ex.Message);
-                warn("Native game type scan was incomplete: " + ex.Message);
+
+                lines.Add("RelevantTypesWritten=" + written);
+                lines.Add("");
             }
 
-            File.WriteAllLines(
-                Path.Combine(outputDirectory, "native-map-property-api.txt"),
+            System.IO.File.WriteAllLines(
+                System.IO.Path.Combine(outputDirectory, "native-map-property-api.txt"),
                 lines);
 
             return inspected;
         }
 
-        private static object? ReadWrapperField(object wrapper, string fieldName)
+        private static bool IsTargetAssembly(Assembly assembly)
         {
-            FieldInfo? field = wrapper.GetType().GetField(
-                fieldName,
-                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            return field?.GetValue(wrapper);
+            string name = assembly.GetName().Name ?? string.Empty;
+            return name.IndexOf("Assembly-CSharp", StringComparison.OrdinalIgnoreCase) >= 0
+                || name.IndexOf("S1API", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private static bool IsRelevantMapOrPropertyType(Type type)
@@ -136,11 +87,10 @@ namespace ScheduleIMegaExpansion.Diagnostics
                 || name.IndexOf("POI", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
-        private static int WriteTypeSurface(List<string> lines, string label, Type type)
+        private static int WriteTypeSurface(List<string> lines, Type type)
         {
             int count = 0;
-            lines.Add("[" + label + "] " + (type.FullName ?? type.Name));
-            lines.Add("Assembly=" + type.Assembly.GetName().Name);
+            lines.Add("[TYPE] " + (type.FullName ?? type.Name));
 
             try
             {
@@ -184,7 +134,7 @@ namespace ScheduleIMegaExpansion.Diagnostics
             }
             catch (Exception ex)
             {
-                lines.Add("MemberInspection=ERROR: " + ex.GetType().Name + ": " + ex.Message);
+                lines.Add("MEMBER_SCAN_ERROR " + ex.GetType().Name + ": " + ex.Message);
             }
 
             lines.Add("");
@@ -198,7 +148,7 @@ namespace ScheduleIMegaExpansion.Diagnostics
                 "register", "unregister", "add", "remove", "create", "initialize",
                 "map", "region", "icon", "bounds", "point", "property", "business",
                 "purchase", "owned", "ownership", "prefab", "load", "building",
-                "properties", "businesses", "poI"
+                "properties", "businesses", "poi"
             };
 
             return keywords.Any(keyword =>
