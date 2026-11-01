@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "packId": "harborline",
   "region": "Harborline",
-  "status": "design-only; final Personnel manifest requires in-game survey and target-version schema validation",
+  "status": "design-only; native S1API NPC implementation requires in-game survey and target-build verification",
   "expansion": {
     "scale": "large-district",
     "subdistricts": [
@@ -132,7 +132,7 @@
       "preferred order day and time"
     ],
     "persistence": "Generate once from a stable per-NPC seed and save the resolved values; never reroll on reload or client join.",
-    "validity": "Choose only product/effect identifiers verified in the target game and Personnel schema. Avoid impossible or empty preference sets.",
+    "validity": "Choose only product/effect identifiers verified in the target game build and native S1API customer schema. Avoid impossible or empty preference sets.",
     "uniqueness": "Use weighted random selection with duplicate-profile detection; if a collision occurs, reroll only the conflicting profile.",
     "mustDefineIndividually": [
       "spending",
