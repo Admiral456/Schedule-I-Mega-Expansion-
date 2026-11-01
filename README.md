@@ -10,6 +10,13 @@ Preserve vanilla Hyland Point and add three major provinces:
 - **Ridgeview** — mountain quarry, processing, factories, research and freight contracts.
 - **Lakeside** — lake, marina, resorts, hotels, recreation and luxury businesses.
 
+## Harborline scale
+- Expanded Harborline is planned as seven connected subdistricts: harbor gate, container port, freight park, market/high street, industrial services, worker housing and waterfront.
+- Target roster: 42 physical NPCs, including 26 native customers and one native dealer. The first simultaneous target is 16, with 20 as a performance-test ceiling.
+- Native customer drug preferences are generated from the installed game's DrugType values using a save-scoped deterministic algorithm.
+- Police are not custom NPCs: Harborline uses the game's native LawController, LawManager and CheckpointManager.
+- See data/harborline_population.json and docs/HARBORLINE_EXPANSION_PLAN.md, docs/NPC_RANDOMIZATION.md and docs/MULTIPLAYER_AND_MOD_COMPATIBILITY.md.
+
 ## Gameplay scope
 - Hyland Network phone app with Home, Contacts, Orders, Online Shop, Businesses and Provinces.
 - Portside Supply physical store and planned online catalogue with one shared stock and price source.
