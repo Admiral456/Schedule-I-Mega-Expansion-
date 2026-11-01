@@ -38,11 +38,25 @@ namespace ScheduleIMegaExpansion.Diagnostics
             WriteProperties(outputDirectory, summary, warn);
             WriteBusinesses(outputDirectory, summary, warn);
             WriteStandaloneMapPois(outputDirectory, summary, warn);
+            WriteNativeApiSurface(outputDirectory, summary, warn);
 
             string summaryPath = Path.Combine(outputDirectory, "summary.txt");
             File.WriteAllLines(summaryPath, summary);
             log("Native world snapshot complete.");
             return summaryPath;
+        }
+
+        private static void WriteNativeApiSurface(string directory, List<string> summary, Action<string> warn)
+        {
+            try
+            {
+                int members = NativeApiSurfaceScanner.Export(directory, warn);
+                summary.Add("NativeApiSurfaceMembers=" + members.ToString(CultureInfo.InvariantCulture));
+            }
+            catch (Exception ex)
+            {
+                AddError("NativeApiSurface", ex, summary, warn);
+            }
         }
 
         private static void WriteRegions(string directory, List<string> summary, Action<string> warn)
