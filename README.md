@@ -63,6 +63,6 @@ Diagnostický IL2CPP projekt je zatím připraven proti S1API.Forked 3.1.6 a Mel
 python -m unittest discover -s tests -v
 ```
 
-Runtime diagnostický mod se sestavuje odděleně na Windows: v `src/` spusť `setup.ps1` a následně `dotnet build ScheduleIMegaExpansion.csproj -c Release`. Build vyžaduje lokální instalaci Schedule I, MelonLoader a S1API; automatická datová CI kontrola herní DLL nesestavuje.
+Runtime diagnostický mod se sestavuje jako samostatný .NET 6 projekt bez lokálních herních DLL. Příkaz `dotnet build src/ScheduleIMegaExpansion.csproj -c Release` vytvoří DLL; GitHub Actions navíc vytváří ZIP artefakt. Do hry se instaluje až po ověření s MelonLoader a S1API.
 
 Runtime balíček se nesmí označit za hotový, dokud nemá stabilní NPC ID, skutečné spawn souřadnice, ověřené trasy a průchozí budovy.
