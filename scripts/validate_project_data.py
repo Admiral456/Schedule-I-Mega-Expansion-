@@ -108,6 +108,14 @@ def main():
 
     for npc in npcs_doc["profiles"]:
         require(npc["provinceId"] in province_ids, f"{npc['id']} references unknown province")
+        relationship = npc.get("relationship")
+        require(
+            isinstance(relationship, dict)
+            and relationship.get("provider") == "schedule_i_native"
+            and relationship.get("initialization") == "use_native_default"
+            and "reputation" not in npc,
+            f"{npc['id']} must defer NPC relationship state to Schedule I",
+        )
 
         preferences = npc["preferences"]
         sensitivity = preferences["priceSensitivity"]
