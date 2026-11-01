@@ -122,7 +122,7 @@
     "output": "UserData/ScheduleIMegaExpansion/Diagnostics/<timestamp>",
     "mutatesGameState": false,
     "compileTarget": "IL2CPP net6.0",
-    "status": "source added; CI compile result pending; in-game execution not yet verified",
+    "status": "CI build succeeded; in-game execution and generated registry report still require target-game verification",
     "outputFiles": [
       "summary.txt",
       "native-regions.csv",
@@ -133,6 +133,13 @@
       "native-map-property-api.txt"
     ],
     "compileRequiresGameAssemblies": false,
-    "buildWorkflow": ".github/workflows/build-runtime.yml"
+    "buildWorkflow": ".github/workflows/build-runtime.yml",
+    "latestSuccessfulBuild": {
+      "commit": "85abe0f8e51ad4deac280c579d47c503af36ebbc",
+      "workflowRunId": 41325604009,
+      "artifactId": 13090943875,
+      "artifactName": "ScheduleIMegaExpansion-runtime-diagnostic",
+      "dllSha256": "d88a23a73160244187f55ac4a83eb9c3f9835e80b08230b49a67c7095631a739"
+    }
   }
 }
