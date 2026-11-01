@@ -1,68 +1,61 @@
-# Bezpečné opakované použití herních prefabů
+# Architektura Harborline — rozšíření skutečného světa
 
-Tento dokument je závazný pro všechny nové budovy, obchody a environmentální objekty v Harborline. Chybná volba síťového spawn režimu může rozbít FishNet multiplayer.
+## Zásada
+Harborline nesmí být samostatná obrazovka, oddělená mapa ani sada dekorací mimo svět hry. Musí jít o fyzické rozšíření Hyland Pointu, propojené s Docks, silnicemi, navigací, mapou telefonu, budovami a původními herními systémy.
 
-## 1. Nejprve ověřit existující objekt
+## NPC: původní systém postav
+- Vytvářet fyzické postavy jako S1API.Entities.NPC, tedy přes NPC prefab, schedule, customer/dealer, save/load a síťovací cestu Schedule I.
+- Vzhled generovat výhradně nativním avatar systémem přes S1API.Entities.NPCAppearance.GenerateRandomAppearance() a následné Build().
+- Nepoužívat vlastní generátor obličejů/těl/oblečení ani Personnel jako povinný framework pro spawny. S1API je API vrstva, která zpřístupňuje herní NPC/avatar systémy.
+- Náhodný vzhled se vytvoří jednou na hostu, uloží s NPC a synchronizuje do klientů. Při načtení save, připojení klienta nebo změně scény se nesmí znovu losovat.
+- Kontrola opakování smí porovnávat jen skutečně vyřešené nativní AvatarSettings; při shodě se znovu zavolá nativní randomizer. Žádné ručně sestavené kombinace vlastních assetů.
+- Zákaznické a dealerské chování musí používat nativní customer/dealer komponenty a ekonomiku.
 
-- Prefab lze dohledat přes `S1MAPI.Core.PrefabRef` s přesným názvem v registru FishNet.
-- `PrefabRef.Find()` vrací odpovídající herní GameObject nebo `null`.
-- Do `world/harborline/prefabs.json` se zapíše přesný název, kategorie, zdroj, přítomnost `NetworkObject` a stav ověření.
-- Název prefabů se nesmí domýšlet podle toho, jak objekt vypadá ve hře.
+Reference: https://ifbars.github.io/S1API/docs/custom-npcs.html a https://ifbars.github.io/S1API/api/S1API.Entities.NPCAppearance.html.
 
-## 2. Síťové objekty
+## Fyzická oblast a mapa
+1. Změřit skutečný prostor navazující na Docks. Nevytvářet souřadnice převodem pixelů z návrhové mapy.
+2. Rozšířit existující herní geometrii/scene: terén, pobřeží, chodníky, silnice, napojení na Docks, kolize a navigační síť.
+3. Rozšířit stejnou mapu používanou hrou o odpovídající výřez/oblast a správný world-to-map převod. Nová část musí být viditelná při běžném otevření mapy; samostatná mapka nebo sada POI ikon není náhrada.
+4. Zaregistrovat oblast v nativním region/map systému tak, aby v ní fungovala NPC navigace, policejní logika a další regionální systémy. Přesný hook/identifikátor je release gate, dokud nebude potvrzen v cílovém herním buildu.
+5. S1API.Map.MapPOI použít pouze pro samostatné veřejné body zájmu, které nemají vlastní nativní budovu/nemovitost. POI nesmí předstírat vlastnictví ani nahradit obchodní či obytnou značku.
 
-Pokud prefab obsahuje `NetworkObject`, vždy se musí vytvořit přes síťovou cestu:
+## Ikony a vlastnictví
+- Obchod se registruje jako skutečný herní obchod/budova; jeho ikonu vybírá nativní mapový klasifikátor hry.
+- Nemovitost/obchod určený k nákupu musí být registrovaný v původním property/real-estate systému. Stav vlastnictví je jediný zdroj pravdy.
+- Po nákupu musí původní mapový renderer změnit značku do nativního stavu vlastněné nemovitosti (včetně domečku, pokud jej hra pro daný typ používá).
+- Nepřidávat vlastní sprite ani ručně přebarvené ikony, pokud pro daný typ existuje nativní ikona.
+- MapPOI je obecný bod zájmu na mapě telefonu; jeho existence sama o sobě nedělá z objektu Property nebo Business.
+- Veřejné body jako Pier Promenade či policejní kontrolní bod mohou mít nativní POI; nemají se tvářit jako koupitelné budovy.
 
-- použít `PrefabRef.InstantiateNetworked()` nebo overload s parentem, lokální pozicí a rotací;
-- volat pouze na hostu/serveru;
-- pozici a rotaci nastavit před network spawnem, aby ji klienti obdrželi správně;
-- nepoužívat lokální `Instantiate()` na síťovém prefabu.
+Důležité: veřejný wrapper PropertyManager umožňuje prohlížet existující vlastnosti a jejich stav. Samotná existence wrapperu není důkaz, že lze libovolně přidat novou Property. Připojení nových budov do Realtor/property registru musí být ověřeno v aktuální hře předtím, než se jejich ikony označí jako hotové.
 
-Dokumentace S1MAPI uvádí mezi síťovými příklady ATM, interaktivní dveře, storage kontejnery, ModularSwitch a SlidingDoors. Konkrétní prefaby je ale nutné ověřit v aktuální instalaci hry.
+## Budovy, dveře a vnitřní vybavení
+- Přednostně použít původní budovy/prefaby, které už obsahují správné vstupy, kolize, interiéry a komponenty.
+- Když neexistuje vhodná budova, S1MAPI BuildingBuilder může dodat geometrii; samotný shell ale není automaticky herní Building, Property, Shop ani interaktivní interiér.
+- Funkční dveře musí být původní interaktivní door prefab s nativním controllerem a NetworkObject, vytvořený serverem přes síťovou cestu. Ověřit ruční otevření/zavření, proximity chování, NPC průchod, save/load a host/client.
+- BuildingBuilder.AddSlidingDoors() je možné použít jen po testu: aktuální dokumentace uvádí server-side spawn a známé omezení automatického otevírání/zavírání na klientech. Pro produkční dveře se nesmí ignorovat.
+- Přidat kolize, průchozí otvory a navigační propojení dveří; NPC musí opravdu vejít dovnitř a použít StayInBuilding/nativní schedule akci.
+- Dekorativní nábytek lze vytvořit přes InteriorBuilder; funkční předměty (pokladna, sklad, regály, prodejní interakce, pracovní stanice, automaty, dveře) musí být skutečné nativní interaktivní objekty s jejich původním gameplay komponentem a multiplayer synchronizací.
+- V interiéru každé budovy musí být konkrétní vybavení odpovídající funkci. Prázdná skořápka budovy se nepovažuje za hotovou.
 
-## 3. Statické dekorace
+Reference: https://ifbars.github.io/S1MAPI/docs/building.html, https://ifbars.github.io/S1API/api/S1API.Map.Building.html, https://ifbars.github.io/S1API/api/S1API.Property.BaseProperty.html.
 
-Pro objekty bez `NetworkObject` lze použít lokální instanci, pokud jsou skutečně pouze vizuální a nepotřebují stav sdílený mezi hráči.
+## Multiplayer a kompatibilita
+- Host/server vytváří NPC, budovy, dveře a vlastnický stav; klienti obdrží stejné objekty přes FishNet.
+- Každý síťový prefab s NetworkObject se spawnuje pouze přes nativní síťovou cestu.
+- Používat stabilní namespaced ID, ukládání nativním save systémem a kontrolu, aby se objekty při reloadu nezdvojily.
+- Nepřepisovat globální vanilla singletony; Harmony hooky jen tam, kde není veřejný extension point, a s detekcí verze/bezpečným fallbackem.
+- Volitelné integrace jiných modů musí být oddělené. Bez daného modu má Harborline bezpečně fungovat v základním režimu.
+- Kompatibilita se nesmí deklarovat jako hotová, dokud neproběhne test host + klient, pozdní připojení, opětovné načtení a test s reprezentativní sadou modů.
 
-- Pro interiéry preferovat `InteriorBuilder` a jeho nativní herní nábytek (například stoly, židle, rostliny).
-- Pro dostupné herní mesh assety použít S1MAPI `Meshes` / `MeshRef`.
-- Nedávat statické dekorace do síťového spawn systému bez důvodu.
+## Brány před vydáním
+1. Ověřená pozice a mapový převod celé oblasti.
+2. Nativní region registrace, navigace a napojení na Docks.
+3. Ověřené nativní building/property/business registration a správné mapové ikony.
+4. Ověřené interaktivní dveře a průchod NPC.
+5. Funkční obsah interiérů (ne pouze dekorace).
+6. Nativní náhodný vzhled NPC, persistence a kooperace.
+7. Host/client test a kontrola výkonu při postupném navýšení populace.
 
-## 4. Pozor na BuildingBuilder
-
-- `BuildingBuilder` vytváří geometrii budovy (podlahu, stěny, strop, světla, dekorace).
-- `BuildingBuilder.AddPrefab()` přijímá `PrefabRef` a podle dokumentace vytváří síťovou instanci.
-- Statické S1 nábytkové meshe patří do `InteriorBuilder`, ne do `AddPrefab()`.
-- Jakékoli interaktivní dveře, ATM či skladovací kontejnery je nutné testovat na hostu i klientovi.
-
-## 5. Povinný záznam do katalogu
-
-Před použitím prefab v produkčním prostředí musí mít záznam:
-
-| Pole | Význam |
-|---|---|
-| `id` | interní stabilní klíč |
-| `exactPrefabName` | přesný název v herním registru |
-| `category` | building, prop, furniture, door, storage, vehicle, lighting… |
-| `networked` | skutečný výsledek kontroly komponent |
-| `source` | místo/scene nebo API, odkud byl získán |
-| `verified` | true až po testu v cílové verzi |
-| `notes` | orientace, transform, závislosti nebo omezení |
-
-Neověřený záznam se nesmí použít pro automatické generování. Prázdný katalog je správný stav, dokud neproběhne herní průzkum.
-
-## Testovací checklist
-
-1. Prefab se najde přes registr.
-2. Je ověřeno, zda obsahuje `NetworkObject`.
-3. Je umístěn na zaměřené pozici.
-4. Host vidí správný objekt a interakce fungují.
-5. Klient po připojení vidí stejný objekt a stejnou pozici.
-6. Interakce (otevření dveří, použití ATM, storage) se synchronizuje.
-7. Uložení a opětovné načtení nezanechá duplikáty.
-
-## Reference
-
-- S1MAPI PrefabRef: https://ifbars.github.io/S1MAPI/api/S1MAPI.Core.PrefabRef.html
-- S1MAPI API Overview: https://ifbars.github.io/S1MAPI/docs/api-overview.html
-- S1MAPI Building Guide: https://ifbars.github.io/S1MAPI/docs/building.html
+Dokud některá brána neprojde, záznam zůstává not-verified a nesmí se prezentovat jako hotová funkce.
