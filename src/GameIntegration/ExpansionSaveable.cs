@@ -258,20 +258,36 @@ public sealed class ExpansionSaveable : Saveable
             expectedWorldRevision != _document.WorldRevision ||
             !StableId.HasPrefix(draft.OrderId, StableId.OrderPrefix) ||
             string.IsNullOrWhiteSpace(draft.RequestId) ||
+            !string.Equals(draft.OrderId, StableId.FromOrderRequest(draft.RequestId), StringComparison.Ordinal) ||
             string.IsNullOrWhiteSpace(draft.RequestFingerprint) ||
+            string.IsNullOrWhiteSpace(draft.RequesterId) ||
             !StableId.HasPrefix(draft.CustomerId, StableId.NpcPrefix) ||
             !StableId.HasPrefix(draft.ProvinceId, StableId.ProvincePrefix) ||
             !StableId.HasPrefix(draft.ShopId, StableId.BusinessPrefix) ||
+            !string.Equals(draft.RequestFingerprint,
+                draft.RequesterId + "|" + draft.CustomerId + "|" + draft.ShopId,
+                StringComparison.Ordinal) ||
+            !string.Equals(draft.BuyerAccountId,
+                NpcOrderPlacementService.CreateBudgetAccountId(draft.CustomerId, draft.RequesterId, draft.WorldInterval),
+                StringComparison.Ordinal) ||
+            !string.Equals(draft.EscrowAccountId, "sime.escrow." + draft.OrderId, StringComparison.Ordinal) ||
+            draft.WorldInterval < 0 ||
+            draft.CreatedAtUnixSeconds <= 0 ||
+            draft.DeadlineUnixSeconds <= draft.CreatedAtUnixSeconds ||
+            draft.AcceptanceScore < NpcCustomerAcceptance.DefaultAcceptanceThreshold ||
+            draft.AcceptanceScore > 100 ||
             draft.TotalPrice <= 0 || draft.Items is null || draft.Items.Count == 0 ||
             !string.Equals(draft.Status, "offered", StringComparison.Ordinal))
             return false;
 
         long verifiedTotal = 0;
+        var uniqueProducts = new HashSet<string>(StringComparer.Ordinal);
         try
         {
             foreach (NpcOrderDraftLine line in draft.Items)
             {
                 if (line is null || string.IsNullOrWhiteSpace(line.ProductId) ||
+                    !uniqueProducts.Add(line.ProductId) ||
                     line.Quantity <= 0 || line.UnitPrice <= 0)
                     return false;
                 verifiedTotal = checked(verifiedTotal + checked(line.UnitPrice * line.Quantity));
