@@ -39,11 +39,60 @@ public sealed record ShopProcessedRequestSnapshot(ShopPurchaseRequest Request, S
 /// A detached, JSON-serializable representation of shop economy state. It includes
 /// processed requests so retries after save/load cannot charge or decrement stock again.
 /// </summary>
+public enum ShopEscrowOperationKind
+{
+    Settle,
+    Refund
+}
+
+public enum ShopEscrowOperationOutcome
+{
+    Succeeded,
+    InvalidRequest,
+    UnknownEscrow,
+    InsufficientEscrow,
+    UnknownRestockProduct,
+    InvalidRestockLines,
+    BalanceOverflow,
+    StockOverflow,
+    RevisionOverflow,
+    OperationIdConflict
+}
+
+public sealed record ShopRefundLine(string ProductId, int Quantity);
+
+public sealed record ShopEscrowOperation(
+    string OperationId,
+    string OrderId,
+    string EscrowAccountId,
+    string CounterpartyAccountId,
+    long Amount,
+    ShopEscrowOperationKind Kind,
+    string? ShopId = null,
+    IReadOnlyList<ShopRefundLine>? RestockLines = null);
+
+public sealed record ShopEscrowOperationResult(
+    ShopEscrowOperationOutcome Outcome,
+    string OperationId,
+    long Amount,
+    long RemainingEscrowBalance,
+    long CounterpartyBalance,
+    long WorldRevision,
+    bool IsReplay = false)
+{
+    public bool Succeeded => Outcome == ShopEscrowOperationOutcome.Succeeded;
+}
+
+public sealed record ShopEscrowOperationSnapshot(
+    ShopEscrowOperation Operation,
+    ShopEscrowOperationResult Result);
+
 public sealed record ShopPurchaseServiceSnapshot(
     long WorldRevision,
     IReadOnlyList<ShopBalanceSnapshot> Balances,
     IReadOnlyList<ShopProductSnapshot> Products,
-    IReadOnlyList<ShopProcessedRequestSnapshot> ProcessedRequests);
+    IReadOnlyList<ShopProcessedRequestSnapshot> ProcessedRequests,
+    IReadOnlyList<ShopEscrowOperationSnapshot>? EscrowOperations = null);
 
 /// <summary>
 /// In-memory domain reference for a host-authoritative shop purchase.
@@ -59,6 +108,7 @@ public sealed class ShopPurchaseService
     private readonly Dictionary<string, long> _prices = new(StringComparer.Ordinal);
     private readonly Dictionary<string, (string ShopId, string ProductId)> _productIdentity = new(StringComparer.Ordinal);
     private readonly Dictionary<string, (ShopPurchaseRequest Request, ShopPurchaseResult Result)> _processedRequests = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, (ShopEscrowOperation Operation, ShopEscrowOperationResult Result)> _processedEscrowOperations = new(StringComparer.Ordinal);
     private long _worldRevision;
 
     public long WorldRevision
@@ -155,6 +205,108 @@ public sealed class ShopPurchaseService
             _balances[accountId] = newBalance;
             _worldRevision++;
             return true;
+        }
+    }
+
+    /// <summary>
+    /// Moves a complete order escrow to its recipient (settlement) or back to the
+    /// customer while restoring all reserved stock (refund). Every operation is
+    /// atomic and idempotent across save/load.
+    /// </summary>
+    public ShopEscrowOperationResult ProcessEscrowOperation(ShopEscrowOperation operation)
+    {
+        if (operation is null)
+            throw new ArgumentNullException(nameof(operation));
+
+        lock (_gate)
+        {
+            if (!IsValidEscrowOperation(operation))
+                return EscrowResult(ShopEscrowOperationOutcome.InvalidRequest, operation.OperationId, operation.Amount, 0, 0);
+
+            if (_processedEscrowOperations.TryGetValue(operation.OperationId, out var previous))
+            {
+                if (!SameEscrowOperation(previous.Operation, operation))
+                {
+                    return EscrowResult(
+                        ShopEscrowOperationOutcome.OperationIdConflict,
+                        operation.OperationId,
+                        operation.Amount,
+                        GetBuyerBalance(operation.EscrowAccountId),
+                        GetBuyerBalance(operation.CounterpartyAccountId));
+                }
+
+                return previous.Result with { IsReplay = true };
+            }
+
+            if (!_balances.TryGetValue(operation.EscrowAccountId, out long escrowBalance))
+                return RememberEscrow(operation, EscrowResult(
+                    ShopEscrowOperationOutcome.UnknownEscrow, operation.OperationId, operation.Amount, 0,
+                    GetBuyerBalance(operation.CounterpartyAccountId)));
+
+            if (escrowBalance != operation.Amount)
+                return RememberEscrow(operation, EscrowResult(
+                    ShopEscrowOperationOutcome.InsufficientEscrow, operation.OperationId, operation.Amount,
+                    escrowBalance, GetBuyerBalance(operation.CounterpartyAccountId)));
+
+            long newCounterpartyBalance;
+            try
+            {
+                newCounterpartyBalance = checked(GetBuyerBalance(operation.CounterpartyAccountId) + operation.Amount);
+            }
+            catch (OverflowException)
+            {
+                return RememberEscrow(operation, EscrowResult(
+                    ShopEscrowOperationOutcome.BalanceOverflow, operation.OperationId, operation.Amount,
+                    escrowBalance, GetBuyerBalance(operation.CounterpartyAccountId)));
+            }
+
+            Dictionary<string, int>? restoredStock = null;
+            if (operation.Kind == ShopEscrowOperationKind.Refund)
+            {
+                restoredStock = new Dictionary<string, int>(StringComparer.Ordinal);
+                foreach (ShopRefundLine line in operation.RestockLines!)
+                {
+                    string key = CreateStockKey(operation.ShopId!, line.ProductId);
+                    if (!_stock.TryGetValue(key, out int currentStock))
+                    {
+                        return RememberEscrow(operation, EscrowResult(
+                            ShopEscrowOperationOutcome.UnknownRestockProduct, operation.OperationId,
+                            operation.Amount, escrowBalance, GetBuyerBalance(operation.CounterpartyAccountId)));
+                    }
+
+                    try
+                    {
+                        restoredStock.Add(key, checked(currentStock + line.Quantity));
+                    }
+                    catch (OverflowException)
+                    {
+                        return RememberEscrow(operation, EscrowResult(
+                            ShopEscrowOperationOutcome.StockOverflow, operation.OperationId,
+                            operation.Amount, escrowBalance, GetBuyerBalance(operation.CounterpartyAccountId)));
+                    }
+                }
+            }
+
+            if (_worldRevision == long.MaxValue)
+                return RememberEscrow(operation, EscrowResult(
+                    ShopEscrowOperationOutcome.RevisionOverflow, operation.OperationId,
+                    operation.Amount, escrowBalance, GetBuyerBalance(operation.CounterpartyAccountId)));
+
+            _balances[operation.EscrowAccountId] = 0;
+            _balances[operation.CounterpartyAccountId] = newCounterpartyBalance;
+            if (restoredStock is not null)
+            {
+                foreach (KeyValuePair<string, int> pair in restoredStock)
+                    _stock[pair.Key] = pair.Value;
+            }
+
+            _worldRevision++;
+            return RememberEscrow(operation, EscrowResult(
+                ShopEscrowOperationOutcome.Succeeded,
+                operation.OperationId,
+                operation.Amount,
+                remainingEscrowBalance: 0,
+                newCounterpartyBalance));
         }
     }
 
@@ -259,11 +411,19 @@ public sealed class ShopPurchaseService
                 .Select(pair => new ShopProcessedRequestSnapshot(pair.Value.Request, pair.Value.Result))
                 .ToArray();
 
+            ShopEscrowOperationSnapshot[] escrowOperations = _processedEscrowOperations
+                .OrderBy(pair => pair.Key, StringComparer.Ordinal)
+                .Select(pair => new ShopEscrowOperationSnapshot(
+                    CloneEscrowOperation(pair.Value.Operation),
+                    pair.Value.Result))
+                .ToArray();
+
             return new ShopPurchaseServiceSnapshot(
                 _worldRevision,
                 Array.AsReadOnly(balances),
                 Array.AsReadOnly(products),
-                Array.AsReadOnly(processed));
+                Array.AsReadOnly(processed),
+                Array.AsReadOnly(escrowOperations));
         }
     }
 
@@ -338,6 +498,28 @@ public sealed class ShopPurchaseService
             }
         }
 
+        var escrowOperations = new Dictionary<string, (ShopEscrowOperation Operation, ShopEscrowOperationResult Result)>(StringComparer.Ordinal);
+        foreach (ShopEscrowOperationSnapshot? entry in snapshot.EscrowOperations ?? Array.Empty<ShopEscrowOperationSnapshot>())
+        {
+            if (entry?.Operation is null || entry.Result is null ||
+                !IsValidEscrowOperation(entry.Operation) ||
+                !Enum.IsDefined(typeof(ShopEscrowOperationOutcome), entry.Result.Outcome) ||
+                !string.Equals(entry.Operation.OperationId, entry.Result.OperationId, StringComparison.Ordinal) ||
+                entry.Result.Amount != entry.Operation.Amount ||
+                entry.Result.Amount <= 0 ||
+                entry.Result.RemainingEscrowBalance < 0 ||
+                entry.Result.CounterpartyBalance < 0 ||
+                entry.Result.WorldRevision < 0 ||
+                entry.Result.WorldRevision > snapshot.WorldRevision ||
+                entry.Result.IsReplay ||
+                !entry.Result.Succeeded ||
+                !escrowOperations.TryAdd(entry.Operation.OperationId,
+                    (CloneEscrowOperation(entry.Operation), entry.Result)))
+            {
+                return false;
+            }
+        }
+
         lock (_gate)
         {
             Replace(_balances, balances);
@@ -345,7 +527,92 @@ public sealed class ShopPurchaseService
             Replace(_prices, prices);
             Replace(_productIdentity, identity);
             Replace(_processedRequests, processed);
+            Replace(_processedEscrowOperations, escrowOperations);
             _worldRevision = snapshot.WorldRevision;
+        }
+
+        return true;
+    }
+
+    private ShopEscrowOperationResult RememberEscrow(
+        ShopEscrowOperation operation,
+        ShopEscrowOperationResult result)
+    {
+        _processedEscrowOperations[operation.OperationId] =
+            (CloneEscrowOperation(operation), result);
+        return result;
+    }
+
+    private ShopEscrowOperationResult EscrowResult(
+        ShopEscrowOperationOutcome outcome,
+        string operationId,
+        long amount,
+        long remainingEscrow,
+        long counterpartyBalance)
+        => new(outcome, operationId, amount, remainingEscrow, counterpartyBalance, _worldRevision);
+
+    private static bool SameEscrowOperation(ShopEscrowOperation left, ShopEscrowOperation right)
+    {
+        if (left.OperationId != right.OperationId ||
+            left.OrderId != right.OrderId ||
+            left.EscrowAccountId != right.EscrowAccountId ||
+            left.CounterpartyAccountId != right.CounterpartyAccountId ||
+            left.Amount != right.Amount ||
+            left.Kind != right.Kind ||
+            left.ShopId != right.ShopId)
+        {
+            return false;
+        }
+
+        if (left.RestockLines is null || right.RestockLines is null)
+            return left.RestockLines is null && right.RestockLines is null;
+
+        return left.RestockLines.SequenceEqual(right.RestockLines);
+    }
+
+    private static ShopEscrowOperation CloneEscrowOperation(ShopEscrowOperation operation) =>
+        operation with
+        {
+            RestockLines = operation.RestockLines is null
+                ? null
+                : Array.AsReadOnly(operation.RestockLines
+                    .Select(line => new ShopRefundLine(line.ProductId, line.Quantity))
+                    .ToArray())
+        };
+
+    private static bool IsValidEscrowOperation(ShopEscrowOperation operation)
+    {
+        if (string.IsNullOrWhiteSpace(operation.OperationId) ||
+            string.IsNullOrWhiteSpace(operation.OrderId) ||
+            !IsValidKeyPart(operation.EscrowAccountId) ||
+            !IsValidKeyPart(operation.CounterpartyAccountId) ||
+            string.Equals(operation.EscrowAccountId, operation.CounterpartyAccountId, StringComparison.Ordinal) ||
+            operation.Amount <= 0 ||
+            !Enum.IsDefined(typeof(ShopEscrowOperationKind), operation.Kind))
+        {
+            return false;
+        }
+
+        if (operation.Kind == ShopEscrowOperationKind.Settle)
+            return operation.ShopId is null && operation.RestockLines is null;
+
+        if (!IsValidKeyPart(operation.ShopId) ||
+            operation.RestockLines is null ||
+            operation.RestockLines.Count == 0)
+        {
+            return false;
+        }
+
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        foreach (ShopRefundLine? line in operation.RestockLines)
+        {
+            if (line is null ||
+                !IsValidKeyPart(line.ProductId) ||
+                line.Quantity <= 0 ||
+                !seen.Add(line.ProductId))
+            {
+                return false;
+            }
         }
 
         return true;
