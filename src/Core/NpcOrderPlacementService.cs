@@ -89,7 +89,7 @@ public static class NpcOrderPlacementService
         }
 
         NpcCustomerProfile profile = customer.Profile;
-        string buyerAccount = CreateBudgetAccountId(profile.NpcId, request.WorldInterval);
+        string buyerAccount = CreateBudgetAccountId(profile.NpcId, request.RequesterId, request.WorldInterval);
         string orderId = StableId.FromOrderRequest(request.RequestId);
         string escrowAccount = "sime.escrow." + orderId;
         ShopPurchaseServiceSnapshot originalSnapshot = shop.CreateSnapshot();
@@ -185,8 +185,18 @@ public static class NpcOrderPlacementService
         return new NpcOrderPlacementResult(true, NpcOrderPlacementFailure.None, draft);
     }
 
-    public static string CreateBudgetAccountId(string npcId, long worldInterval) =>
-        "sime.customer_budget." + npcId + "." + worldInterval.ToString(System.Globalization.CultureInfo.InvariantCulture);
+    public static string CreateBudgetAccountId(string npcId, string requesterId, long worldInterval)
+    {
+        if (!StableId.HasPrefix(npcId, StableId.NpcPrefix))
+            throw new ArgumentException("NPC ID is invalid.", nameof(npcId));
+        if (string.IsNullOrWhiteSpace(requesterId) || requesterId.Contains('\u001f'))
+            throw new ArgumentException("Requester ID is invalid.", nameof(requesterId));
+        if (worldInterval < 0)
+            throw new ArgumentOutOfRangeException(nameof(worldInterval));
+
+        return "sime.customer_budget." + npcId + "." + requesterId + "." +
+            worldInterval.ToString(System.Globalization.CultureInfo.InvariantCulture);
+    }
 
     private static bool IsValidRequestId(string? requestId) =>
         !string.IsNullOrWhiteSpace(requestId) &&
