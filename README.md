@@ -2,49 +2,32 @@
 
 Fan-made world and gameplay expansion for Schedule I, targeting Steam Default / IL2CPP and two-player co-op.
 
-> **Current state:** project foundation, independently tested domain core and first game-facing IL2CPP adapter scaffold. A playable three-province build does not exist yet.
+> **Current state:** repository foundation, tested game-independent domain core and first native S1API phone/save/network scaffolds. This is not yet a playable three-province build.
 
 ## World scope
 Preserve vanilla Hyland Point and add three major provinces:
-- **Harborline** — southern coastal port, logistics, warehouses, shops and industry.
+- **Harborline** — coastal port, logistics, warehouses, shops and industry.
 - **Ridgeview** — mountain quarry, processing, factories, research and freight contracts.
 - **Lakeside** — lake, marina, resorts, hotels, recreation and luxury businesses.
 
 ## Gameplay scope
-- **Hyland Network:** native in-game phone app shell, with live NPC contacts, orders, jobs and online shop services planned on top.
-- **Portside Supply:** physical shop and online phone ordering with one shared stock and price source.
-- **Realtor:** every purchasable expansion business is listed through the existing Realtor flow.
-- **NPCs:** individual product preferences, budgets, price sensitivity, per-player reputation and order evaluation logic.
-- **Dealers and police:** new dealers, patrol routes, checkpoints and controls in all three provinces.
-- **Co-op:** host-authoritative ownership, shop transactions, orders, reputation, police and save state.
+- Hyland Network phone app with Home, Contacts, Orders, Online Shop, Businesses and Provinces.
+- Portside Supply physical store and planned online catalogue with one shared stock and price source.
+- Every purchasable expansion business must appear in the existing Realtor.
+- Residents have distinct preferences, budgets, schedules and per-player reputation.
+- New dealers, police patrols and checkpoints across the expansion provinces.
+- Host-authoritative co-op for shared world state, orders, stock, reputation and ownership.
 
 ## Technical baseline
-- S1API 3.2.2 for native phone apps and per-save-slot Saveables.
-- S1MAPI 2.0.1 for geometry/building/GLTF prototypes.
-- SteamNetworkLib 1.6.0 for Steam lobby and typed P2P.
+- S1API 3.2.2 — native phone apps and per-save-slot Saveables.
+- S1MAPI 2.0.1 — geometry/building/GLTF prototype candidate.
+- SteamNetworkLib 1.6.0 — Steam lobby and typed P2P.
 - .NET 6.0 game-facing IL2CPP target.
 
-See docs/FRAMEWORK_INTEGRATION.md and docs/COMPATIBILITY_AND_DEPENDENCIES.md for runtime setup and limitations.
-
-## Start here
-- [Scope](docs/PROJECT_SCOPE.md)
-- [World map](docs/WORLD_MAP_AND_PROVINCES.md)
-- [Hyland Network](docs/HYLAND_NETWORK.md)
-- [NPC preferences](docs/NPC_CUSTOMER_PREFERENCES.md)
-- [Multiplayer](docs/MULTIPLAYER_ARCHITECTURE.md)
-- [Network protocol](docs/NETWORK_PROTOCOL.md)
-- [Save store](docs/SAVE_STORE.md)
-- [Framework integration](docs/FRAMEWORK_INTEGRATION.md)
-- [Domain core](docs/DOMAIN_CORE.md)
-- [Implementation plan](docs/IMPLEMENTATION_PLAN.md)
-- [Roadmap](docs/ROADMAP.md)
-- [Test plan](docs/TEST_PLAN.md)
+See docs/FRAMEWORK_INTEGRATION.md, docs/PHONE_APP_IMPLEMENTATION.md and docs/COMPATIBILITY_AND_DEPENDENCIES.md.
 
 ## CI
-GitHub Actions validates project JSON schemas/cross-file references and runs .NET domain-core unit tests. Game integration requires the player's local Schedule I IL2CPP assemblies and installed framework DLLs.
+GitHub Actions validates data registries and runs game-independent domain tests. Game-facing integration requires local Schedule I IL2CPP assemblies and installed dependencies.
 
-## Existing-save safety
-The game adapter uses S1API's native per-save-slot Saveable mechanism. Future-schema or invalid data is held read-only in its raw serialized field; it is never silently reset. First in-game tests must use a copied save. Never point the sidecar JSON utility at a vanilla save file.
-
-## Status
-The NPC preference/budget evaluator and three differentiated example profiles are tested in the game-independent core. They are not yet wired to spawned NPCs or live Schedule I product definitions. The first phone-app navigation shell, S1API save adapter and Steam compatibility handshake are written as game-facing scaffolds but have not been compiled against the user's local game assemblies or exercised in-game. Map streaming, Realtor integration and live two-player gameplay are not yet verified.
+## Safety and status
+Use a copied save for first in-game tests. Unsupported/newer save schemas are preserved read-only. The phone app is a navigation/read-only status shell; contacts, shop checkout, Realtor, NPC AI, world streaming and live co-op gameplay are not yet integrated.
