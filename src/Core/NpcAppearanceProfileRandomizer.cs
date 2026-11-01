@@ -49,8 +49,7 @@ public sealed record NpcAppearanceProfile(
         ColorSignature(PantsColor),
         ShoesLayerPath,
         ColorSignature(ShoesColor),
-        HeadAccessoryPath ?? "-",
-        ColorSignature(HeadAccessoryColor)
+        HeadAccessoryPath is null ? "-" : HeadAccessoryPath + ":" + ColorSignature(HeadAccessoryColor)
     });
 
     private static string ColorSignature(NpcRgbColor color) =>
