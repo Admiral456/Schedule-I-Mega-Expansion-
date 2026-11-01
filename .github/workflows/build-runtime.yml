@@ -1,4 +1,5 @@
 name: Build runtime diagnostic
+# Rebuild the diagnostic after lifecycle polling safeguards were added.
 
 on:
   push:
