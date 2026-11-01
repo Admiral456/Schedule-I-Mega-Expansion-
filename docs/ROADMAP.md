@@ -9,13 +9,13 @@
 - SteamNetworkLib initialization and protocol compatibility handshake.
 
 ## First integrated vertical slice
-1. Compile the game-facing project against the exact local IL2CPP dependency set.
-2. Connect the persisted shop snapshot to actual Schedule I cash and item inventory transactions.
-3. Seed Portside Supply from a shared product/price registry and verify online/physical stock consistency.
-4. Connect one real NPC profile and generated order to spawned NPC identity and schedule.
-5. Integrate one physical shop and one Realtor listing.
-6. Run a two-player host/client purchase test, reconnect and late-join snapshot.
-
+1. Compile the game-facing project against the exact local IL2CPP dependency set and verify the host request/result handlers in a live co-op lobby.
+2. Map the persistent order escrow to actual Schedule I player cash settlement and item inventory delivery APIs.
+3. Seed Portside Supply from real Schedule I item definitions and verify physical/online stock consistency.
+4. Connect one real NPC profile and generated order to a spawned NPC identity and in-game schedule.
+5. Add escrow settlement/refund for completed, cancelled and expired orders.
+6. Integrate one physical shop and one Realtor listing.
+7. Run a two-player request/replay/restart/reconnect test and implement late-join order snapshots.
 ## World construction
 - Survey vanilla world bounds and candidate exits in-game.
 - Build Harborline as a greybox first, including road/terrain/colliders.
