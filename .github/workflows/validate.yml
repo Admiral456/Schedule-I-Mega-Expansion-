@@ -20,5 +20,7 @@ jobs:
         run: |
           python -m json.tool world/harborline/anchors.json > /dev/null
           python -m json.tool packs/Harborline/roster.json > /dev/null
+          python -m json.tool world/harborline/expansion-plan.json > /dev/null
+          python -m json.tool world/harborline/native-integration.json > /dev/null
       - name: Run tests
         run: python -m unittest discover -s tests -v
