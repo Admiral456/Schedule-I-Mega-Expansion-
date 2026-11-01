@@ -84,29 +84,17 @@ public static class NpcOrderSettlementService
                 NpcOrderSettlementFailure.InvalidTransition, currentStatus, targetStatus);
         }
 
-        long expectedTotal = 0;
         var uniqueProducts = new HashSet<string>(StringComparer.Ordinal);
-        try
+        foreach (ShopRefundLine line in order.Items)
         {
-            foreach (ShopRefundLine line in order.Items)
+            if (line is null ||
+                string.IsNullOrWhiteSpace(line.ProductId) ||
+                line.Quantity <= 0 ||
+                !uniqueProducts.Add(line.ProductId))
             {
-                if (line is null ||
-                    string.IsNullOrWhiteSpace(line.ProductId) ||
-                    line.Quantity <= 0 ||
-                    !uniqueProducts.Add(line.ProductId))
-                {
-                    return NpcOrderSettlementResult.Failed(
-                        NpcOrderSettlementFailure.InvalidOrder, currentStatus, targetStatus);
-                }
-
-                // The order ledger stores unit price on its order line. The refund service
-                // uses quantities only; total price is verified by the save adapter.
+                return NpcOrderSettlementResult.Failed(
+                    NpcOrderSettlementFailure.InvalidOrder, currentStatus, targetStatus);
             }
-        }
-        catch (OverflowException)
-        {
-            return NpcOrderSettlementResult.Failed(
-                NpcOrderSettlementFailure.InvalidOrder, currentStatus, targetStatus);
         }
 
         if (settles)
