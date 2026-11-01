@@ -18,7 +18,11 @@
       "physical": true,
       "primaryAnchor": "harbor_freight_warehouse",
       "scheduleProfile": "day-shift",
-      "gameSystems": ["Personnel spawn", "Personnel schedule", "S1API NPC"]
+      "gameSystems": [
+        "Personnel spawn",
+        "Personnel schedule",
+        "S1API NPC"
+      ]
     },
     {
       "idPrefix": "harborline_driver",
@@ -27,7 +31,11 @@
       "physical": true,
       "primaryAnchor": "truck_parking",
       "scheduleProfile": "rotating-shift",
-      "gameSystems": ["Personnel spawn", "Personnel route", "vehicle route only after compatibility check"]
+      "gameSystems": [
+        "Personnel spawn",
+        "Personnel route",
+        "vehicle route only after compatibility check"
+      ]
     },
     {
       "idPrefix": "harborline_fisher",
@@ -36,7 +44,10 @@
       "physical": true,
       "primaryAnchor": "pier_promenade",
       "scheduleProfile": "early-morning-and-evening",
-      "gameSystems": ["Personnel spawn", "Personnel schedule"]
+      "gameSystems": [
+        "Personnel spawn",
+        "Personnel schedule"
+      ]
     },
     {
       "idPrefix": "harborline_vendor",
@@ -45,7 +56,11 @@
       "physical": true,
       "primaryAnchor": "harbor_market",
       "scheduleProfile": "market-opening-hours",
-      "gameSystems": ["Personnel spawn", "Personnel schedule", "customer profile where applicable"]
+      "gameSystems": [
+        "Personnel spawn",
+        "Personnel schedule",
+        "customer profile where applicable"
+      ]
     },
     {
       "idPrefix": "harborline_mechanic",
@@ -54,7 +69,10 @@
       "physical": true,
       "primaryAnchor": "harbor_auto_works",
       "scheduleProfile": "workshop-shift",
-      "gameSystems": ["Personnel spawn", "Personnel schedule"]
+      "gameSystems": [
+        "Personnel spawn",
+        "Personnel schedule"
+      ]
     },
     {
       "idPrefix": "harborline_tourist",
@@ -63,7 +81,11 @@
       "physical": true,
       "primaryAnchor": "pier_promenade",
       "scheduleProfile": "daytime-and-evening",
-      "gameSystems": ["Personnel spawn", "Personnel route", "customer profile where applicable"]
+      "gameSystems": [
+        "Personnel spawn",
+        "Personnel route",
+        "customer profile where applicable"
+      ]
     },
     {
       "idPrefix": "harborline_security",
@@ -72,26 +94,35 @@
       "physical": true,
       "primaryAnchor": "police_checkpoint",
       "scheduleProfile": "rotating-security-shift",
-      "gameSystems": ["Personnel spawn", "Personnel schedule", "existing police/crime systems only"]
+      "gameSystems": [
+        "Personnel spawn",
+        "Personnel schedule",
+        "existing police/crime systems only"
+      ]
     }
   ],
   "customerProfileRules": {
     "targetCount": 14,
     "uniquePerNpc": true,
     "mustDefineIndividually": [
-      "budget",
-      "ordersPerWeek",
-      "preferredDay",
-      "orderTime",
-      "productOrEffectPreferences",
+      "spending",
+      "orders per week",
+      "preferred day and time",
       "standards",
-      "relationshipRequirements"
+      "direct approach",
+      "first sample",
+      "mutual relation requirement",
+      "call-police chance",
+      "dependence",
+      "affinities",
+      "preferred properties"
     ],
     "notes": [
-      "Use the current Personnel Pack Format names and value ranges; do not invent undocumented JSON keys.",
-      "Profiles may be attached to physical residents or contact-only NPCs.",
-      "Preference values must be valid game products/effects and should differ by NPC."
-    ]
+      "customer-designs.json is the project's design source, not a raw Personnel manifest.",
+      "Map each design field into the current Personnel customer schema; do not copy design-only keys into manifest.json.",
+      "All preference values must be valid in-game products/effects and verified in a live save."
+    ],
+    "designSource": "packs/Harborline/customer-designs.json"
   },
   "dealerProfile": {
     "id": "harborline_port_dealer",
@@ -100,7 +131,16 @@
     "primaryAnchor": "harbor_offices",
     "spawnPosition": null,
     "schedule": [],
-    "notes": "Create through Personnel dealer data; exact fields to be filled from Pack Format and tested in game."
+    "notes": "Set the Personnel dealer conversation role and dealer configuration so the NPC uses the real dealer prefab/economy.",
+    "requiredBehaviorConversation": "dealer",
+    "fieldsToMap": [
+      "dealer type",
+      "cut",
+      "signing fee",
+      "home",
+      "completed-deals variable",
+      "quality tolerances"
+    ]
   },
   "releaseRules": [
     "Use stable explicit NPC ids before the first public save.",
