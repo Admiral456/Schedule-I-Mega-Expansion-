@@ -73,6 +73,22 @@ The public S1API Money documentation currently lists `GetCashBalance()` and `Cha
 
 The expansion therefore keeps player cash, live player inventory and physical store stock behind an explicit integration boundary. Do not enable checkout by combining a one-way item grant with a money debit. The required host transaction, compensation and local-assembly inspection are documented in [GAME_ECONOMY_ADAPTER.md](GAME_ECONOMY_ADAPTER.md).
 
+## Native Schedule I gameplay systems to reuse first
+
+The S1API 3.2.2 documentation exposes native systems for NPC lifecycle and prefab configuration, customer contracts, dealers, suppliers, dialogue injection, relationships, daily schedules, law enforcement, item definitions, existing shop catalogues, property/business wrappers and delivery status. The implementation map and limitations are maintained in [NATIVE_SYSTEM_REUSE_AUDIT.md](NATIVE_SYSTEM_REUSE_AUDIT.md).
+
+Integration rules:
+
+- Native `NPCCustomer` owns ordinary in-world customer offers, contracts, delivery requests and its native relationship lifecycle. The custom `NpcOrderOfferGenerator` is limited to tests/simulation and expansion-only remote/online order rules.
+- Use `NPCDealer` and its native `DealerType` for an expansion rival or recruitable dealer. Use `NPCSupplier` for wholesale supplier logistics where its physical supplier model fits; it is not automatically a replacement for a public retail shop.
+- Use native NPC dialogue injection for extra branches and native schedules/relationships rather than another schedule or friendship engine.
+- Use `LawManager` and `LawController` for wanted state, patrols and checkpoint/law intensity. Intensity is global; new province patrols need real route and navigation objects.
+- Use `ItemManager`/vanilla item definitions and `ShopManager`/existing shop catalogues first. Catalogue operations do not prove quantity stock or an atomic purchase.
+- Use native property/business objects and the original Realtor flow if registration can be proven. Do not invent a second ownership screen.
+- Observe native delivery status through the documented read surface; do not fabricate or mutate deliveries outside the native lifecycle.
+
+The game-facing assembly still has to be compiled against the exact local IL2CPP DLLs and exercised in-game. Documentation availability is not proof that the local game build exposes the same runtime behavior.
+
 ## Local developer prerequisites
 
 Install matching dependencies for the same Schedule I public build and Steam Default / IL2CPP branch. Do not commit game assemblies or third-party DLLs.
