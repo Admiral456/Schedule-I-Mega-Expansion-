@@ -68,7 +68,13 @@ public static class NpcOrderPlacementService
         if (!isAuthoritativeHost)
             return NpcOrderPlacementResult.Failed(NpcOrderPlacementFailure.NotAuthoritativeHost);
 
-        if (shop is null || customer is null || request is null ||
+        if (shop is null)
+            return NpcOrderPlacementResult.Failed(NpcOrderPlacementFailure.SaveOrShopUnavailable);
+
+        if (customer is null)
+            return NpcOrderPlacementResult.Failed(NpcOrderPlacementFailure.UnknownCustomer);
+
+        if (request is null ||
             !StableId.HasPrefix(customer.ProvinceId, StableId.ProvincePrefix) ||
             !StableId.HasPrefix(customer.Profile.NpcId, StableId.NpcPrefix) ||
             !StableId.HasPrefix(request.ShopId, StableId.BusinessPrefix) ||
@@ -185,5 +191,5 @@ public static class NpcOrderPlacementService
     private static bool IsValidRequestId(string? requestId) =>
         !string.IsNullOrWhiteSpace(requestId) &&
         requestId.Length <= 160 &&
-        requestId.All(character => char.IsAsciiLetterOrDigit(character) || character is '-' or '_' or '.' or ':');
+        requestId.All(character => (character <= 127 && char.IsLetterOrDigit(character)) || character is '-' or '_' or '.' or ':');
 }
