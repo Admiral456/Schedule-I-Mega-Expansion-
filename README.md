@@ -37,6 +37,7 @@ Verze závislostí se uzamknou až při prvním sestavitelném runtime projektu.
 
 - `docs/architecture.md` – technická architektura a pořadí implementace.
 - `docs/prefab-reuse-rules.md` – pravidla pro opakované použití vanilla prefabů a multiplayer.
+- `docs/harborline-survey-checklist.md` – přesný postup zaměření spawnu, tras, budov a checkpointů ve hře.
 - `world/harborline/anchors.json` – seznam lokalit a míst k zaměření.
 - `world/harborline/prefabs.json` – katalog původních prefabů ověřených přímo ve hře.
 - `packs/Harborline/roster.json` – role a cílové počty NPC.
