@@ -31,3 +31,16 @@ The host persists an idempotency receipt with a fingerprint of requester, custom
 The customer budget account is isolated by NPC, Steam player and interval. This prevents one co-op partner from consuming another player's relationship-specific budget.
 
 The current client order mirror is session-local. The host save remains the durable source of truth; late-join order snapshots are not implemented yet. The order clock currently uses host UTC time until the in-game Schedule I world-clock adapter is available.
+
+## Escrow settlement and order closure
+
+NpcOrderSettlementService handles the money and stock side of terminal order transitions.
+
+- **Completed** orders transfer the exact escrow amount to a shop-revenue ledger account. The shop stock remains consumed.
+- **Cancelled**, **Expired** and **Failed** orders return the escrow amount to the original customer budget and restore every reserved product quantity to the same shop.
+- The service validates the complete refund plan before changing balances or inventory. If a product is missing or any balance/stock arithmetic overflows, no money or stock is changed.
+- Each settlement/refund carries a deterministic operation ID. Replaying it returns the stored receipt and does not pay or refund twice.
+- Escrow operation receipts are stored inside ShopPurchaseServiceSnapshot, including failed operations, so retry semantics survive a save reload.
+- ExpansionSaveable.TryFinalizeNpcOrder applies the lifecycle transition, updated shop snapshot and order version in one host-only optimistic save revision.
+
+The current revenue account and customer budget are expansion-side virtual ledger accounts. They are not vanilla Schedule I player cash. Real payout and item delivery still require a game adapter backed by the local game assemblies.
