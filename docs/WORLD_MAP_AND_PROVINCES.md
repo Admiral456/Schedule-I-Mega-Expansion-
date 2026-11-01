@@ -9,15 +9,11 @@ Westville, Northtown, Downtown, Uptown, Docks and Suburbia. Their exact boundari
 ## Province 1 — Harborline
 **Theme:** southern coast, cargo port, logistics, retail and industry.
 
-Planned POIs:
-- Portside Supply — physical store plus in-phone online shop.
-- Harbor Freight Warehouse — purchasable warehouse through Realtor.
-- Harbor Market — purchasable market.
-- Harbor Auto Works — purchasable repair/tuning business.
-- Harbor Offices — office/business plots.
-- Pier Promenade — public waterfront.
-- Shipyard and freight yard — logistics contracts.
-- Police checkpoint and new dealer contact.
+Harborline is now planned as seven connected subdistricts: Harbor Gate and Customs Approach; Container Port and Shipyard; Freight and Logistics Park; Harbor Market and High Street; Industrial and Vehicle Service Quarter; Workers' Residential Quarter; Waterfront, Marina and Pier Promenade.
+
+The points of interest include the existing Portside Supply, Harbor Freight Warehouse, Harbor Market, Harbor Auto Works, Harbor Offices and Pier Promenade plus a container terminal, crane yard, ship repair, cold storage, freight depot, truck staging, market square, Harbor Diner, maintenance depot, worker apartments, laundromat, marina, bait shop and visitor services.
+
+Target population: 42 physical NPCs (26 native customers and one native dealer), with 16 active during the first population stage. Police remain native LawController/LawManager/CheckpointManager activity; there are no custom police NPCs. Exact zone and POI assignments are listed in data/harborline_population.json.
 
 Economy: freight, storage, delivery, port-worker demand, operating costs and supply contracts.
 
