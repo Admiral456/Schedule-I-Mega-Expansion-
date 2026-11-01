@@ -1,6 +1,6 @@
 # Runtime world survey
 
-The first runtime build is a read-only diagnostic mod. It discovers S1API at runtime and exports the registries exposed by the installed Schedule I/S1API build. It does not need Schedule I game assemblies to compile.
+The first runtime build is a read-only diagnostic mod. It discovers S1API at runtime and exports the registries exposed by the installed Schedule I/S1API build. It does not need Schedule I game assemblies to compile. The .NET 6 build and ZIP artifact have now succeeded in GitHub Actions; the mod has not yet been run inside the game.
 
 ## Build and install
 
