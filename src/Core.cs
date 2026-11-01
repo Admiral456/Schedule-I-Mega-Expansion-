@@ -63,10 +63,10 @@ namespace ScheduleIMegaExpansion
                     "OnLoadComplete",
                     BindingFlags.Public | BindingFlags.Static);
 
-                MethodInfo preMethod = typeof(Core).GetMethod(
+                MethodInfo preMethod = typeof(MegaExpansionMod).GetMethod(
                     nameof(OnPreLoad),
                     BindingFlags.Instance | BindingFlags.NonPublic)!;
-                MethodInfo loadMethod = typeof(Core).GetMethod(
+                MethodInfo loadMethod = typeof(MegaExpansionMod).GetMethod(
                     nameof(OnLoadComplete),
                     BindingFlags.Instance | BindingFlags.NonPublic)!;
 
