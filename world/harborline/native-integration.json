@@ -80,5 +80,17 @@
     "NPCs traverse and enter interiors",
     "key interior objects perform native interactions",
     "save/load and late join create no duplicates"
-  ]
+  ],
+  "regionIntegration": {
+    "npcRegionApi": "S1API NPC prefab builder accepts the game's Region enum (documented examples include existing values such as Uptown and Northtown).",
+    "newRegionApiVerified": false,
+    "requirement": "Do not pass an arbitrary Harborline string as a region. Verify the target game's native region registration hook; otherwise use an existing native region only if the actual world coordinates and police/navigation semantics correctly belong to it.",
+    "affects": [
+      "NPC WithRegion assignment",
+      "police dispatch and patrol eligibility",
+      "region-aware gameplay systems",
+      "map labels and region bounds"
+    ],
+    "status": "not-verified; blocking requirement before region-aware NPC/police behavior is enabled"
+  }
 }
