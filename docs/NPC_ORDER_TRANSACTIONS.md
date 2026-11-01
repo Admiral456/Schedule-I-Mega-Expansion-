@@ -16,11 +16,11 @@ Request IDs are namespaced with the sender's Steam ID and hashed into stable ord
 
 ## Money and game-integration boundary
 
-The customer budget and escrow currently live in the expansion's persistent money ledger. The escrow is a held customer payment, not yet a deposit into vanilla Schedule I player cash. Real player cash payout, actual item definitions/inventory delivery, and the physical shop's live stock adapter still require the exact local Schedule I assemblies and API calls. The project deliberately does not invent those game APIs or seed fake stock. Until Portside stock is registered from real item definitions, order requests fail safely with `NoEligibleProduct`.
+The customer budget and escrow currently live in the expansion's persistent money ledger. The escrow is a held customer payment, not yet a deposit into vanilla Schedule I player cash. Real player cash payout, actual item definitions/inventory delivery, and the physical shop's live stock adapter still require the exact local Schedule I assemblies and API calls. Domain escrow settlement and refunds are now implemented separately in NpcOrderSettlementService and the host save adapter. The project deliberately does not invent those game APIs or seed fake stock. Until Portside stock is registered from real item definitions, order requests fail safely with `NoEligibleProduct`.
 
 ## Multiplayer boundary
 
-Only an initialized SteamNetworkLib host in an active lobby may run the placement service or commit the save. The co-op client sends only a request ID, resident ID and shop ID. The host derives the requester identity from the Steam sender, reads reputation from its own save, generates the offer, persists the transaction and returns the committed order. A late-join snapshot and settlement/payout workflow remain separate follow-up work.
+Only an initialized SteamNetworkLib host in an active lobby may run the placement service or commit the save. The co-op client sends only a request ID, resident ID and shop ID. The host derives the requester identity from the Steam sender, reads reputation from its own save, generates the offer, persists the transaction and returns the committed order. A late-join snapshot and vanilla Schedule I cash/item payout adapter remain separate follow-up work.
 
 ## Steam request path
 
