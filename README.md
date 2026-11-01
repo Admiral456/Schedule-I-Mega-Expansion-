@@ -36,7 +36,7 @@ Diagnostický IL2CPP projekt cílí na .NET 6 a MelonLoader 0.7.3; S1API se obje
 ## Aktuální stav a limity
 
 - Větev nyní obsahuje sestavitelný runtime mod s první fyzickou prototypovou částí Harborline. Po zachycení herního bodu (F6) lze ve hře vytvořit přístavní areál z reálných Unity objektů s kolizemi (F7). Nejde zatím o finální nativní budovy/obchody a nespawnuje NPC.
-- Přesné umístění se zachytává v herním světě; žádné Unity souřadnice se neodvozují z 2D obrázku mapy.
+- Umístění se odvozuje z nativní pozice Docks Warehouse a runtime fyzikálních kontrol; nepoužívají se souřadnice odhadnuté z obrázku mapy.
 - Nákup businessů, obchodní inventář, policie a Hyland Network se napojí na původní systémy až po ověření jejich API v cílové verzi hry.
 - GitHub Actions sestavuje diagnostický IL2CPP mod a balí DLL do artefaktu. Samotný běh ve hře a jeho výstup ještě nejsou ověřeny; diagnostický runtime nic nemění a vyčítá původní registry pro další implementaci.
 
