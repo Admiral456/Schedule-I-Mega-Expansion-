@@ -52,9 +52,24 @@ public sealed class NpcAppearanceProfileRandomizerTests
             Assert.StartsWith("Avatar/Layers/Top/", profile.ShirtLayerPath, StringComparison.Ordinal);
             Assert.StartsWith("Avatar/Layers/Bottom/", profile.PantsLayerPath, StringComparison.Ordinal);
             Assert.StartsWith("Avatar/Accessories/Feet/", profile.ShoesLayerPath, StringComparison.Ordinal);
-            Assert.InRange(profile.Height, 0.86f, 1.14f);
+            Assert.InRange(profile.Height, 0.82f, 1.10f);
             Assert.InRange(profile.Weight, 0.18f, 0.88f);
         });
+    }
+
+
+    [Fact]
+    public void VisualSignatureDoesNotDependOnNpcIdOrUnusedAccessoryTint()
+    {
+        var profiles = NpcAppearanceProfileRandomizer.CreateProfiles("signature-test", NpcIds);
+        NpcAppearanceProfile original = profiles.Values.First(profile => profile.HeadAccessoryPath is null);
+        NpcAppearanceProfile changed = original with
+        {
+            NpcId = "sime.npc.harborline.different_identity",
+            HeadAccessoryColor = new NpcRgbColor(1, 2, 3)
+        };
+
+        Assert.Equal(original.Signature, changed.Signature);
     }
 
     [Fact]
