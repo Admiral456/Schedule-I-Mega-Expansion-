@@ -512,7 +512,6 @@ public sealed class ShopPurchaseService
                 entry.Result.WorldRevision < 0 ||
                 entry.Result.WorldRevision > snapshot.WorldRevision ||
                 entry.Result.IsReplay ||
-                !entry.Result.Succeeded ||
                 !escrowOperations.TryAdd(entry.Operation.OperationId,
                     (CloneEscrowOperation(entry.Operation), entry.Result)))
             {
