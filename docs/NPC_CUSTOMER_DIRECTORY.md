@@ -2,6 +2,8 @@
 
 The core now contains a fixed, deterministic directory of nine fictional customer profiles: three each for Harborline, Ridgeview and Lakeside.
 
+The canonical profile definitions live in `data/npc_profiles.json`; the typed C# directory mirrors those records for the game-independent domain layer. Product IDs intentionally use only entries already present in `data/product_catalog.example.json`.
+
 Every resident has:
 - a stable namespaced NPC ID and province ID;
 - a role and availability window for future schedule binding;
