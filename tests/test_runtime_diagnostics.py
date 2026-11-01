@@ -35,6 +35,8 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn('GetType("S1API.Lifecycle.GameLifecycle", false)', self.core)
         self.assertIn("OnLoadComplete", self.core)
         self.assertIn("WorldSnapshotExporter.Export(", self.core)
+        self.assertIn("_loggedLifecycleError", self.core)
+        self.assertIn("_subscriptionPollFrames < 120", self.core)
 
     def test_exporter_reads_native_game_registries(self):
         self.assertIn('FindLoadedType("S1API.Map.Building")', self.exporter)
