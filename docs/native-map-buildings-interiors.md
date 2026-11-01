@@ -62,3 +62,7 @@ The following are mandatory before a building is described as functional:
 - The building can be entered, traversed and used by NPCs.
 - Its key interior objects have working original gameplay interactions.
 - State persists through save/load and multiplayer late join.
+
+## Region registration gate
+
+S1API NPC setup exposes the game's Region enum (documented examples include existing values such as Uptown and Northtown). The public API examples do not establish a way to register an entirely new Region. Harborline must not be passed as an arbitrary string or treated as a valid enum value. Verify the target game's native region registry and determine whether Harborline can be registered additively. If not, use an existing native region only when the actual world coordinates and police/navigation semantics correctly belong to it. This affects NPC WithRegion assignment, police dispatch and other region-aware gameplay systems.
