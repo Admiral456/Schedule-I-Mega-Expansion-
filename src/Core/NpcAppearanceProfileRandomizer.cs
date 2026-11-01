@@ -34,7 +34,6 @@ public sealed record NpcAppearanceProfile(
 {
     public string Signature => string.Join("|", new[]
     {
-        NpcId,
         Gender.ToString("0.00", CultureInfo.InvariantCulture),
         Height.ToString("0.00", CultureInfo.InvariantCulture),
         Weight.ToString("0.00", CultureInfo.InvariantCulture),
@@ -68,7 +67,7 @@ public static class NpcAppearanceProfileRandomizer
 {
     private const string AlgorithmId = "sime.npc-appearance.v1";
 
-    private static readonly float[] Heights = { 0.86f, 0.91f, 0.96f, 1.00f, 1.04f, 1.09f, 1.14f };
+    private static readonly float[] Heights = { 0.82f, 0.88f, 0.94f, 1.00f, 1.04f, 1.08f, 1.10f };
     private static readonly float[] Weights = { 0.18f, 0.28f, 0.38f, 0.48f, 0.58f, 0.68f, 0.78f, 0.88f };
     private static readonly string[] HairStyles =
     {
