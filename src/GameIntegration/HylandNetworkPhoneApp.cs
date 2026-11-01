@@ -132,10 +132,20 @@ public sealed class HylandNetworkPhoneApp : PhoneApp
 
     private void BuildContacts()
     {
-        AddCard("RESIDENT NETWORK", "Profiles include role, preferred products, budget, schedule and reputation. Live spawned-NPC binding is not connected yet.");
-        AddCard("MORGAN REED  /  HARBORLINE", "Shopkeeper profile is registered in project data. Live NPC instance is not yet linked.");
-        AddCard("JORDAN PIKE  /  RIDGEVIEW", "Industrial customer profile is registered in project data. Live NPC instance is not yet linked.");
-        AddCard("TAYLOR BROOKS  /  LAKESIDE", "VIP customer profile is registered in project data. Live NPC instance is not yet linked.");
+        AddCard("RESIDENT NETWORK", "Nine named expansion residents have individual budgets, price sensitivity, product preferences and availability windows. Profiles are ready for runtime NPC binding; live spawned-NPC linking is still pending.");
+
+        foreach (NpcCustomerDirectoryEntry resident in NpcCustomerDirectory.All)
+        {
+            string preferences = string.Join(", ", resident.Profile.PreferredProductIds);
+            string body = resident.Role +
+                "\\nProvince: " + resident.ProvinceId +
+                "\\nAvailability: " + resident.AvailabilityWindow +
+                "\\nBudget: $" + resident.Profile.BudgetLimit +
+                "\\nPrice sensitivity: " + resident.Profile.PriceSensitivity.ToString("P0") +
+                "\\nLikes: " + preferences;
+
+            AddCard(resident.DisplayName.ToUpperInvariant(), body);
+        }
     }
 
     private void BuildOrders()
