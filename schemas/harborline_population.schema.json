@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Harborline district and NPC population",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "id",
+    "displayName",
+    "zones",
+    "population",
+    "police",
+    "randomization",
+    "releaseGates"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^sime\\.district\\."
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "zones": {
+      "type": "array",
+      "minItems": 7,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "purpose",
+          "poiIds",
+          "targetNpcIdsByRole"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "purpose": {
+            "type": "string",
+            "minLength": 1
+          },
+          "poiIds": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^sime\\.poi\\."
+            }
+          },
+          "targetNpcIdsByRole": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "population": {
+      "type": "object",
+      "required": [
+        "totalPhysicalNpcTarget",
+        "customerNpcTarget",
+        "dealerNpcTarget",
+        "nonCustomerNonDealerNpcTarget",
+        "initialSimultaneousPopulationTarget",
+        "performanceTestCeiling",
+        "npcGroups",
+        "populationPolicy"
+      ],
+      "properties": {
+        "totalPhysicalNpcTarget": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "customerNpcTarget": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "dealerNpcTarget": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "nonCustomerNonDealerNpcTarget": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "initialSimultaneousPopulationTarget": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "performanceTestCeiling": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "npcGroups": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "role",
+              "physicalCount",
+              "customerCount"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "role": {
+                "type": "string",
+                "minLength": 1
+              },
+              "physicalCount": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "customerCount": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "populationPolicy": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "police": {
+      "type": "object",
+      "required": [
+        "system",
+        "customPoliceNpcCount",
+        "plannedCheckpointPoiIds",
+        "plannedPatrolRouteIds"
+      ],
+      "properties": {
+        "system": {
+          "type": "string"
+        },
+        "customPoliceNpcCount": {
+          "const": 0
+        },
+        "plannedCheckpointPoiIds": {
+          "type": "array",
+          "minItems": 3,
+          "uniqueItems": true
+        },
+        "plannedPatrolRouteIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "randomization": {
+      "type": "object",
+      "required": [
+        "drugPreferences",
+        "appearance"
+      ],
+      "properties": {
+        "drugPreferences": {
+          "type": "object"
+        },
+        "appearance": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": true
+    },
+    "releaseGates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}
