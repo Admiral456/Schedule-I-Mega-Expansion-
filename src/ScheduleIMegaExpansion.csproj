@@ -1,6 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="local.build.props" Condition="Exists('local.build.props')" />
-
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>ScheduleIMegaExpansion</AssemblyName>
@@ -9,43 +7,10 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
-    <LocalGameDir Condition="'$(LocalGameDir)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Schedule I</LocalGameDir>
-    <Il2CppAssembliesPath Condition="'$(Il2CppAssembliesPath)' == ''">$(LocalGameDir)\MelonLoader\Il2CppAssemblies</Il2CppAssembliesPath>
-    <MelonLoaderAssembliesPath Condition="'$(MelonLoaderAssembliesPath)' == ''">$(LocalGameDir)\MelonLoader\net6</MelonLoaderAssembliesPath>
+    <Version>0.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="S1API.Forked" Version="3.1.6" />
     <PackageReference Include="LavaGang.MelonLoader" Version="0.7.3" PrivateAssets="all" NoWarn="NU1701" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>$(Il2CppAssembliesPath)\Assembly-CSharp.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="Il2CppFishNet.Runtime">
-      <HintPath>$(Il2CppAssembliesPath)\Il2CppFishNet.Runtime.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="Il2CppInterop.Runtime">
-      <HintPath>$(MelonLoaderAssembliesPath)\Il2CppInterop.Runtime.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>$(Il2CppAssembliesPath)\UnityEngine.CoreModule.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-
-  <Target Name="ValidateGameReferences" BeforeTargets="ResolveReferences">
-    <Error Condition="!Exists('$(LocalGameDir)\Schedule I.exe')"
-           Text="Schedule I.exe was not found at LocalGameDir. Run setup.ps1 -GameDir with your actual game folder." />
-    <Error Condition="!Exists('$(Il2CppAssembliesPath)\Assembly-CSharp.dll')"
-           Text="Assembly-CSharp.dll not found. Install MelonLoader on the IL2CPP game build and check Il2CppAssembliesPath." />
-    <Error Condition="!Exists('$(MelonLoaderAssembliesPath)\Il2CppInterop.Runtime.dll')"
-           Text="Il2CppInterop.Runtime.dll not found. Check MelonLoaderAssembliesPath." />
-  </Target>
 </Project>
