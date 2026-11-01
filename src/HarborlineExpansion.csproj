@@ -10,12 +10,19 @@
     <GameDir Condition="'$(GameDir)' == ''">$(SCHEDULEI_GAME_DIR)</GameDir>
     <MelonLoaderDll Condition="'$(MelonLoaderDll)' == ''">$(GameDir)\MelonLoader\net6\MelonLoader.dll</MelonLoaderDll>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="Core/Domain.Core.csproj" />
+    <Compile Remove="Core/**/*.cs" />
+  </ItemGroup>
+
   <ItemGroup Condition="Exists('$(MelonLoaderDll)')">
     <Reference Include="MelonLoader">
       <HintPath>$(MelonLoaderDll)</HintPath>
       <Private>false</Private>
     </Reference>
   </ItemGroup>
+
   <Target Name="CheckGameReferences" BeforeTargets="ResolveReferences">
     <Error Condition="'$(GameDir)' == ''" Text="Set GameDir or SCHEDULEI_GAME_DIR to your Schedule I installation." />
     <Error Condition="!Exists('$(MelonLoaderDll)')" Text="MelonLoader.dll not found at $(MelonLoaderDll). Set MelonLoaderDll to the actual IL2CPP reference path." />
