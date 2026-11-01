@@ -1,3 +1,4 @@
+using ScheduleIMegaExpansion.Core;
 using S1API.PhoneApp;
 using S1API.UI;
 using S1API.Utils;
