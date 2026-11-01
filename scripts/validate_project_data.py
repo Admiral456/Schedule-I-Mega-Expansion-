@@ -98,6 +98,12 @@ def main():
 
     npc_ids = [item["id"] for item in npcs_doc["profiles"]]
     require(len(npc_ids) == len(set(npc_ids)), "NPC IDs must be unique")
+    require(len(npc_ids) >= 9, "at least nine initial NPC profiles are required")
+    npc_counts = {province_id: 0 for province_id in province_ids}
+    for npc in npcs_doc["profiles"]:
+        npc_counts[npc["provinceId"]] += 1
+    for province_id, count in npc_counts.items():
+        require(count >= 3, f"{province_id} must define at least three residents")
     preference_signatures = set()
 
     for npc in npcs_doc["profiles"]:
