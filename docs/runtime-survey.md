@@ -18,6 +18,7 @@ Schedule I/UserData/ScheduleIMegaExpansion/Diagnostics/<timestamp>/
 - native-properties.csv: property name/code/price/ownership and exposed spawn locations.
 - native-businesses.csv: business name/code/price/ownership and exposed spawn locations.
 - standalone-phone-map-pois.csv: phone-map POI markers, if supported by the installed S1API build.
+- native-map-property-api.txt: metadata-only reflection report of relevant game map, region, property and business types/members; no methods are invoked.
 - summary.txt: assembly version, counts and errors.
 
 ## Safety
