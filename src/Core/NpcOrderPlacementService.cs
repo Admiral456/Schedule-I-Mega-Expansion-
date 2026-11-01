@@ -8,7 +8,7 @@ public sealed record NpcOrderPlacementRequest(
     long WorldInterval,
     long CreatedAtUnixSeconds,
     long DeadlineUnixSeconds,
-    int PlayerReputation);
+    int ExpansionStanding);
 
 public sealed record NpcOrderDraftLine(string ProductId, int Quantity, long UnitPrice);
 
@@ -116,7 +116,7 @@ public static class NpcOrderPlacementService
             profile with { BudgetLimit = orderBudget },
             stock,
             request.WorldInterval,
-            request.PlayerReputation);
+            request.ExpansionStanding);
 
         if (!generated.Success || generated.Offer is null || generated.Evaluation is null)
         {
