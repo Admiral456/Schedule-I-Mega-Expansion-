@@ -1,11 +1,52 @@
 {
-  "$schema":"https://json-schema.org/draft/2020-12/schema",
-  "title":"NPC profiles",
-  "type":"object",
-  "required":["schemaVersion","profiles"],
-  "properties":{
-    "schemaVersion":{"type":"integer","minimum":1},
-    "profiles":{"type":"array","items":{"type":"object","required":["id","name","provinceId","role","presence","preferences"],"properties":{"id":{"type":"string","pattern":"^sime\\.npc\\."},"name":{"type":"string"},"provinceId":{"type":"string","pattern":"^sime\\.province\\."},"role":{"type":"string"},"presence":{"enum":["physical_and_contact","physical","contact_only_until_navigation_verified"]},"preferences":{"type":"object","required":["preferredProductIds","neutralProductIds","rejectedProductIds","priceSensitivity","budgetBand"],"properties":{"preferredProductIds":{"type":"array","items":{"type":"string"}},"neutralProductIds":{"type":"array","items":{"type":"string"}},"rejectedProductIds":{"type":"array","items":{"type":"string"}},"priceSensitivity":{"type":"number","minimum":0,"maximum":1},"budgetBand":{"enum":["low","medium","high","very_high"]}},"additionalProperties":false}},"additionalProperties":true}}
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "NPC profiles",
+  "type": "object",
+  "required": ["schemaVersion", "profiles"],
+  "properties": {
+    "schemaVersion": { "type": "integer", "minimum": 1 },
+    "profiles": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "provinceId", "role", "presence", "preferences"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^sime\\.npc\\." },
+          "name": { "type": "string" },
+          "provinceId": { "type": "string", "pattern": "^sime\\.province\\." },
+          "role": { "type": "string" },
+          "presence": {
+            "enum": [
+              "physical_and_contact",
+              "physical",
+              "contact_only_until_navigation_verified"
+            ]
+          },
+          "preferences": {
+            "type": "object",
+            "required": [
+              "preferredProductIds",
+              "neutralProductIds",
+              "rejectedProductIds",
+              "priceSensitivity",
+              "budgetBand",
+              "budgetLimit"
+            ],
+            "properties": {
+              "preferredProductIds": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^sime\\.product\\." } },
+              "neutralProductIds": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^sime\\.product\\." } },
+              "rejectedProductIds": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^sime\\.product\\." } },
+              "priceSensitivity": { "type": "number", "minimum": 0, "maximum": 1 },
+              "budgetBand": { "enum": ["low", "medium", "high", "very_high"] },
+              "budgetLimit": { "type": "integer", "minimum": 1 }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": true
+      }
+    }
   },
-  "additionalProperties":false
+  "additionalProperties": false
 }

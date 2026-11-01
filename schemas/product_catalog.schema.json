@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Expansion example product catalogue",
+  "type": "object",
+  "required": ["schemaVersion", "products"],
+  "properties": {
+    "schemaVersion": { "type": "integer", "minimum": 1 },
+    "note": { "type": "string" },
+    "products": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "displayName", "category", "tier"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^sime\\.product\\." },
+          "displayName": { "type": "string", "minLength": 1 },
+          "category": { "type": "string", "minLength": 1 },
+          "tier": { "enum": ["standard", "industrial", "premium"] }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

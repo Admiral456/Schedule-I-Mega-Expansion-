@@ -17,9 +17,16 @@ A real phone app backed by persistent game data and host-authoritative services,
 11. Reputation — per-NPC, crew, business and province reputation.
 
 ## NPC profiles
-Every significant NPC has stable npcId, display name, portrait reference, province/position, role, schedule, availability, preferred/neutral/rejected product IDs, budget band, price sensitivity, per-player relationship, crew relationship, order history and message thread IDs.
+Every significant NPC has stable npcId, display name, portrait reference, province/position, role, schedule, availability, preferred/neutral/rejected product IDs, budget band, individual budget limit, price sensitivity, per-player relationship, crew relationship, order history and message thread IDs.
 
 A physical NPC is required when the player must meet/interact with the person in-world. Contact-only NPCs are allowed when a physical entity is unnecessary or not yet safe to spawn.
+
+Three distinct sample customer profiles are defined:
+- Morgan Reed: standard-preferring, premium-rejecting and relatively price-sensitive.
+- Jordan Pike: prefers industrial/standard products and has a larger budget.
+- Taylor Brooks: premium-preferring, standard-rejecting and less price-sensitive.
+
+Product IDs are example expansion IDs only until a runtime product adapter maps them to actual Schedule I item definitions.
 
 ## Reputation scopes
 - playerRep: NPC relationship with player A or B.
@@ -27,7 +34,7 @@ A physical NPC is required when the player must meet/interact with the person in
 - businessRep: reputation of a specific owned business.
 - provinceRep: broader regional standing.
 
-Reputation changes only after host-confirmed events.
+Reputation changes only after host-confirmed events. A customer's current player-specific reputation is an input to the acceptance evaluator; the crew value remains a separate ledger scope.
 
 ## NPC-generated orders
 Generation depends on preferences, budget, schedule, availability, reputation and local events. Status flow:
@@ -35,6 +42,8 @@ offered -> accepted -> preparing -> ready -> delivered/collected -> completed
 Terminal alternatives: expired, cancelled, failed, disputed.
 
 Each order has orderId, customerId, product IDs, quantities, deadline, reward, fulfilment method, status, version and audit log.
+
+The core preference evaluator is deterministic: rejected products and over-budget offers fail immediately; preferred/neutral products, budget usage, price sensitivity and player-specific reputation contribute to an acceptance score. It is currently game-independent and does not yet spawn live NPC orders.
 
 ## Online shop
 Portside Supply has a physical shop and phone app but one shared inventory, one price source and one order ledger. Purchases and delivery are host-authoritative. Never keep two independent inventories for online and physical sales.

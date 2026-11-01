@@ -44,11 +44,13 @@ def main():
     validate_schema("data/provinces.json", "schemas/provinces.schema.json")
     validate_schema("data/businesses.json", "schemas/businesses.schema.json")
     validate_schema("data/npc_profiles.json", "schemas/npc_profiles.schema.json")
+    validate_schema("data/product_catalog.example.json", "schemas/product_catalog.schema.json")
     validate_schema("data/dependency-baseline.json", "schemas/dependency-baseline.schema.json")
 
     provinces_doc = load("data/provinces.json")
     businesses_doc = load("data/businesses.json")
     npcs_doc = load("data/npc_profiles.json")
+    product_catalog_doc = load("data/product_catalog.example.json")
     dependency_doc = load("data/dependency-baseline.json")
 
     provinces = provinces_doc["provinces"]
@@ -89,12 +91,38 @@ def main():
     require(bool(portside.get("onlinePhoneAppId")), "Portside Supply must expose a phone app")
     require(bool(portside.get("sharedInventoryId")), "Portside Supply online and physical sales must share inventory")
 
+    product_ids = [item["id"] for item in product_catalog_doc["products"]]
+    product_id_set = set(product_ids)
+    require(len(product_ids) == len(product_id_set), "example product IDs must be unique")
+    require(bool(product_id_set), "at least one example product definition is required")
+
     npc_ids = [item["id"] for item in npcs_doc["profiles"]]
     require(len(npc_ids) == len(set(npc_ids)), "NPC IDs must be unique")
+    preference_signatures = set()
+
     for npc in npcs_doc["profiles"]:
         require(npc["provinceId"] in province_ids, f"{npc['id']} references unknown province")
-        sensitivity = npc["preferences"]["priceSensitivity"]
+
+        preferences = npc["preferences"]
+        sensitivity = preferences["priceSensitivity"]
         require(0.0 <= sensitivity <= 1.0, f"{npc['id']} priceSensitivity must be between 0 and 1")
+        require(preferences["budgetLimit"] > 0, f"{npc['id']} budgetLimit must be positive")
+
+        preferred = set(preferences["preferredProductIds"])
+        neutral = set(preferences["neutralProductIds"])
+        rejected = set(preferences["rejectedProductIds"])
+
+        require(not (preferred & neutral), f"{npc['id']} has products marked both preferred and neutral")
+        require(not (preferred & rejected), f"{npc['id']} has products marked both preferred and rejected")
+        require(not (neutral & rejected), f"{npc['id']} has products marked both neutral and rejected")
+
+        referenced_products = preferred | neutral | rejected
+        unknown_products = referenced_products - product_id_set
+        require(not unknown_products, f"{npc['id']} references unknown products: {sorted(unknown_products)}")
+
+        preference_signatures.add(tuple(sorted(preferred)))
+
+    require(len(preference_signatures) > 1, "NPCs must not all share the same preferred-product profile")
 
     dependencies = dependency_doc["dependencies"]
     dependency_ids = [item["id"] for item in dependencies]
@@ -112,7 +140,7 @@ def main():
         require(actual[dependency_id]["version"] == version, f"{dependency_id} version differs from the reviewed baseline")
         require(actual[dependency_id]["targetFramework"] == target_framework, f"{dependency_id} target framework differs from the reviewed baseline")
 
-    print("Project data validation passed: provinces, Realtor listings, shared shop stock, NPC references and IL2CPP dependency pins are consistent.")
+    print("Project data validation passed: provinces, Realtor listings, shared shop stock, NPC product preferences/budgets and IL2CPP dependency pins are consistent.")
 
 if __name__ == "__main__":
     main()
