@@ -47,6 +47,7 @@ def main():
     validate_schema("data/product_catalog.example.json", "schemas/product_catalog.schema.json")
     validate_schema("data/dependency-baseline.json", "schemas/dependency-baseline.schema.json")
     validate_schema("data/harborline_population.json", "schemas/harborline_population.schema.json")
+    validate_schema("data/harborline_npc_roster.json", "schemas/harborline_npc_roster.schema.json")
 
     provinces_doc = load("data/provinces.json")
     businesses_doc = load("data/businesses.json")
@@ -54,6 +55,7 @@ def main():
     product_catalog_doc = load("data/product_catalog.example.json")
     dependency_doc = load("data/dependency-baseline.json")
     harborline_doc = load("data/harborline_population.json")
+    harborline_roster_doc = load("data/harborline_npc_roster.json")
 
     provinces = provinces_doc["provinces"]
     province_ids = {item["id"] for item in provinces}
@@ -157,6 +159,30 @@ def main():
     require(harborline_doc["police"]["customPoliceNpcCount"] == 0, "Harborline must use native police AI, not custom police NPCs")
     require(len(harborline_doc["police"]["plannedCheckpointPoiIds"]) >= 3, "Harborline needs at least three native checkpoint locations")
     require(harborline_population["initialSimultaneousPopulationTarget"] <= harborline_population["performanceTestCeiling"] <= harborline_population["totalPhysicalNpcTarget"], "Harborline simultaneous NPC targets are inconsistent")
+    roster_entries = harborline_roster_doc["entries"]
+    require(len(roster_entries) == harborline_roster_doc["physicalNpcTarget"] == harborline_population["totalPhysicalNpcTarget"], "Harborline roster count does not match physical NPC target")
+    roster_ids = [entry["id"] for entry in roster_entries]
+    require(len(roster_ids) == len(set(roster_ids)), "Harborline NPC IDs must be unique")
+    roster_names = [entry["name"] for entry in roster_entries]
+    require(len(roster_names) == len(set(roster_names)), "Harborline names must be unique within the expansion roster")
+    require(all(entry["appearanceProfileId"] == entry["id"] for entry in roster_entries), "Each NPC must have a dedicated appearance profile key")
+    require(all(entry["presence"] == "physical" for entry in roster_entries), "Harborline roster must contain physical NPCs only")
+    require(all(entry["position"] is None and entry["spawnAnchorId"] is None for entry in roster_entries), "Harborline spawn positions must remain unset until live survey")
+    require(sum(1 for entry in roster_entries if entry["isCustomer"]) == harborline_roster_doc["customerNpcTarget"] == harborline_population["customerNpcTarget"], "Harborline customer count is inconsistent")
+    require(sum(1 for entry in roster_entries if entry["isDealer"]) == harborline_roster_doc["dealerNpcTarget"] == harborline_population["dealerNpcTarget"], "Harborline dealer count is inconsistent")
+    roster_role_counts = {}
+    roster_zone_counts = {}
+    expected_zone_ids = {zone["id"] for zone in harborline_doc["zones"]}
+    for entry in roster_entries:
+        roster_role_counts[entry["role"]] = roster_role_counts.get(entry["role"], 0) + 1
+        roster_zone_counts[entry["zoneId"]] = roster_zone_counts.get(entry["zoneId"], 0) + 1
+        require(entry["zoneId"] in expected_zone_ids, "Harborline NPC references an unknown zone: " + entry["id"])
+        expected_behaviour = "NPCCustomer" if entry["isCustomer"] else "NPCDealer" if entry["isDealer"] else "NPC"
+        require(entry["nativeBehaviour"] == expected_behaviour, "Harborline NPC role flags do not match native behaviour: " + entry["id"])
+    require(roster_role_counts == role_counts, "Harborline roster roles do not match population group counts")
+    expected_zone_counts = {zone["id"]: sum(zone["targetNpcIdsByRole"].values()) for zone in harborline_doc["zones"]}
+    require(roster_zone_counts == expected_zone_counts, "Harborline roster zones do not match zone population targets")
+
     dependencies = dependency_doc["dependencies"]
     dependency_ids = [item["id"] for item in dependencies]
     require(len(dependency_ids) == len(set(dependency_ids)), "dependency IDs must be unique")
@@ -173,7 +199,7 @@ def main():
         require(actual[dependency_id]["version"] == version, f"{dependency_id} version differs from the reviewed baseline")
         require(actual[dependency_id]["targetFramework"] == target_framework, f"{dependency_id} target framework differs from the reviewed baseline")
 
-    print("Project data validation passed: provinces, Realtor listings, shared stock, NPC profiles, Harborline zone/population totals, native police reuse and IL2CPP dependency pins are consistent.")
+    print("Project data validation passed: provinces, Realtor listings, shared stock, NPC profiles, Harborline zone/population totals, stable NPC identities, native police reuse and IL2CPP dependency pins are consistent.")
 
 if __name__ == "__main__":
     main()
