@@ -1,14 +1,21 @@
 # Domain core
 
-The src/Core library contains game-independent rules that can be tested without launching Schedule I or loading MelonLoader.
+The src/Core library contains game-independent rules tested without launching Schedule I or loading MelonLoader.
 
 ## Included
-- StableId: namespaced stable IDs; display names are never persistence keys.
-- OrderState: allowed transitions for NPC and shop orders.
-- ShopPurchaseService: in-memory reference transaction with request idempotency, stock checks and balance checks.
-- ReputationLedger: scoped reputation with bounds and duplicate-event protection.
+- StableId: stable namespaced identifiers.
+- OrderState: allowed customer-order state transitions.
+- ShopPurchaseService: in-memory reference transaction with stock/balance checks and request idempotency.
+- ReputationLedger: scoped reputation, bounds and duplicate-event protection.
+- NetworkMessageValidator and ReplayWindow: authenticated envelope checks, payload limits and replay detection.
+- SaveMigrationPipeline: explicit schema migration chain.
+- JsonSaveStore: mod-owned JSON file replacement with previous-file backup.
 
-## Important production boundary
-ShopPurchaseService is an in-memory domain reference, not yet connected to Schedule I inventory, cash, save data or Steam networking. The host must call it only after the network adapter validates a client request. A production implementation must persist state and the idempotency ledger atomically; otherwise a crash between memory mutation and save could still lose or repeat a transaction.
+## Important production boundaries
+The shop service is in-memory and not connected to game cash, stock, save data or Steam networking. Its production transaction and idempotency ledger must persist atomically.
 
-The tests prove domain behavior only. They do not prove that game integration, co-op packet delivery or save persistence work.
+The replay window does not replace transport authentication, reliable delivery, encryption, host authorization or the SteamNetworkLib adapter.
+
+The save store uses a caller-provided path and is not wired to the game's S1API save lifecycle. It must never target vanilla save files.
+
+Tests prove isolated domain behavior only. They do not prove game integration, live co-op packet delivery, map streaming, Realtor or NPC AI.

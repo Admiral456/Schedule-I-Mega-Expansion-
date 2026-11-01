@@ -8,7 +8,8 @@ public enum ShopPurchaseOutcome
     OutOfStock,
     InsufficientFunds,
     InvalidPrice,
-    PriceOverflow
+    PriceOverflow,
+    RequestIdConflict
 }
 
 public sealed record ShopPurchaseRequest(
@@ -40,7 +41,7 @@ public sealed class ShopPurchaseService
     private readonly Dictionary<string, long> _balances = new(StringComparer.Ordinal);
     private readonly Dictionary<string, int> _stock = new(StringComparer.Ordinal);
     private readonly Dictionary<string, long> _prices = new(StringComparer.Ordinal);
-    private readonly Dictionary<string, ShopPurchaseResult> _processedRequests = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, (ShopPurchaseRequest Request, ShopPurchaseResult Result)> _processedRequests = new(StringComparer.Ordinal);
     private long _worldRevision;
 
     public long WorldRevision
@@ -104,18 +105,30 @@ public sealed class ShopPurchaseService
                 return Result(ShopPurchaseOutcome.InvalidRequest, request.RequestId ?? string.Empty, 0, 0, 0);
             }
 
-            if (_processedRequests.TryGetValue(request.RequestId, out ShopPurchaseResult? previous))
-                return previous with { IsReplay = true };
+            if (_processedRequests.TryGetValue(request.RequestId, out var previous))
+            {
+                if (previous.Request != request)
+                {
+                    return Result(
+                        ShopPurchaseOutcome.RequestIdConflict,
+                        request.RequestId,
+                        0,
+                        GetBuyerBalance(request.BuyerId),
+                        GetStockUnsafe(request.ShopId, request.ProductId));
+                }
+
+                return previous.Result with { IsReplay = true };
+            }
 
             string key = CreateStockKey(request.ShopId, request.ProductId);
             if (!_stock.TryGetValue(key, out int stock) || !_prices.TryGetValue(key, out long unitPrice))
-                return Remember(Result(ShopPurchaseOutcome.UnknownShopItem, request.RequestId, 0, GetBuyerBalance(request.BuyerId), 0));
+                return Remember(request, Result(ShopPurchaseOutcome.UnknownShopItem, request.RequestId, 0, GetBuyerBalance(request.BuyerId), 0));
 
             if (unitPrice <= 0)
-                return Remember(Result(ShopPurchaseOutcome.InvalidPrice, request.RequestId, 0, GetBuyerBalance(request.BuyerId), stock));
+                return Remember(request, Result(ShopPurchaseOutcome.InvalidPrice, request.RequestId, 0, GetBuyerBalance(request.BuyerId), stock));
 
             if (stock < request.Quantity)
-                return Remember(Result(ShopPurchaseOutcome.OutOfStock, request.RequestId, 0, GetBuyerBalance(request.BuyerId), stock));
+                return Remember(request, Result(ShopPurchaseOutcome.OutOfStock, request.RequestId, 0, GetBuyerBalance(request.BuyerId), stock));
 
             long totalPrice;
             try
@@ -124,28 +137,26 @@ public sealed class ShopPurchaseService
             }
             catch (OverflowException)
             {
-                return Remember(Result(ShopPurchaseOutcome.PriceOverflow, request.RequestId, 0, GetBuyerBalance(request.BuyerId), stock));
+                return Remember(request, Result(ShopPurchaseOutcome.PriceOverflow, request.RequestId, 0, GetBuyerBalance(request.BuyerId), stock));
             }
 
             long balance = GetBuyerBalance(request.BuyerId);
             if (balance < totalPrice)
-                return Remember(Result(ShopPurchaseOutcome.InsufficientFunds, request.RequestId, totalPrice, balance, stock));
+                return Remember(request, Result(ShopPurchaseOutcome.InsufficientFunds, request.RequestId, totalPrice, balance, stock));
 
-            // The host applies both mutations under one lock: no partial charge or stock decrement.
             long remainingBalance = balance - totalPrice;
             int remainingStock = stock - request.Quantity;
             _balances[request.BuyerId] = remainingBalance;
             _stock[key] = remainingStock;
             _worldRevision++;
 
-            return Remember(Result(ShopPurchaseOutcome.Succeeded, request.RequestId, totalPrice, remainingBalance, remainingStock));
+            return Remember(request, Result(ShopPurchaseOutcome.Succeeded, request.RequestId, totalPrice, remainingBalance, remainingStock));
         }
     }
 
-    private ShopPurchaseResult Remember(ShopPurchaseResult result)
+    private ShopPurchaseResult Remember(ShopPurchaseRequest request, ShopPurchaseResult result)
     {
-        if (!string.IsNullOrWhiteSpace(result.RequestId))
-            _processedRequests[result.RequestId] = result;
+        _processedRequests[request.RequestId] = (request, result);
         return result;
     }
 
@@ -159,6 +170,12 @@ public sealed class ShopPurchaseService
 
     private long GetBuyerBalance(string buyerId) =>
         _balances.TryGetValue(buyerId, out long balance) ? balance : 0;
+
+    private int GetStockUnsafe(string shopId, string productId)
+    {
+        string key = CreateStockKey(shopId, productId);
+        return _stock.TryGetValue(key, out int stock) ? stock : 0;
+    }
 
     private static string CreateStockKey(string shopId, string productId) => $"{shopId}\u001f{productId}";
 }

@@ -2,49 +2,46 @@
 
 Fan-made world and gameplay expansion for Schedule I, targeting Steam Default / IL2CPP and two-player co-op.
 
-> **Project state:** foundation/specification in progress. This repository does not yet contain a finished, compiled, or tested in-game expansion DLL.
+> **Current state:** project foundation plus testable game-independent domain core. This is not yet a finished, compiled or tested in-game expansion DLL.
 
-## Scope
-Preserve vanilla Hyland Point and add exactly three major provinces:
+## World scope
+Preserve vanilla Hyland Point and add three major provinces:
 - **Harborline** — southern coastal port, logistics, warehouses, shops and industry.
 - **Ridgeview** — mountain quarry, processing, factories, research and freight contracts.
 - **Lakeside** — lake, marina, resorts, hotels, recreation and luxury businesses.
 
-All provinces share one world, economy, NPC/contact network, police simulation, business ownership and co-op state.
-
-## Required systems
-- **Hyland Network:** phone app with contacts, NPC profiles, messages, per-NPC reputation, orders, contracts and online shops.
-- **Portside Supply:** physical shop and online phone ordering backed by one shared inventory/pricing system.
-- **Realtor integration:** every purchasable new business must be listed through the existing Realtor flow.
-- **NPC:** named residents, individual product preferences, budgets, schedules and generated orders.
-- **Dealer network:** new province contacts, inventory and customer relationships.
-- **Police:** checkpoints, patrols, inspections and events across all three provinces.
-- **Co-op:** host-authoritative economy, ownership, orders, police events, save/load and late join.
+## Gameplay scope
+- **Hyland Network:** phone app with contacts, profiles, messages, reputation, NPC orders, contracts and online shops.
+- **Portside Supply:** physical shop and online phone ordering with one shared stock and price source.
+- **Realtor:** every purchasable expansion business is listed through the existing Realtor flow.
+- **NPCs:** individual preferences, budgets, schedules, relationships and generated customer orders.
+- **Dealers and police:** new dealers, patrol routes, checkpoints and controls in all three provinces.
+- **Co-op:** host-authoritative ownership, shop transactions, orders, reputation, police and save state.
 
 ## Technical candidates
-- MelonLoader
-- ifBars/S1API
-- ifBars/S1MAPI
-- SteamNetworkLib IL2CPP
-- Sideload (only if the S1API phone app path needs it)
-- ScheduleOne-Personnel (optional NPC framework; API/licensing check required)
+MelonLoader, S1API, S1MAPI and SteamNetworkLib IL2CPP. Sideload and ScheduleOne-Personnel remain optional candidates pending integration/license checks.
 
-Frameworks are candidates, not proof that map streaming, NavMesh, vehicle road graphs, Realtor extension or multiplayer persistence already work. Those are tracked as technical spikes.
+These candidates do not prove map streaming, NavMesh, vehicle road graph extension, Realtor hooks or multiplayer persistence. Those require separate in-game proof-of-concepts.
 
 ## Start here
-- [Project scope](docs/PROJECT_SCOPE.md)
-- [World map and provinces](docs/WORLD_MAP_AND_PROVINCES.md)
+- [Scope](docs/PROJECT_SCOPE.md)
+- [World map](docs/WORLD_MAP_AND_PROVINCES.md)
 - [Hyland Network](docs/HYLAND_NETWORK.md)
-- [Multiplayer architecture](docs/MULTIPLAYER_ARCHITECTURE.md)
-- [Save migration and safety](docs/SAVE_AND_MIGRATIONS.md)
-- [Compatibility and dependencies](docs/COMPATIBILITY_AND_DEPENDENCIES.md)
+- [Multiplayer](docs/MULTIPLAYER_ARCHITECTURE.md)
+- [Network protocol](docs/NETWORK_PROTOCOL.md)
+- [Save store](docs/SAVE_STORE.md)
+- [Domain core](docs/DOMAIN_CORE.md)
+- [Compatibility](docs/COMPATIBILITY_AND_DEPENDENCIES.md)
 - [Technical spikes](docs/TECHNICAL_SPIKES.md)
+- [Implementation plan](docs/IMPLEMENTATION_PLAN.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Test plan](docs/TEST_PLAN.md)
-- [Deep research summary](docs/DEEP_RESEARCH_SUMMARY.md)
 
-## Save safety
-All first tests use a copy of an existing save. Mod data is namespaced and versioned. Migrations must be reversible and idempotent. The vanilla save must never be silently rewritten.
+## CI
+GitHub Actions validates project JSON schemas/cross-file references and runs .NET domain-core unit tests.
+
+## Existing-save safety
+The core save store writes only to a caller-provided mod-owned path and maintains a previous-file backup. It is not wired to the game's S1API save lifecycle. Never point it at the vanilla save file. First tests must use a copy of the existing save.
 
 ## Status
-Foundation files are being established. No finished map, shop, NPC, phone app or co-op feature is claimed until it passes the documented tests.
+The domain core is tested independently, but no physical map, phone app, Realtor integration, NPC AI or two-player game adapter is claimed complete.

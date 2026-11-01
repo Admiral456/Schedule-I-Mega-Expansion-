@@ -11,7 +11,6 @@ public sealed class DomainServicesTests
         var service = new ShopPurchaseService();
         service.SetBalance("player-a", 1_000);
         service.SetProduct("portside", "crate", unitPrice: 100, stock: 2);
-
         var request = new ShopPurchaseRequest("req-001", "player-a", "portside", "crate", 1);
 
         ShopPurchaseResult first = service.Purchase(request);
@@ -23,6 +22,22 @@ public sealed class DomainServicesTests
         Assert.Equal(900, service.GetBalance("player-a"));
         Assert.Equal(1, service.GetStock("portside", "crate"));
         Assert.Equal(1, service.WorldRevision);
+    }
+
+    [Fact]
+    public void ReusingRequestIdWithDifferentPayloadIsRejected()
+    {
+        var service = new ShopPurchaseService();
+        service.SetBalance("player-a", 1_000);
+        service.SetProduct("portside", "crate", 100, 5);
+        service.SetProduct("portside", "box", 50, 5);
+
+        Assert.True(service.Purchase(new ShopPurchaseRequest("same-id", "player-a", "portside", "crate", 1)).Succeeded);
+        ShopPurchaseResult conflict = service.Purchase(new ShopPurchaseRequest("same-id", "player-a", "portside", "box", 1));
+
+        Assert.Equal(ShopPurchaseOutcome.RequestIdConflict, conflict.Outcome);
+        Assert.Equal(900, service.GetBalance("player-a"));
+        Assert.Equal(5, service.GetStock("portside", "box"));
     }
 
     [Fact]
@@ -50,8 +65,7 @@ public sealed class DomainServicesTests
         service.SetBalance("player-a", 50);
         service.SetProduct("portside", "crate", unitPrice: 100, stock: 1);
 
-        ShopPurchaseResult result = service.Purchase(
-            new ShopPurchaseRequest("req-poor", "player-a", "portside", "crate", 1));
+        ShopPurchaseResult result = service.Purchase(new ShopPurchaseRequest("req-poor", "player-a", "portside", "crate", 1));
 
         Assert.Equal(ShopPurchaseOutcome.InsufficientFunds, result.Outcome);
         Assert.Equal(50, service.GetBalance("player-a"));
@@ -85,7 +99,6 @@ public sealed class DomainServicesTests
     public void StableOrderIdsUseNamespacedPrefix()
     {
         string id = StableId.NewOrderId();
-
         Assert.True(StableId.HasPrefix(id, StableId.OrderPrefix));
         Assert.False(StableId.HasPrefix("some-order", StableId.OrderPrefix));
     }
