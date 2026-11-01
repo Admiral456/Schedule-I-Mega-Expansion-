@@ -11,7 +11,7 @@ Rozšíření nebude nahrazovat systémy hry. Přidá do existujícího Hyland P
 - Personnel vytváří skutečné S1API NPC; nepoužijeme náhražky ve formě statických modelů ani vlastní paralelní AI.
 - Vzhled navrhneme v Personify a exportujeme do packu.
 - Zákaznické/dealerské vlastnosti, inventář, vztahy a kontaktní texty budou v manifestu. Konkrétní pole budou převzata z aktuální Pack Format dokumentace a ověřena na testovacím NPC.
-- Stabilní `id` každé postavy je povinné. Po vydání se nemění, protože slouží jako identita v uložené hře.
+- Stabilní `id` každé postavy je povinné. Aktuální Personnel formát vlastní ID normalizuje; bez vlastního ID se odvodí z názvu balíčku a jména NPC. Po vydání se identita nemění, protože je součástí uložené hry.
 - V kooperaci musí mít všichni hráči stejný Personnel pack.
 
 ### Měření souřadnic – bez odhadů
@@ -33,7 +33,7 @@ Pořadí implementace pro každý objekt:
 2. Pokud existuje odpovídající objekt, znovu ho použít nebo vytvořit jeho runtime instanci; zachovat materiály a herní styl.
 3. Pro statické dekorace interiéru použít existující herní nábytek/mesh.
 4. Pokud vhodný prvek neexistuje, vytvořit vlastní doplněk přes S1MAPI.
-5. Interaktivní/NetworkObject prefaby musí být spawnované se správným síťovým režimem. U S1MAPI je například ATM, interaktivní dveře a úložné kontejnery síťový obsah; dekorativní nábytek je odlišný případ.
+5. Interaktivní/NetworkObject prefaby musí být spawnované se správným síťovým režimem. Přesná pravidla jsou v `docs/prefab-reuse-rules.md`.
 
 S1MAPI `BuildingBuilder` je záložní nástroj pro nové konstrukce, ne výchozí způsob, jak modelovat každou budovu. Prioritou je znovupoužití originálních herních prvků.
 
