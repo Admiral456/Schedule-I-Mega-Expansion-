@@ -27,12 +27,12 @@ jobs:
         run: dotnet restore src/ScheduleIMegaExpansion.csproj
       - name: Build
         run: dotnet build src/ScheduleIMegaExpansion.csproj --configuration Release --no-restore
-      - name: Prepare diagnostic artifact
+      - name: Prepare Harborline mod artifact
         run: |
           mkdir -p artifact
           cp src/bin/Release/net6.0/ScheduleIMegaExpansion.dll artifact/
           cp src/README.md artifact/README.txt
-      - name: Upload diagnostic artifact
+      - name: Upload Harborline mod artifact
         uses: actions/upload-artifact@v4
         with:
           name: ScheduleIMegaExpansion-harborline-prototype
