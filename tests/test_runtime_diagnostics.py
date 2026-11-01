@@ -14,6 +14,8 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         cls.exporter = (ROOT / "src" / "Diagnostics" / "WorldSnapshotExporter.cs").read_text(encoding="utf-8")
         cls.scanner = (ROOT / "src" / "Diagnostics" / "NativeApiSurfaceScanner.cs").read_text(encoding="utf-8")
         cls.installer = (ROOT / "src" / "install.ps1").read_text(encoding="utf-8")
+        cls.physical = (ROOT / "src" / "Runtime" / "HarborlinePhysicalBuilder.cs").read_text(encoding="utf-8")
+        cls.hotkeys = (ROOT / "src" / "Runtime" / "HarborlineHotkeys.cs").read_text(encoding="utf-8")
 
     def test_runtime_project_targets_net6(self):
         target = self.project.find("./PropertyGroup/TargetFramework")
@@ -55,6 +57,25 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertNotIn(".InstantiateNetworked(", combined)
         self.assertNotIn(".Spawn(", combined)
         self.assertNotIn(".Invoke(", self.scanner)
+
+    def test_harborline_physical_slice_uses_real_unity_objects_and_colliders(self):
+        self.assertIn('CreatePrimitive', self.physical)
+        self.assertIn('UnityEngine.GameObject', self.physical)
+        self.assertIn('UnityEngine.MeshRenderer', self.physical)
+        self.assertIn('SetParent', self.physical)
+        self.assertIn('BuildWarehouse()', self.physical)
+        self.assertIn('BuildContainers()', self.physical)
+        self.assertIn('BuildCrane()', self.physical)
+        self.assertIn('primitive colliders', self.physical.lower())
+        self.assertIn('IsMultiplayerSession()', self.physical)
+
+    def test_harborline_hotkeys_capture_anchor_and_spawn_geometry(self):
+        self.assertIn('KeyDown("F6")', self.hotkeys)
+        self.assertIn('KeyDown("F7")', self.hotkeys)
+        self.assertIn('CaptureAnchor(', self.hotkeys)
+        self.assertIn('BuildPhysicalSlice(', self.hotkeys)
+        self.assertIn('HarborlineHotkeys.Update(', self.core)
+        self.assertIn('_saveLoaded = true', self.core)
 
     def test_installer_only_copies_the_built_dll(self):
         self.assertIn("Schedule I.exe", self.installer)
