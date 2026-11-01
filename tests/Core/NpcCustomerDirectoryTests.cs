@@ -61,12 +61,12 @@ public sealed class NpcCustomerDirectoryTests
         CustomerAcceptanceResult dockWorker = NpcCustomerAcceptance.Evaluate(
             NpcCustomerDirectory.FindById("sime.npc.harborline.casey_ward")!.Profile,
             offer,
-            playerReputation: 0);
+            expansionStanding: 0);
 
         CustomerAcceptanceResult resortInvestor = NpcCustomerAcceptance.Evaluate(
             NpcCustomerDirectory.FindById("sime.npc.lakeside.taylor_brooks")!.Profile,
             offer,
-            playerReputation: 0);
+            expansionStanding: 0);
 
         Assert.True(dockWorker.Accepted);
         Assert.False(resortInvestor.Accepted);
