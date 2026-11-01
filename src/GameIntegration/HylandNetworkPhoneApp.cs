@@ -138,12 +138,16 @@ public sealed class HylandNetworkPhoneApp : PhoneApp
         foreach (NpcCustomerDirectoryEntry resident in NpcCustomerDirectory.All)
         {
             string preferences = string.Join(", ", resident.Profile.PreferredProductIds);
+            string neutral = string.Join(", ", resident.Profile.NeutralProductIds);
+            string avoided = string.Join(", ", resident.Profile.RejectedProductIds);
             string body = resident.Role +
                 "\nProvince: " + resident.ProvinceId +
                 "\nAvailability: " + resident.AvailabilityWindow +
                 "\nBudget: $" + resident.Profile.BudgetLimit +
                 "\nPrice sensitivity: " + resident.Profile.PriceSensitivity.ToString("P0") +
-                "\nLikes: " + preferences;
+                "\nLikes: " + preferences +
+                "\nNeutral: " + neutral +
+                "\nAvoids: " + avoided;
 
             AddCard(resident.DisplayName.ToUpperInvariant(), body);
         }
