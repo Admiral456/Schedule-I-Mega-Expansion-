@@ -155,7 +155,7 @@
     ]
   },
   "appearanceRules": {
-    "system": "S1API NPCAppearance over Schedule I AvatarSettings; call GenerateRandomAppearance() then Build()",
+    "system": "S1API NPC instance Appearance; call Appearance.GenerateRandomAppearance() then Appearance.Build()",
     "useNativeRandomizer": true,
     "usePersonnelFramework": false,
     "useCustomAvatarGenerator": false,
@@ -215,7 +215,7 @@
   "npcImplementation": {
     "system": "S1API.Entities.NPC using the native Schedule I NPC prefab, save, schedule, avatar and networking pipeline",
     "externalNpcPackFrameworkRequired": false,
-    "appearanceApi": "S1API.Entities.NPCAppearance.GenerateRandomAppearance()",
+    "appearanceApi": "On the NPC instance: Appearance.GenerateRandomAppearance() followed by Appearance.Build()",
     "appearanceAssets": "vanilla game avatar layers only unless later explicitly required",
     "appearancePersistence": "Build the random appearance once when the authoritative host creates the NPC; preserve it through native NPC save/load and networking.",
     "duplicatePolicy": "Compare resolved native avatar settings for Harborline; reroll exact duplicates through GenerateRandomAppearance(), not a custom appearance generator.",
