@@ -35,8 +35,8 @@ Diagnostický IL2CPP projekt cílí na .NET 6 a MelonLoader 0.7.3; S1API se obje
 
 ## Aktuální stav a limity
 
-- Větev nyní obsahuje první sestavitelný, pouze diagnostický runtime mod. Neprovádí zatím změny světa ani spawn NPC.
-- Pozice budov, silnic a NPC musí být zachyceny v herním světě.
+- Větev nyní obsahuje sestavitelný runtime mod s první fyzickou prototypovou částí Harborline. Po zachycení herního bodu (F6) lze ve hře vytvořit přístavní areál z reálných Unity objektů s kolizemi (F7). Nejde zatím o finální nativní budovy/obchody a nespawnuje NPC.
+- Přesné umístění se zachytává v herním světě; žádné Unity souřadnice se neodvozují z 2D obrázku mapy.
 - Nákup businessů, obchodní inventář, policie a Hyland Network se napojí na původní systémy až po ověření jejich API v cílové verzi hry.
 - GitHub Actions sestavuje diagnostický IL2CPP mod a balí DLL do artefaktu. Samotný běh ve hře a jeho výstup ještě nejsou ověřeny; diagnostický runtime nic nemění a vyčítá původní registry pro další implementaci.
 
@@ -65,4 +65,4 @@ python -m unittest discover -s tests -v
 
 Runtime diagnostický mod se sestavuje jako samostatný .NET 6 projekt bez lokálních herních DLL. Příkaz `dotnet build src/ScheduleIMegaExpansion.csproj -c Release` vytvoří DLL; GitHub Actions navíc vytváří ZIP artefakt. Do hry se instaluje až po ověření s MelonLoader a S1API.
 
-Runtime balíček se nesmí označit za hotový, dokud nemá stabilní NPC ID, skutečné spawn souřadnice, ověřené trasy a průchozí budovy.
+Současný fyzický prototyp není finální Harborline: chybí nativní registrace budov a podniků, nativní dveře/interakce, NPC, mapové ikony, telefonní objednávky, policie, síťová synchronizace a uložení světa.
