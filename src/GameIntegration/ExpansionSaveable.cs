@@ -361,6 +361,139 @@ public sealed class ExpansionSaveable : Saveable
         return false;
     }
 
+    /// <summary>
+    /// Finalizes an NPC order and its escrow in the same persisted world revision.
+    /// Completed orders settle to shop revenue; cancelled, expired and failed orders
+    /// refund the customer budget and restore the reserved shop stock.
+    /// </summary>
+    public bool TryFinalizeNpcOrder(
+        string orderId,
+        OrderStatus targetStatus,
+        long expectedWorldRevision,
+        SteamNetworkClient? network)
+    {
+        if (string.IsNullOrWhiteSpace(orderId) ||
+            !StableId.HasPrefix(orderId, StableId.OrderPrefix) ||
+            !IsAuthoritativeHost(network) ||
+            IsReadOnly ||
+            !IsLoaded ||
+            _document is null ||
+            expectedWorldRevision != _document.WorldRevision)
+        {
+            return false;
+        }
+
+        ExpansionSaveDocument? updated = GetDocumentSnapshot();
+        if (updated?.Data is null ||
+            updated.WorldRevision != expectedWorldRevision ||
+            !updated.Data.Orders.TryGetValue(orderId, out ExpansionOrderRecord? order) ||
+            order is null)
+        {
+            return false;
+        }
+
+        if (!Enum.TryParse(order.Status, ignoreCase: true, out OrderStatus currentStatus) ||
+            !Enum.IsDefined(typeof(OrderStatus), currentStatus))
+        {
+            return false;
+        }
+
+        // A persisted terminal state means the escrow operation was committed with it.
+        if (currentStatus == targetStatus &&
+            targetStatus is OrderStatus.Completed or OrderStatus.Cancelled or OrderStatus.Expired or OrderStatus.Failed)
+        {
+            return true;
+        }
+
+        if (order.Version < 1 || order.Version == long.MaxValue ||
+            order.Items is null || order.Items.Count == 0 ||
+            order.TotalPrice <= 0 ||
+            string.IsNullOrWhiteSpace(order.RequestId) ||
+            string.IsNullOrWhiteSpace(order.RequesterId) ||
+            !StableId.HasPrefix(order.CustomerId, StableId.NpcPrefix) ||
+            !StableId.HasPrefix(order.ProvinceId, StableId.ProvincePrefix) ||
+            !StableId.HasPrefix(order.ShopId, StableId.BusinessPrefix) ||
+            !string.Equals(order.EscrowAccountId, "sime.escrow." + orderId, StringComparison.Ordinal) ||
+            !string.Equals(order.BuyerAccountId,
+                NpcOrderPlacementService.CreateBudgetAccountId(order.CustomerId, order.RequesterId, order.WorldInterval),
+                StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        long verifiedTotal = 0;
+        var refundLines = new List<ShopRefundLine>();
+        var seenProducts = new HashSet<string>(StringComparer.Ordinal);
+        try
+        {
+            foreach (ExpansionOrderLine line in order.Items)
+            {
+                if (line is null ||
+                    string.IsNullOrWhiteSpace(line.ProductId) ||
+                    line.Quantity <= 0 ||
+                    line.UnitPrice <= 0 ||
+                    !seenProducts.Add(line.ProductId))
+                {
+                    return false;
+                }
+
+                verifiedTotal = checked(verifiedTotal + checked(line.UnitPrice * line.Quantity));
+                refundLines.Add(new ShopRefundLine(line.ProductId, line.Quantity));
+            }
+        }
+        catch (OverflowException)
+        {
+            return false;
+        }
+
+        if (verifiedTotal != order.TotalPrice)
+            return false;
+
+        if (updated.Data.ShopPurchaseState is null)
+            return false;
+
+        var economy = new ShopPurchaseService();
+        if (!economy.TryRestoreSnapshot(updated.Data.ShopPurchaseState))
+            return false;
+
+        string operationId = StableId.FromOrderRequest(
+            "npc-order-finalization:" + orderId + ":" + targetStatus.ToString());
+
+        var escrowTerms = new NpcOrderEscrowTerms(
+            orderId,
+            order.EscrowAccountId,
+            order.BuyerAccountId,
+            order.ShopId,
+            order.TotalPrice,
+            Array.AsReadOnly(refundLines.ToArray()));
+
+        NpcOrderSettlementResult settlement = NpcOrderSettlementService.Finalize(
+            economy,
+            escrowTerms,
+            currentStatus,
+            targetStatus,
+            operationId);
+
+        if (!settlement.Success || settlement.LedgerResult is null)
+            return false;
+
+        order.Status = targetStatus.ToString().ToLowerInvariant();
+        order.Version++;
+        updated.Data.ShopPurchaseState = economy.CreateSnapshot();
+
+        ExpansionSaveDocument previousDocument = _document;
+        string previousRawDocument = _rawDocument;
+        if (!TryReplaceWorldState(updated.Data, network))
+            return false;
+
+        if (RequestHostSave(network))
+            return true;
+
+        _document = previousDocument;
+        _rawDocument = previousRawDocument;
+        return false;
+    }
+
     public bool RequestHostSave(SteamNetworkClient? network)
     {
         if (!IsAuthoritativeHost(network) || IsReadOnly || _document is null)
