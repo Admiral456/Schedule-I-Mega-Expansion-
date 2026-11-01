@@ -1,0 +1,24 @@
+name: Validate expansion data
+
+on:
+  push:
+    branches: ["main", "feat/**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate JSON data
+        run: |
+          python -m json.tool world/harborline/anchors.json > /dev/null
+          python -m json.tool packs/Harborline/roster.json > /dev/null
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
