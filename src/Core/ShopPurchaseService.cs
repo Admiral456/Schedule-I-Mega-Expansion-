@@ -305,7 +305,7 @@ public sealed class ShopPurchaseService
                 ShopEscrowOperationOutcome.Succeeded,
                 operation.OperationId,
                 operation.Amount,
-                remainingEscrowBalance: 0,
+                0,
                 newCounterpartyBalance));
         }
     }
