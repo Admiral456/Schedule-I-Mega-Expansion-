@@ -47,6 +47,7 @@ Files:
 - native-properties.csv
 - native-businesses.csv
 - standalone-phone-map-pois.csv
+- native-map-property-api.txt (metadata-only type/member report for native map, region, property and business APIs)
 
 ## Why this is needed
 
