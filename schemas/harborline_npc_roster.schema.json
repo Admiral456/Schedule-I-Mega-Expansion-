@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Harborline physical NPC roster",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "status",
+    "districtId",
+    "physicalNpcTarget",
+    "customerNpcTarget",
+    "dealerNpcTarget",
+    "entries",
+    "identityRules"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "status": {
+      "type": "string"
+    },
+    "districtId": {
+      "type": "string",
+      "pattern": "^sime\\.district\\."
+    },
+    "physicalNpcTarget": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "customerNpcTarget": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "dealerNpcTarget": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 42,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "role",
+          "zoneId",
+          "presence",
+          "nativeBehaviour",
+          "isCustomer",
+          "isDealer",
+          "appearanceProfileId",
+          "schedulePresetId",
+          "spawnAnchorId",
+          "position",
+          "spawnState"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^sime\\.npc\\.harborline\\."
+          },
+          "name": {
+            "type": "string",
+            "minLength": 3
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1
+          },
+          "zoneId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "presence": {
+            "const": "physical"
+          },
+          "nativeBehaviour": {
+            "enum": [
+              "NPC",
+              "NPCCustomer",
+              "NPCDealer"
+            ]
+          },
+          "isCustomer": {
+            "type": "boolean"
+          },
+          "isDealer": {
+            "type": "boolean"
+          },
+          "appearanceProfileId": {
+            "type": "string",
+            "pattern": "^sime\\.npc\\.harborline\\."
+          },
+          "schedulePresetId": {
+            "type": "string",
+            "pattern": "^sime\\.schedule\\.harborline\\."
+          },
+          "spawnAnchorId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "position": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "spawnState": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "identityRules": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}
