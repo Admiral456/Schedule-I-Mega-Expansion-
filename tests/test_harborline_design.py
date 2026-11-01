@@ -33,9 +33,24 @@ class HarborlineDesignTests(unittest.TestCase):
             self.assertTrue(dislikes, profile["id"])
             self.assertFalse(likes & dislikes, profile["id"])
             self.assertTrue(profile["preferredEffects"], profile["id"])
-            signature = (tuple(sorted(likes)), tuple(sorted(dislikes)), tuple(sorted(profile["preferredEffects"])), tuple(sorted(profile["avoidEffects"])))
+            signature = (
+                tuple(sorted(likes)),
+                tuple(sorted(dislikes)),
+                tuple(sorted(profile["preferredEffects"])),
+                tuple(sorted(profile["avoidEffects"])),
+            )
             self.assertNotIn(signature, signatures, profile["id"])
             signatures.add(signature)
+
+    def test_harborline_uses_native_docks_region_not_a_fake_enum(self):
+        allowed = {"Northtown", "Westville", "Downtown", "Docks", "Suburbia", "Uptown"}
+        self.assertEqual(self.roster["nativeRegion"], "Docks")
+        self.assertEqual(self.anchors["nativeRegion"], "Docks")
+        self.assertEqual(self.expansion["nativeRegion"], "Docks")
+        self.assertEqual(self.native["regionIntegration"]["harborlineParentNativeRegion"], "Docks")
+        self.assertTrue(self.native["regionIntegration"]["nativeRegionEnumVerified"])
+        self.assertFalse(self.native["regionIntegration"]["customRegionEnumRequired"])
+        self.assertEqual(set(self.native["regionIntegration"]["availableNativeRegionValues"]), allowed)
 
     def test_native_npc_random_appearance_is_required(self):
         npc = self.roster["npcImplementation"]
@@ -65,7 +80,7 @@ class HarborlineDesignTests(unittest.TestCase):
                 self.assertEqual(site["mapClassification"]["ownedIconRole"], "native-owned-property-icon")
         self.assertEqual(self.anchors["businessIntegration"]["listingSystem"], "existing-Realtor")
 
-    def test_property_api_gap_is_not_hidden(self):
+    def test_property_registration_gap_is_not_hidden(self):
         self.assertIs(self.native["propertyRegistration"]["customPropertyHookVerified"], False)
 
     def test_all_interactive_doors_are_networked_native_doors(self):
