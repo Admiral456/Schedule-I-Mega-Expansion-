@@ -436,5 +436,7 @@
     "ownershipPolicy": "The native property ownership state must drive the owned-property icon (house/home marker where used by the game).",
     "mapPOIPolicy": "S1API MapPOI is only for public landmarks that do not have native building/property markers; never use a POI as a fake shop or owned property.",
     "status": "not-verified; requires target-build runtime inspection"
-  }
+  },
+  "nativeRegion": "Docks",
+  "nativeRegionPolicy": "Display/creative name Harborline; native gameplay Region enum remains Docks. Exact positions must be checked against Docks map and police/navigation bounds."
 }
