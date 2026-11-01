@@ -16,7 +16,15 @@ Cílem je přirozeně rozšířit Hyland Point o nové obyvatelné a funkční o
 
 Plánované dominanty: Portside Supply, Harbor Freight Warehouse, Harbor Market, Harbor Auto Works, Harbor Offices, Harbor Power Plant, Pier Promenade a policejní kontrolní bod. Seznam je v `world/harborline/anchors.json`; dosud neobsahuje herní souřadnice a není určen k přímému spawnu.
 
-NPC role a cílové počty jsou v `packs/Harborline/roster.json`. Finální herní manifest bude vytvořen z měření ve hře a ověřen nástrojem `tools/validate_personnel_pack.py`.
+NPC role a cílové počty jsou v `packs/Harborline/roster.json`: nově 42 fyzických NPC, z toho zhruba 18 současně aktivních, 30 zákaznických profilů a 2 dealeři. Harborline je rozdělený do pěti propojených podčástí. Detail rozšíření je v `world/harborline/expansion-plan.json`.
+
+## Generování NPC a multiplayer
+
+- Každý zákazník má vlastní náhodné preference, ale generování je deterministické podle stabilního ID a uložené do save; po načtení ani připojení hráče se znovu nelosuje.
+- Vzhledy se generují z ověřených vanilla avatar vrstev. Kontroluje se otisk celé kombinace a při kolizi se vzhled přegeneruje.
+- Policie se nebude nahrazovat vlastním AI; Harborline se napojí na nativní policejní spawn/dispatch a navigaci.
+- Host je autorita pro spawn a stav NPC. Všichni hráči musí mít shodnou verzi modu, Personnel a S1API.
+- Detailní kontrakt a testovací brány: `docs/npc-generation-and-multiplayer.md`.
 
 ## Technologická vrstva
 
@@ -38,10 +46,12 @@ Verze závislostí se uzamknou až při prvním sestavitelném runtime projektu.
 - `docs/architecture.md` – technická architektura a pořadí implementace.
 - `docs/prefab-reuse-rules.md` – pravidla pro opakované použití vanilla prefabů a multiplayer.
 - `docs/harborline-survey-checklist.md` – přesný postup zaměření spawnu, tras, budov a checkpointů ve hře.
+- `docs/npc-generation-and-multiplayer.md` – náhodné preference, jedinečný vzhled, policie a multiplayerový kontrakt.
 - `world/harborline/anchors.json` – seznam lokalit a míst k zaměření.
+- `world/harborline/expansion-plan.json` – plán větší oblasti a pěti podčástí.
 - `world/harborline/prefabs.json` – katalog původních prefabů ověřených přímo ve hře.
 - `packs/Harborline/roster.json` – role a cílové počty NPC.
-- `packs/Harborline/customer-designs.json` – 14 individuálních návrhů zákaznických preferencí.
+- `packs/Harborline/customer-designs.json` – 30 návrhů zákaznických preferencí, které se před vydáním mapují na ověřená herní data.
 - `tools/validate_personnel_pack.py` – validace skutečného Personnel manifestu.
 - `tests/` – testy validátoru.
 
