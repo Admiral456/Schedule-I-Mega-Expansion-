@@ -31,7 +31,7 @@ NPC role a cílové počty jsou v `packs/Harborline/roster.json`: nově 42 fyzic
 - **MelonLoader + S1API Forked** – základní mod runtime a herní API.
 - **S1MAPI** – budovy a interiéry pouze pro prvky, které nelze vhodně znovu použít z původní hry.
 
-Verze závislostí se uzamknou až při prvním sestavitelném runtime projektu. Aktuální Personnel dokumentace uvádí MelonLoader 0.7.3+ a S1API Forked 3.2.1+. Viz [S1API Custom NPCs](https://ifbars.github.io/S1API/docs/custom-npcs.html), [NPCAppearance](https://ifbars.github.io/S1API/api/S1API.Entities.NPCAppearance.html) a [S1MAPI](https://ifbars.github.io/S1MAPI/).
+Verze závislostí se uzamknou až při prvním sestavitelném runtime projektu. Viz [S1API Custom NPCs](https://ifbars.github.io/S1API/docs/custom-npcs.html), [NPCAppearance](https://ifbars.github.io/S1API/api/S1API.Entities.NPCAppearance.html) a [S1MAPI](https://ifbars.github.io/S1MAPI/).
 
 ## Aktuální stav a limity
 
@@ -60,7 +60,7 @@ Verze závislostí se uzamknou až při prvním sestavitelném runtime projektu.
 
 ```bash
 python -m unittest discover -s tests -v
-python tools/validate_personnel_pack.py path/to/manifest.json
+
 ```
 
-Manifest se nesmí vydat, dokud nemá stabilní NPC ID, skutečné spawn souřadnice a ověřené trasy.
+Runtime balíček se nesmí označit za hotový, dokud nemá stabilní NPC ID, skutečné spawn souřadnice, ověřené trasy a průchozí budovy.
