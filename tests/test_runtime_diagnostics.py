@@ -15,7 +15,6 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         cls.scanner = (ROOT / "src" / "Diagnostics" / "NativeApiSurfaceScanner.cs").read_text(encoding="utf-8")
         cls.installer = (ROOT / "src" / "install.ps1").read_text(encoding="utf-8")
         cls.physical = (ROOT / "src" / "Runtime" / "HarborlinePhysicalBuilder.cs").read_text(encoding="utf-8")
-        cls.hotkeys = (ROOT / "src" / "Runtime" / "HarborlineHotkeys.cs").read_text(encoding="utf-8")
 
     def test_runtime_project_targets_net6(self):
         target = self.project.find("./PropertyGroup/TargetFramework")
@@ -69,13 +68,18 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn('primitive colliders', self.physical.lower())
         self.assertIn('IsMultiplayerSession()', self.physical)
 
-    def test_harborline_hotkeys_capture_anchor_and_spawn_geometry(self):
-        self.assertIn('KeyDown("F6")', self.hotkeys)
-        self.assertIn('KeyDown("F7")', self.hotkeys)
-        self.assertIn('CaptureAnchor(', self.hotkeys)
-        self.assertIn('BuildPhysicalSlice(', self.hotkeys)
-        self.assertIn('HarborlineHotkeys.Update(', self.core)
+    def test_harborline_is_generated_automatically_from_native_docks_anchor(self):
+        self.assertIn('HarborlinePhysicalBuilder.TryAutoGenerate(', self.core)
         self.assertIn('_saveLoaded = true', self.core)
+        self.assertIn('TryFindDocksWarehouseAnchor(', self.physical)
+        self.assertIn('GetAllProperties', self.physical)
+        self.assertIn('Docks Warehouse', self.physical)
+        self.assertIn('ExteriorSpawnPosition', self.physical)
+        self.assertIn('TryFindClearPlacement(', self.physical)
+        self.assertIn('CheckBox', self.physical)
+        self.assertIn('Raycast', self.physical)
+        self.assertNotIn('F6', self.physical)
+        self.assertNotIn('F7', self.physical)
 
     def test_installer_only_copies_the_built_dll(self):
         self.assertIn("Schedule I.exe", self.installer)
