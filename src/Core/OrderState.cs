@@ -28,10 +28,10 @@ public static class OrderState
                 next is OrderStatus.Accepted or OrderStatus.Expired or OrderStatus.Cancelled,
 
             OrderStatus.Accepted =>
-                next is OrderStatus.Preparing or OrderStatus.Cancelled or OrderStatus.Failed,
+                next is OrderStatus.Preparing or OrderStatus.Cancelled or OrderStatus.Expired or OrderStatus.Failed,
 
             OrderStatus.Preparing =>
-                next is OrderStatus.Ready or OrderStatus.Failed,
+                next is OrderStatus.Ready or OrderStatus.Expired or OrderStatus.Failed,
 
             OrderStatus.Ready =>
                 next is OrderStatus.Delivered or OrderStatus.Collected or OrderStatus.Expired or OrderStatus.Failed,
