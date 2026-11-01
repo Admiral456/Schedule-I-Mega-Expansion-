@@ -61,7 +61,8 @@ Verze závislostí se uzamknou až při prvním sestavitelném runtime projektu.
 
 ```bash
 python -m unittest discover -s tests -v
-
 ```
+
+Runtime diagnostický mod se sestavuje odděleně na Windows: v `src/` spusť `setup.ps1` a následně `dotnet build ScheduleIMegaExpansion.csproj -c Release`. Build vyžaduje lokální instalaci Schedule I, MelonLoader a S1API; automatická datová CI kontrola herní DLL nesestavuje.
 
 Runtime balíček se nesmí označit za hotový, dokud nemá stabilní NPC ID, skutečné spawn souřadnice, ověřené trasy a průchozí budovy.
