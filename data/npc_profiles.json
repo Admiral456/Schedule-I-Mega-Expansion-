@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "profiles": [
+    {"id":"sime.npc.harborline.morgan_reed","name":"Morgan Reed","provinceId":"sime.province.harborline","role":"shopkeeper","presence":"physical_and_contact","preferences":{"preferredProductIds":[],"neutralProductIds":[],"rejectedProductIds":[],"priceSensitivity":0.55,"budgetBand":"medium"},"reputation":{"scope":"per_player_and_crew","initialValue":0},"scheduleId":"sime.schedule.harborline.shopkeeper_day"},
+    {"id":"sime.npc.ridgeview.jordan_pike","name":"Jordan Pike","provinceId":"sime.province.ridgeview","role":"industrial_customer","presence":"contact_only_until_navigation_verified","preferences":{"preferredProductIds":[],"neutralProductIds":[],"rejectedProductIds":[],"priceSensitivity":0.3,"budgetBand":"high"},"reputation":{"scope":"per_player_and_crew","initialValue":0}},
+    {"id":"sime.npc.lakeside.taylor_brooks","name":"Taylor Brooks","provinceId":"sime.province.lakeside","role":"vip_customer","presence":"contact_only_until_navigation_verified","preferences":{"preferredProductIds":[],"neutralProductIds":[],"rejectedProductIds":[],"priceSensitivity":0.2,"budgetBand":"very_high"},"reputation":{"scope":"per_player_and_crew","initialValue":0}}
+  ]
+}

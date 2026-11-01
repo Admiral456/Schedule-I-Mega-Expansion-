@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "shops": [
+    {
+      "id": "sime.shop.portside_supply",
+      "businessId": "sime.business.harborline.portside_supply",
+      "phoneAppId": "sime.phone.portside_supply",
+      "physicalPoiId": "sime.poi.harborline.portside_supply",
+      "inventoryId": "sime.inventory.portside_supply",
+      "stockAuthority": "host",
+      "priceAuthority": "host",
+      "fulfilmentMethods": ["pickup", "delivery"],
+      "catalogue": []
+    }
+  ]
+}

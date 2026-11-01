@@ -1,0 +1,19 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"Customer order",
+  "type":"object",
+  "required":["id","customerId","provinceId","status","items","createdWorldTime","version"],
+  "properties":{
+    "id":{"type":"string","pattern":"^sime.order\\."},
+    "customerId":{"type":"string","pattern":"^sime.npc\\."},
+    "provinceId":{"type":"string","pattern":"^sime.province\\."},
+    "status":{"enum":["offered","accepted","preparing","ready","delivered","collected","completed","expired","cancelled","failed","disputed"]},
+    "items":{"type":"array","minItems":1,"items":{"type":"object","required":["productId","quantity"],"properties":{"productId":{"type":"string"},"quantity":{"type":"integer","minimum":1}},"additionalProperties":false}},
+    "createdWorldTime":{"type":"number"},
+    "deadlineWorldTime":{"type":["number","null"]},
+    "reward":{"type":"number","minimum":0},
+    "fulfilment":{"enum":["pickup","delivery","direct_handover"]},
+    "version":{"type":"integer","minimum":1}
+  },
+  "additionalProperties":false
+}

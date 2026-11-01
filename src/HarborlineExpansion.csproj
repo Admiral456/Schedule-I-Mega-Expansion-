@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>ScheduleIMegaExpansion</AssemblyName>
+    <RootNamespace>ScheduleIMegaExpansion</RootNamespace>
+    <Configurations>Debug;Release;Il2Cpp</Configurations>
+    <GameDir Condition="'$(GameDir)' == ''">$(SCHEDULEI_GAME_DIR)</GameDir>
+    <MelonLoaderDll Condition="'$(MelonLoaderDll)' == ''">$(GameDir)\MelonLoader\net6\MelonLoader.dll</MelonLoaderDll>
+  </PropertyGroup>
+  <ItemGroup Condition="Exists('$(MelonLoaderDll)')">
+    <Reference Include="MelonLoader">
+      <HintPath>$(MelonLoaderDll)</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <Target Name="CheckGameReferences" BeforeTargets="ResolveReferences">
+    <Error Condition="'$(GameDir)' == ''" Text="Set GameDir or SCHEDULEI_GAME_DIR to your Schedule I installation." />
+    <Error Condition="!Exists('$(MelonLoaderDll)')" Text="MelonLoader.dll not found at $(MelonLoaderDll). Set MelonLoaderDll to the actual IL2CPP reference path." />
+  </Target>
+</Project>
