@@ -123,7 +123,7 @@
     "output": "UserData/ScheduleIMegaExpansion/Diagnostics/<timestamp>",
     "mutatesGameState": false,
     "compileTarget": "IL2CPP net6.0",
-    "status": "CI build succeeded; in-game execution and generated registry report still require target-game verification",
+    "status": "CI build succeeded; diagnostic DLL exported; in-game execution and generated registry report still require target-game verification",
     "outputFiles": [
       "summary.txt",
       "native-regions.csv",
@@ -136,11 +136,12 @@
     "compileRequiresGameAssemblies": false,
     "buildWorkflow": ".github/workflows/build-runtime.yml",
     "latestSuccessfulBuild": {
-      "commit": "85abe0f8e51ad4deac280c579d47c503af36ebbc",
-      "workflowRunId": 41325604009,
-      "artifactId": 13090943875,
+      "commit": "a9ef111ff51bb47039ae7cd51be37ecd4c94a786",
+      "workflowRunId": 41325846619,
+      "artifactId": 13090758692,
       "artifactName": "ScheduleIMegaExpansion-runtime-diagnostic",
-      "dllSha256": "d88a23a73160244187f55ac4a83eb9c3f9835e80b08230b49a67c7095631a739"
+      "dllSha256": "6c656ae4f0a57ab74d54217a59ffe25c7a0cd2b0883f6c9795d926e3ac10b6a9",
+      "dllSizeBytes": 43520
     }
   }
 }
