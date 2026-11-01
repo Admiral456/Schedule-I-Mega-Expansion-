@@ -46,12 +46,14 @@ def main():
     validate_schema("data/npc_profiles.json", "schemas/npc_profiles.schema.json")
     validate_schema("data/product_catalog.example.json", "schemas/product_catalog.schema.json")
     validate_schema("data/dependency-baseline.json", "schemas/dependency-baseline.schema.json")
+    validate_schema("data/harborline_population.json", "schemas/harborline_population.schema.json")
 
     provinces_doc = load("data/provinces.json")
     businesses_doc = load("data/businesses.json")
     npcs_doc = load("data/npc_profiles.json")
     product_catalog_doc = load("data/product_catalog.example.json")
     dependency_doc = load("data/dependency-baseline.json")
+    harborline_doc = load("data/harborline_population.json")
 
     provinces = provinces_doc["provinces"]
     province_ids = {item["id"] for item in provinces}
@@ -138,6 +140,23 @@ def main():
 
     require(len(preference_signatures) > 1, "NPCs must not all share the same preferred-product profile")
 
+    harborline_population = harborline_doc["population"]
+    harborline_groups = harborline_population["npcGroups"]
+    require(sum(group["physicalCount"] for group in harborline_groups) == harborline_population["totalPhysicalNpcTarget"], "Harborline group counts do not match the physical NPC target")
+    require(sum(group["customerCount"] for group in harborline_groups) == harborline_population["customerNpcTarget"], "Harborline customer group counts do not match the customer target")
+    require(harborline_population["nonCustomerNonDealerNpcTarget"] == harborline_population["totalPhysicalNpcTarget"] - harborline_population["customerNpcTarget"] - harborline_population["dealerNpcTarget"], "Harborline non-customer/non-dealer count is inconsistent")
+    require(all(group["customerCount"] <= group["physicalCount"] for group in harborline_groups), "Harborline customer counts cannot exceed physical NPC counts")
+    role_counts = {group["role"]: group["physicalCount"] for group in harborline_groups}
+    zoned_role_counts = {}
+    for zone in harborline_doc["zones"]:
+        for role, count in zone["targetNpcIdsByRole"].items():
+            zoned_role_counts[role] = zoned_role_counts.get(role, 0) + count
+    require(role_counts == zoned_role_counts, "Harborline zone NPC distribution must match the group roster exactly")
+    all_zone_pois = [poi for zone in harborline_doc["zones"] for poi in zone["poiIds"]]
+    require(len(all_zone_pois) == len(set(all_zone_pois)), "Harborline POI IDs must be unique across zones")
+    require(harborline_doc["police"]["customPoliceNpcCount"] == 0, "Harborline must use native police AI, not custom police NPCs")
+    require(len(harborline_doc["police"]["plannedCheckpointPoiIds"]) >= 3, "Harborline needs at least three native checkpoint locations")
+    require(harborline_population["initialSimultaneousPopulationTarget"] <= harborline_population["performanceTestCeiling"] <= harborline_population["totalPhysicalNpcTarget"], "Harborline simultaneous NPC targets are inconsistent")
     dependencies = dependency_doc["dependencies"]
     dependency_ids = [item["id"] for item in dependencies]
     require(len(dependency_ids) == len(set(dependency_ids)), "dependency IDs must be unique")
@@ -154,7 +173,7 @@ def main():
         require(actual[dependency_id]["version"] == version, f"{dependency_id} version differs from the reviewed baseline")
         require(actual[dependency_id]["targetFramework"] == target_framework, f"{dependency_id} target framework differs from the reviewed baseline")
 
-    print("Project data validation passed: provinces, Realtor listings, shared shop stock, NPC product preferences/budgets and IL2CPP dependency pins are consistent.")
+    print("Project data validation passed: provinces, Realtor listings, shared stock, NPC profiles, Harborline zone/population totals, native police reuse and IL2CPP dependency pins are consistent.")
 
 if __name__ == "__main__":
     main()
