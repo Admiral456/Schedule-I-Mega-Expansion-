@@ -314,7 +314,9 @@ namespace ScheduleIMegaExpansion.Diagnostics
             if (value.IndexOfAny(new[] { ',', '"', '\r', '\n' }) < 0)
                 return value;
 
-            return """ + value.Replace(""", """") + """;
+            string quote = new string((char)34, 1);
+            string escapedQuote = new string((char)34, 2);
+            return quote + value.Replace(quote, escapedQuote) + quote;
         }
 
         private static void AddError(string section, Exception ex, List<string> summary, Action<string> warn)
