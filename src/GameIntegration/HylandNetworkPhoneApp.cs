@@ -139,11 +139,11 @@ public sealed class HylandNetworkPhoneApp : PhoneApp
         {
             string preferences = string.Join(", ", resident.Profile.PreferredProductIds);
             string body = resident.Role +
-                "\\nProvince: " + resident.ProvinceId +
-                "\\nAvailability: " + resident.AvailabilityWindow +
-                "\\nBudget: $" + resident.Profile.BudgetLimit +
-                "\\nPrice sensitivity: " + resident.Profile.PriceSensitivity.ToString("P0") +
-                "\\nLikes: " + preferences;
+                "\nProvince: " + resident.ProvinceId +
+                "\nAvailability: " + resident.AvailabilityWindow +
+                "\nBudget: $" + resident.Profile.BudgetLimit +
+                "\nPrice sensitivity: " + resident.Profile.PriceSensitivity.ToString("P0") +
+                "\nLikes: " + preferences;
 
             AddCard(resident.DisplayName.ToUpperInvariant(), body);
         }
