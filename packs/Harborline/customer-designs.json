@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "region": "Harborline",
-  "status": "design-only",
+  "status": "design-only; preferences are design candidates and must be checked against the target game build",
   "purpose": "Individual customer behaviour and preference design for the Harborline NPC roster.",
   "sourceGameProductFamilies": [
     "Weed",
@@ -332,6 +332,370 @@
         "Foggy"
       ],
       "mappingStatus": "design-only; map to Personnel customer schema before release"
+    },
+    {
+      "id": "harborline_customer_15",
+      "archetype": "Port clerk",
+      "spendingTier": "low",
+      "ordersPerWeek": 1,
+      "preferredDay": "Monday",
+      "preferredTime": "06:00",
+      "likesProducts": [
+        "Weed",
+        "Meth"
+      ],
+      "dislikesProducts": [
+        "Shrooms"
+      ],
+      "preferredEffects": [
+        "Calming",
+        "Sedating"
+      ],
+      "avoidEffects": [
+        "Slippery"
+      ],
+      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+    },
+    {
+      "id": "harborline_customer_16",
+      "archetype": "Night guard",
+      "spendingTier": "medium",
+      "ordersPerWeek": 2,
+      "preferredDay": "Tuesday",
+      "preferredTime": "09:30",
+      "likesProducts": [
+        "Meth",
+        "Weed"
+      ],
+      "dislikesProducts": [
+        "Cocaine"
+      ],
+      "preferredEffects": [
+        "Euphoric",
+        "Slippery"
+      ],
+      "avoidEffects": [
+        "Spicy"
+      ],
+      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+    },
+    {
+      "id": "harborline_customer_17",
+      "archetype": "Warehouse loader",
+      "spendingTier": "high",
+      "ordersPerWeek": 3,
+      "preferredDay": "Wednesday",
+      "preferredTime": "12:30",
+      "likesProducts": [
+        "Shrooms",
+        "Cocaine"
+      ],
+      "dislikesProducts": [
+        "Weed"
+      ],
+      "preferredEffects": [
+        "Focused",
+        "Explosive"
+      ],
+      "avoidEffects": [
+        "Foggy"
+      ],
+      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+    },
+    {
+      "id": "harborline_customer_18",
+      "archetype": "Taxi driver",
+      "spendingTier": "vip",
+      "ordersPerWeek": 4,
+      "preferredDay": "Thursday",
+      "preferredTime": "17:00",
+      "likesProducts": [
+        "Cocaine",
+        "Shrooms"
+      ],
+      "dislikesProducts": [
+        "Meth"
+      ],
+      "preferredEffects": [
+        "Sneaky",
+        "Lethal"
+      ],
+      "avoidEffects": [
+        "Energizing"
+      ],
+      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+    },
+    {
+      "id": "harborline_customer_19",
+      "archetype": "Cafe regular",
+      "spendingTier": "low",
+      "ordersPerWeek": 1,
+      "preferredDay": "Friday",
+      "preferredTime": "20:30",
+      "likesProducts": [
+        "Weed",
+        "Meth"
+      ],
+      "dislikesProducts": [
+        "Shrooms"
+      ],
+      "preferredEffects": [
+        "Thought-Provoking",
+        "Foggy"
+      ],
+      "avoidEffects": [
+        "Euphoric"
+      ],
+      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+    },
+    {
+      "id": "harborline_customer_20",
+      "archetype": "Local resident",
+      "spendingTier": "medium",
+      "ordersPerWeek": 2,
+      "preferredDay": "Saturday",
+      "preferredTime": "23:00",
+      "likesProducts": [
+        "Meth",
+        "Weed"
+      ],
+      "dislikesProducts": [
+        "Cocaine"
+      ],
+      "preferredEffects": [
+        "Spicy",
+        "Gingeritis"
+      ],
+      "avoidEffects": [
+        "Sedating"
+      ],
+      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+    },
+    {
+      "id": "harborline_customer_21",
+      "archetype": "Boat mechanic",
+      "spendingTier": "high",
+      "ordersPerWeek": 3,
+      "preferredDay": "Sunday",
+      "preferredTime": "06:00",
+      "likesProducts": [
+        "Shrooms",
+        "Cocaine"
+      ],
+      "dislikesProducts": [
+        "Weed"
+      ],
+      "preferredEffects": [
+        "Toxic",
+        "Calming"
+      ],
+      "avoidEffects": [
+        "Thought-Provoking"
+      ],
+      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+    },
+    {
+      "id": "harborline_customer_22",
+      "archetype": "Tour guide",
+      "spendingTier": "vip",
+      "ordersPerWeek": 4,
+      "preferredDay": "Monday",
+      "preferredTime": "09:30",
+      "likesProducts": [
+        "Cocaine",
+        "Shrooms"
+      ],
+      "dislikesProducts": [
+        "Meth"
+      ],
+      "preferredEffects": [
+        "Tropic Thunder",
+        "Euphoric"
+      ],
+      "avoidEffects": [
+        "Lethal"
+      ],
+      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+    },
+    {
+      "id": "harborline_customer_23",
+      "archetype": "Port clerk",
+      "spendingTier": "low",
+      "ordersPerWeek": 1,
+      "preferredDay": "Tuesday",
+      "preferredTime": "12:30",
+      "likesProducts": [
+        "Weed",
+        "Meth"
+      ],
+      "dislikesProducts": [
+        "Shrooms"
+      ],
+      "preferredEffects": [
+        "Energizing",
+        "Focused"
+      ],
+      "avoidEffects": [
+        "Tropic Thunder"
+      ],
+      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+    },
+    {
+      "id": "harborline_customer_24",
+      "archetype": "Night guard",
+      "spendingTier": "medium",
+      "ordersPerWeek": 2,
+      "preferredDay": "Wednesday",
+      "preferredTime": "17:00",
+      "likesProducts": [
+        "Meth",
+        "Weed"
+      ],
+      "dislikesProducts": [
+        "Cocaine"
+      ],
+      "preferredEffects": [
+        "Refreshing",
+        "Sneaky"
+      ],
+      "avoidEffects": [
+        "Calming"
+      ],
+      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+    },
+    {
+      "id": "harborline_customer_25",
+      "archetype": "Warehouse loader",
+      "spendingTier": "high",
+      "ordersPerWeek": 3,
+      "preferredDay": "Thursday",
+      "preferredTime": "20:30",
+      "likesProducts": [
+        "Shrooms",
+        "Cocaine"
+      ],
+      "dislikesProducts": [
+        "Weed"
+      ],
+      "preferredEffects": [
+        "Munchies",
+        "Thought-Provoking"
+      ],
+      "avoidEffects": [],
+      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+    },
+    {
+      "id": "harborline_customer_26",
+      "archetype": "Taxi driver",
+      "spendingTier": "vip",
+      "ordersPerWeek": 4,
+      "preferredDay": "Friday",
+      "preferredTime": "23:00",
+      "likesProducts": [
+        "Cocaine",
+        "Shrooms"
+      ],
+      "dislikesProducts": [
+        "Meth"
+      ],
+      "preferredEffects": [
+        "Sedating",
+        "Spicy"
+      ],
+      "avoidEffects": [
+        "Sneaky"
+      ],
+      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+    },
+    {
+      "id": "harborline_customer_27",
+      "archetype": "Cafe regular",
+      "spendingTier": "low",
+      "ordersPerWeek": 1,
+      "preferredDay": "Saturday",
+      "preferredTime": "06:00",
+      "likesProducts": [
+        "Weed",
+        "Meth"
+      ],
+      "dislikesProducts": [
+        "Shrooms"
+      ],
+      "preferredEffects": [
+        "Slippery",
+        "Toxic"
+      ],
+      "avoidEffects": [
+        "Explosive"
+      ],
+      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+    },
+    {
+      "id": "harborline_customer_28",
+      "archetype": "Local resident",
+      "spendingTier": "medium",
+      "ordersPerWeek": 2,
+      "preferredDay": "Sunday",
+      "preferredTime": "09:30",
+      "likesProducts": [
+        "Meth",
+        "Weed"
+      ],
+      "dislikesProducts": [
+        "Cocaine"
+      ],
+      "preferredEffects": [
+        "Explosive",
+        "Tropic Thunder"
+      ],
+      "avoidEffects": [
+        "Toxic"
+      ],
+      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+    },
+    {
+      "id": "harborline_customer_29",
+      "archetype": "Boat mechanic",
+      "spendingTier": "high",
+      "ordersPerWeek": 3,
+      "preferredDay": "Monday",
+      "preferredTime": "12:30",
+      "likesProducts": [
+        "Shrooms",
+        "Cocaine"
+      ],
+      "dislikesProducts": [
+        "Weed"
+      ],
+      "preferredEffects": [
+        "Lethal",
+        "Energizing"
+      ],
+      "avoidEffects": [
+        "Gingeritis"
+      ],
+      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+    },
+    {
+      "id": "harborline_customer_30",
+      "archetype": "Tour guide",
+      "spendingTier": "vip",
+      "ordersPerWeek": 4,
+      "preferredDay": "Tuesday",
+      "preferredTime": "17:00",
+      "likesProducts": [
+        "Cocaine",
+        "Shrooms"
+      ],
+      "dislikesProducts": [
+        "Meth"
+      ],
+      "preferredEffects": [
+        "Foggy",
+        "Refreshing"
+      ],
+      "avoidEffects": [],
+      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
     }
   ]
 }
