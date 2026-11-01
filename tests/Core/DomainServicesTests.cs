@@ -74,6 +74,35 @@ public sealed class DomainServicesTests
     }
 
     [Fact]
+    public void FailedPurchaseReplayRemainsFailedAfterBalanceChangesAndReload()
+    {
+        var source = new ShopPurchaseService();
+        source.SetBalance("player-a", 10);
+        source.SetProduct("portside", "crate", 100, 2);
+        var request = new ShopPurchaseRequest("failed-request-persisted", "player-a", "portside", "crate", 1);
+
+        ShopPurchaseResult first = source.Purchase(request);
+        Assert.Equal(ShopPurchaseOutcome.InsufficientFunds, first.Outcome);
+
+        string json = System.Text.Json.JsonSerializer.Serialize(source.CreateSnapshot());
+        ShopPurchaseServiceSnapshot? snapshot =
+            System.Text.Json.JsonSerializer.Deserialize<ShopPurchaseServiceSnapshot>(json);
+        Assert.NotNull(snapshot);
+
+        var restored = new ShopPurchaseService();
+        Assert.True(restored.TryRestoreSnapshot(snapshot));
+        restored.SetBalance("player-a", 1_000);
+
+        ShopPurchaseResult replay = restored.Purchase(request);
+
+        Assert.Equal(ShopPurchaseOutcome.InsufficientFunds, replay.Outcome);
+        Assert.True(replay.IsReplay);
+        Assert.Equal(1_000, restored.GetBalance("player-a"));
+        Assert.Equal(2, restored.GetStock("portside", "crate"));
+        Assert.Equal(0, restored.WorldRevision);
+    }
+
+    [Fact]
     public void OrderStateMachineRejectsInvalidTransitions()
     {
         Assert.True(OrderState.CanTransition(OrderStatus.Offered, OrderStatus.Accepted));
