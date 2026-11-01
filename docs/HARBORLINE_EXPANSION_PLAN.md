@@ -56,9 +56,9 @@ S1API documents the random generator and build step. It does not currently docum
 
 ## Police activity
 
-The project uses `LawController`, `LawManager` and `CheckpointManager`. Planned checkpoints are at Harbor Gate, the freight depot and the market square. Patrol routes follow the port loop and freight-market loop after route objects and navigation are verified in-game.
+The project uses `LawController`, `LawManager` and `CheckpointManager`. Planned police infrastructure includes a local Harbor Police Substation using the native police-station prefab, plus checkpoints at Harbor Gate, the freight depot and the market square. Patrol routes follow the port loop and freight-market loop after route objects and navigation are verified in-game.
 
-Law intensity is global. Harborline must not change global law intensity to fake a local patrol system, force-spawn custom officers, or override dispatch. After live routes are created, use LawManager.GetAllFootPatrolRoutes/GetAllVehiclePatrolRoutes and the native StartFootPatrol/StartVehiclePatrol APIs so officers are assigned from the nearest police station. CheckpointManager retains its automatic evaluation of time, curfew, distance, law intensity and officer availability.
+Law intensity is global. Harborline must not change global law intensity to fake a local patrol system, force-spawn custom officers, or override dispatch. After the native Harbor Police Substation is confirmed in the live scene and patrol routes are created, use LawManager.GetAllFootPatrolRoutes/GetAllVehiclePatrolRoutes and the native StartFootPatrol/StartVehiclePatrol APIs so officers are assigned from the nearest police station. CheckpointManager retains its automatic evaluation of time, curfew, distance, law intensity and officer availability.
 
 ## Individual NPC roster\nThe complete stable-ID roster is in data/harborline_npc_roster.json. Every planned physical character has a distinct identity key and an appearance profile key; world positions remain null until the live map survey.\n\n## Multiplayer and other mods
 
