@@ -18,7 +18,8 @@
       "poiIds": [
         "sime.poi.harborline.harbor_gate",
         "sime.poi.harborline.customs_office",
-        "sime.poi.harborline.port_operations"
+        "sime.poi.harborline.port_operations",
+        "sime.poi.harborline.harbor_police_substation"
       ],
       "targetNpcIdsByRole": {
         "port_operations_staff": 2,
@@ -235,12 +236,14 @@
       "sime.route.harborline.freight_market_loop"
     ],
     "routeCoordinates": null,
-    "activationPolicy": "Use discovered native police routes and the existing global law intensity/automatic evaluation rules. Do not force-spawn officers or change the global heat level to fake local police activity."
+    "activationPolicy": "Use discovered native police routes and the existing global law intensity/automatic evaluation rules. Do not force-spawn officers or change the global heat level to fake local police activity.",
+    "localPoliceFacilityPoiId": "sime.poi.harborline.harbor_police_substation",
+    "localPoliceFacilityImplementation": "Reuse the native vanilla police-station prefab and verify its station registration/officer pool in the live scene"
   },
   "randomization": {
     "drugPreferences": {
       "system": "native NPCCustomer affinity configuration",
-      "runtimeCatalog": "DrugType enum values discovered from the installed S1API/game build",
+      "runtimeCatalog": "S1API.Products.DrugType enum enumerated from the installed runtime",
       "assignmentAlgorithm": "save-seeded deterministic per-NPC affinity vectors with uniqueness enforced within the Harborline customer roster",
       "favoriteAffinityRange": [
         0.7,
@@ -259,7 +262,17 @@
         "Do not use the expansion-only sime.product.batch.* order tiers as DrugType affinities.",
         "Do not hardcode DrugType names that are absent from the installed game.",
         "If the installed runtime exposes too few DrugType combinations for all unique profiles, fail validation rather than silently cloning preferences."
-      ]
+      ],
+      "knownS1ApiBaselineValues": [
+        "Marijuana",
+        "Methamphetamine",
+        "Cocaine",
+        "MDMA",
+        "Shrooms",
+        "Heroin"
+      ],
+      "adapter": "ScheduleIMegaExpansion.GameIntegration.NativeDrugAffinityAdapter",
+      "nativeApplication": "Pass mapped (DrugType, affinity) tuples to the native NPCCustomer builder's WithAffinities inside WithCustomerDefaults"
     },
     "appearance": {
       "system": "S1API NPCAppearance typed customization builder with deterministic seeded profile selection",
