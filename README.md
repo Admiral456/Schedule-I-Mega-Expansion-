@@ -24,8 +24,10 @@ Preserve vanilla Hyland Point and add three major provinces:
 - ShopPurchaseService performs atomic in-memory purchases, prevents request replay/double charges and can export/restore validated economy snapshots.
 - Snapshot data includes balances, prices, stock, processed successful and failed requests, enabling reliable recovery after a host save/load.
 - S1API Saveable now contains the optional shop snapshot and exposes host-only load/commit methods with optimistic world-revision checks to reject stale writes.
+- NPC order requests now run through a host-authoritative Steam request/response path. The host resolves the NPC profile, player reputation, stock and pricing; the transaction reserves stock, debits a player-specific customer budget, funds order escrow and saves the order plus an idempotency receipt under one world revision.
+- The Hyland Network Contacts screen exposes a request action and clients receive host-confirmed order results.
 
-These are domain/save foundations, not a working in-game checkout. Real Schedule I cash and inventory APIs, shop stock seeding, NPC bindings and live networking still require integration.
+The host order pipeline currently uses an expansion-side customer budget and escrow ledger, not vanilla Schedule I player cash. Actual player-cash settlement, live item inventory delivery, Portside stock seeding from real game item definitions, spawned-NPC binding and late-join snapshots still require integration. The order deadline currently uses host UTC time until the game-clock adapter is connected.
 
 ## Technical baseline
 - S1API 3.2.2 — native phone apps and per-save-slot Saveables.
