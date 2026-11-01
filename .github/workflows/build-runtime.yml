@@ -1,0 +1,41 @@
+name: Build runtime diagnostic
+
+on:
+  push:
+    branches: ["main", "feat/**"]
+    paths:
+      - "src/**"
+      - ".github/workflows/build-runtime.yml"
+  pull_request:
+    paths:
+      - "src/**"
+      - ".github/workflows/build-runtime.yml"
+  workflow_dispatch:
+
+jobs:
+  build-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up .NET 6
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "6.0.x"
+      - name: Restore
+        run: dotnet restore src/ScheduleIMegaExpansion.csproj
+      - name: Build
+        run: dotnet build src/ScheduleIMegaExpansion.csproj --configuration Release --no-restore
+      - name: Package diagnostic DLL
+        run: |
+          mkdir -p artifact
+          cp src/bin/Release/net6.0/ScheduleIMegaExpansion.dll artifact/
+          cp src/README.md artifact/README.txt
+          cd artifact
+          zip -r ../ScheduleIMegaExpansion-runtime-diagnostic.zip .
+      - name: Upload diagnostic artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ScheduleIMegaExpansion-runtime-diagnostic
+          path: ScheduleIMegaExpansion-runtime-diagnostic.zip
+          if-no-files-found: error
