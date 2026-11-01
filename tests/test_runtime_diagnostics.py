@@ -65,7 +65,8 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn('BuildWarehouse()', self.physical)
         self.assertIn('BuildContainers()', self.physical)
         self.assertIn('BuildCrane()', self.physical)
-        self.assertIn('primitive colliders', self.physical.lower())
+        self.assertIn('UnityEngine.PrimitiveType', self.physical)
+        self.assertIn('CreatePrimitive', self.physical)
         self.assertIn('IsMultiplayerSession()', self.physical)
 
     def test_harborline_is_generated_automatically_from_native_docks_anchor(self):
