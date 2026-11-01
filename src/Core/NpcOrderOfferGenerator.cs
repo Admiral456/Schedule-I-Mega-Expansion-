@@ -58,12 +58,16 @@ public static class NpcOrderOfferGenerator
         var eligible = new List<(NpcOrderProductStock Product, int MaximumQuantity, int PreferenceTier, string TieBreak)>();
         foreach (NpcOrderProductStock? product in products)
         {
+            // A malformed inventory snapshot must fail closed. Zero stock is valid and is skipped.
             if (product is null || string.IsNullOrWhiteSpace(product.ProductId) ||
-                product.UnitPrice <= 0 || product.AvailableStock <= 0 ||
-                !seen.Add(product.ProductId) || rejected.Contains(product.ProductId))
+                product.UnitPrice <= 0 || product.AvailableStock < 0 ||
+                !seen.Add(product.ProductId))
             {
-                continue;
+                return Failure(NpcOrderGenerationFailure.InvalidArguments);
             }
+
+            if (product.AvailableStock == 0 || rejected.Contains(product.ProductId))
+                continue;
 
             int preferenceTier = preferred.Contains(product.ProductId) ? 0 :
                 neutral.Contains(product.ProductId) ? 1 : 2;

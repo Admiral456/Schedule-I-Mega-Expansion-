@@ -88,7 +88,7 @@ public sealed class HylandNetworkPhoneApp : PhoneApp
         };
 
         foreach (Transform child in _content)
-            Object.Destroy(child.gameObject);
+            UnityEngine.Object.Destroy(child.gameObject);
 
         switch (page)
         {

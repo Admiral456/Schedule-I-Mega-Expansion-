@@ -88,6 +88,28 @@ public sealed class NpcOrderOfferGeneratorTests
     }
 
     [Fact]
+    public void MalformedOrDuplicatedInventoryRowsFailClosed()
+    {
+        var blankId = new[] { new NpcOrderProductStock(" ", 100, 1) };
+        var invalidPrice = new[] { new NpcOrderProductStock(NpcCustomerDirectory.StandardProductId, 0, 1) };
+        var negativeStock = new[] { new NpcOrderProductStock(NpcCustomerDirectory.StandardProductId, 100, -1) };
+        var duplicateIds = new[]
+        {
+            new NpcOrderProductStock(NpcCustomerDirectory.StandardProductId, 100, 1),
+            new NpcOrderProductStock(NpcCustomerDirectory.StandardProductId, 100, 1)
+        };
+
+        Assert.Equal(NpcOrderGenerationFailure.InvalidArguments,
+            NpcOrderOfferGenerator.Generate(Morgan, blankId, 0, 0).Failure);
+        Assert.Equal(NpcOrderGenerationFailure.InvalidArguments,
+            NpcOrderOfferGenerator.Generate(Morgan, invalidPrice, 0, 0).Failure);
+        Assert.Equal(NpcOrderGenerationFailure.InvalidArguments,
+            NpcOrderOfferGenerator.Generate(Morgan, negativeStock, 0, 0).Failure);
+        Assert.Equal(NpcOrderGenerationFailure.InvalidArguments,
+            NpcOrderOfferGenerator.Generate(Morgan, duplicateIds, 0, 0).Failure);
+    }
+
+    [Fact]
     public void InvalidArgumentsFailClosed()
     {
         Assert.Equal(NpcOrderGenerationFailure.InvalidArguments,
