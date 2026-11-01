@@ -10,9 +10,9 @@ After a save finishes loading, the mod discovers S1API dynamically and exports n
 - native businesses and ownership state (S1API.Property.BusinessManager.GetAllBusinesses);
 - exact native Region enum values;
 - standalone phone-map POIs, when the installed S1API assembly exposes that optional API;
-- a metadata-only report of relevant native map/property/business types and member signatures.
+- a metadata-only report of native map, region, property, business, NPC, avatar, schedule, door, navigation and law-enforcement types and member signatures.
 
-It does not create or remove buildings, NPCs, POIs, properties or doors. It does not change ownership, prices, inventory, map icons or save data.
+It does not create or remove buildings, NPCs, POIs, properties or doors. The expanded API scan still reads metadata only and never invokes discovered methods or property getters/setters. It does not change ownership, prices, inventory, map icons or save data.
 
 ## Build
 
@@ -54,10 +54,10 @@ Files:
 - native-properties.csv
 - native-businesses.csv
 - standalone-phone-map-pois.csv
-- native-map-property-api.txt
+- native-game-api-surface.txt
 
 ## Why this is needed
 
-The public S1API property and business managers expose existing collections for reading, but do not expose a public method to add a new Property/Business. The diagnostic snapshot records the actual native names, codes, prices, ownership state and available spawn points so the next implementation can target real game systems instead of inventing identifiers.
+The public S1API property and business managers expose existing collections for reading. The installed runtime API scan is used to check whether the target game build exposes an additive registration path for new Property/Business records; do not assume one exists. The diagnostic snapshot records the actual native names, codes, prices, ownership state and available spawn points so the next implementation can target real game systems instead of inventing identifiers.
 
 MapPOI is a standalone phone-map marker API. It is not equivalent to a native shop/property pin or ownership marker.
