@@ -18,8 +18,10 @@ namespace ScheduleIMegaExpansion
     {
         private EventInfo? _preLoadEvent;
         private EventInfo? _loadCompleteEvent;
+        private EventInfo? _preSceneChangeEvent;
         private Delegate? _preLoadHandler;
         private Delegate? _loadCompleteHandler;
+        private Delegate? _preSceneChangeHandler;
         private bool _subscribed;
         private bool _exportedForCurrentLoad;
         private bool _loggedMissingApi;
@@ -90,12 +92,18 @@ namespace ScheduleIMegaExpansion
                 EventInfo? loadComplete = lifecycleType.GetEvent(
                     "OnLoadComplete",
                     BindingFlags.Public | BindingFlags.Static);
+                EventInfo? preSceneChange = lifecycleType.GetEvent(
+                    "OnPreSceneChange",
+                    BindingFlags.Public | BindingFlags.Static);
 
                 MethodInfo preMethod = typeof(MegaExpansionMod).GetMethod(
                     nameof(OnPreLoad),
                     BindingFlags.Instance | BindingFlags.NonPublic)!;
                 MethodInfo loadMethod = typeof(MegaExpansionMod).GetMethod(
                     nameof(OnLoadComplete),
+                    BindingFlags.Instance | BindingFlags.NonPublic)!;
+                MethodInfo sceneChangeMethod = typeof(MegaExpansionMod).GetMethod(
+                    nameof(OnPreSceneChange),
                     BindingFlags.Instance | BindingFlags.NonPublic)!;
 
                 if (loadComplete?.EventHandlerType == null)
@@ -110,6 +118,13 @@ namespace ScheduleIMegaExpansion
                     _preLoadHandler = Delegate.CreateDelegate(preLoad.EventHandlerType, this, preMethod);
                     preLoad.AddEventHandler(null, _preLoadHandler);
                     _preLoadEvent = preLoad;
+                }
+
+                if (preSceneChange?.EventHandlerType != null)
+                {
+                    _preSceneChangeHandler = Delegate.CreateDelegate(preSceneChange.EventHandlerType, this, sceneChangeMethod);
+                    preSceneChange.AddEventHandler(null, _preSceneChangeHandler);
+                    _preSceneChangeEvent = preSceneChange;
                 }
 
                 _subscribed = true;
@@ -129,6 +144,15 @@ namespace ScheduleIMegaExpansion
         {
             _exportedForCurrentLoad = false;
             _saveLoaded = false;
+            _harborlineGenerated = false;
+            _generationPollFrames = 0;
+            HarborlinePhysicalBuilder.ResetForNewSave();
+        }
+
+        private void OnPreSceneChange()
+        {
+            _saveLoaded = false;
+            _exportedForCurrentLoad = false;
             _harborlineGenerated = false;
             _generationPollFrames = 0;
             HarborlinePhysicalBuilder.ResetForNewSave();
@@ -172,6 +196,8 @@ namespace ScheduleIMegaExpansion
                     _preLoadEvent.RemoveEventHandler(null, _preLoadHandler);
                 if (_loadCompleteEvent != null && _loadCompleteHandler != null)
                     _loadCompleteEvent.RemoveEventHandler(null, _loadCompleteHandler);
+                if (_preSceneChangeEvent != null && _preSceneChangeHandler != null)
+                    _preSceneChangeEvent.RemoveEventHandler(null, _preSceneChangeHandler);
             }
             catch (Exception ex)
             {
