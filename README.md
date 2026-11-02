@@ -49,7 +49,7 @@ Pro mod manager je připraven manifest `manifest.json`. Balíček obsahuje samot
 
 - Runtime vytváří první geometrickou prototypovou část z Unity primitiv a následně se pokouší o vytvoření pěti nativních NPC a úpravu vanilla Hardware Store. To vše je zatím ověřené pouze zdrojovou kontrolou, nikoli během v cílové hře.
 - Umístění se odvozuje z nativní pozice Docks Warehouse a runtime fyzikálních kontrol. To ale samo o sobě nezaručuje, že kandidát leží uvnitř hranic Docks nebo že není nad vodou s neoznačeným colliderem.
-- Nové Realtor/property registrace, mapové ikony, funkční interiéry, nové fyzické obchody v Harborline, online objednávky, policie, ukládání geometrie a multiplayer nejsou hotové. Veřejné S1API PropertyManager a BusinessManager zatím pouze enumerují existující záznamy. Vanilla Hardware Store už má doplněný sortiment.
+- Nové Realtor/property registrace, mapové ikony, funkční interiéry, nové fyzické obchody v Harborline, online objednávky, policie, ukládání geometrie a multiplayer nejsou v runtime implementované. Veřejné S1API PropertyManager a BusinessManager zatím pouze enumerují existující záznamy. Vanilla Hardware Store už má doplněný sortiment.
 - GitHub Actions sestavuje IL2CPP mod a balí Thunderstore ZIP. Statické testy a build neprokazují chování ve hře. Diagnostické exportéry pouze čtou registry, ale celý mod navíc vytváří session-local Unity geometrii.
 
 ## Struktura
