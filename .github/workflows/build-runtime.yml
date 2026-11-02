@@ -1,5 +1,5 @@
 name: Build Harborline runtime mod
-# Compile the physical Harborline prototype and native registry survey.
+# Build against the same native S1API and IL2CPP branch used by the shipped mod.
 
 on:
   push:
@@ -26,10 +26,22 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "6.0.x"
+      - name: Download the matching S1API IL2CPP assembly
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s1api"
+          curl --fail --location --retry 3 \
+            "https://thunderstore.io/package/download/ifBars/S1API_Forked/3.2.2/" \
+            --output "$RUNNER_TEMP/s1api-forked.zip"
+          unzip -q "$RUNNER_TEMP/s1api-forked.zip" -d "$RUNNER_TEMP/s1api-package"
+          S1API_DLL="$(find "$RUNNER_TEMP/s1api-package" -type f -name 'S1API.Il2Cpp.MelonLoader.dll' -print -quit)"
+          test -n "$S1API_DLL"
+          cp "$S1API_DLL" "$RUNNER_TEMP/s1api/S1API.Il2Cpp.MelonLoader.dll"
       - name: Restore
-        run: dotnet restore src/ScheduleIMegaExpansion.csproj
+        run: dotnet restore src/ScheduleIMegaExpansion.csproj -p:S1APIDllPath="$RUNNER_TEMP/s1api/S1API.Il2Cpp.MelonLoader.dll"
       - name: Build
-        run: dotnet build src/ScheduleIMegaExpansion.csproj --configuration Release --no-restore
+        run: dotnet build src/ScheduleIMegaExpansion.csproj --configuration Release --no-restore -p:S1APIDllPath="$RUNNER_TEMP/s1api/S1API.Il2Cpp.MelonLoader.dll"
       - name: Assemble Thunderstore package
         run: |
           mkdir -p package/Mods
@@ -37,8 +49,8 @@ jobs:
           cp manifest.json package/
           cp README.md package/
           cp LICENSE package/
-          (cd package && zip -r ../ScheduleIMegaExpansion-0.2.0.zip .)
-          unzip -Z1 ScheduleIMegaExpansion-0.2.0.zip > package-contents.txt
+          (cd package && zip -r ../ScheduleIMegaExpansion-0.3.0.zip .)
+          unzip -Z1 ScheduleIMegaExpansion-0.3.0.zip > package-contents.txt
           grep -Fxq "Mods/ScheduleIMegaExpansion.dll" package-contents.txt
           grep -Fxq "manifest.json" package-contents.txt
           grep -Fxq "README.md" package-contents.txt
@@ -46,6 +58,6 @@ jobs:
       - name: Upload installable mod package
         uses: actions/upload-artifact@v4
         with:
-          name: ScheduleIMegaExpansion-0.2.0
-          path: ScheduleIMegaExpansion-0.2.0.zip
+          name: ScheduleIMegaExpansion-0.3.0
+          path: ScheduleIMegaExpansion-0.3.0.zip
           if-no-files-found: error
