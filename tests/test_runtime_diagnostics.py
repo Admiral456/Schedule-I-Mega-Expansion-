@@ -165,7 +165,7 @@ class RuntimeDiagnosticTests(unittest.TestCase):
     def test_docs_do_not_claim_full_implementation_or_read_only_total_mod(self):
         self.assertNotIn("diagnostický runtime nic nemění", self.root_readme)
         self.assertIn("nejsou v runtime implementované", self.root_readme.lower())
-        self.assertIn("does not yet register a native Building", self.src_readme)
+        self.assertIn("Unity primitiva nejsou nativní Schedule I Building", self.src_readme)
 
     def test_audit_matrix_covers_all_requested_systems(self):
         ids = {item["id"] for item in self.audit["requirements"]}
