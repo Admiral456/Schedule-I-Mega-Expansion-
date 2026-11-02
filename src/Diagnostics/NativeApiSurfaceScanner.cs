@@ -50,7 +50,7 @@ namespace ScheduleIMegaExpansion.Diagnostics
                 "Mode=METADATA_ONLY",
                 "Inspected data: type names, inheritance, interfaces and member signatures only.",
                 "No reflected methods, property getters/setters, constructors or game actions are invoked.",
-                "Assembly scan is limited to Assembly-CSharp and S1API assemblies.",
+                "Assembly scan targets Assembly-CSharp, S1API, S1MAPI and FishNet assemblies.",
                 ""
             };
 
