@@ -30,6 +30,8 @@ namespace ScheduleIMegaExpansion
         private bool _saveLoaded;
         private int _generationPollFrames;
         private bool _harborlineGenerated;
+        private int _gameplayPollFrames;
+        private bool _gameplayInitialized;
 
         public override void OnInitializeMelon()
         {
@@ -48,6 +50,18 @@ namespace ScheduleIMegaExpansion
                     string gameRoot = AppDomain.CurrentDomain.BaseDirectory;
                     _harborlineGenerated = HarborlinePhysicalBuilder.TryAutoGenerate(
                         gameRoot,
+                        message => MelonLogger.Msg("[Schedule I Mega Expansion] " + message),
+                        message => MelonLogger.Warning("[Schedule I Mega Expansion] " + message));
+                }
+            }
+
+            if (_saveLoaded && _harborlineGenerated && !_gameplayInitialized)
+            {
+                _gameplayPollFrames++;
+                if (_gameplayPollFrames >= 60)
+                {
+                    _gameplayPollFrames = 0;
+                    _gameplayInitialized = HarborlineGameplayBootstrap.TryActivate(
                         message => MelonLogger.Msg("[Schedule I Mega Expansion] " + message),
                         message => MelonLogger.Warning("[Schedule I Mega Expansion] " + message));
                 }
@@ -146,7 +160,10 @@ namespace ScheduleIMegaExpansion
             _saveLoaded = false;
             _harborlineGenerated = false;
             _generationPollFrames = 0;
+            _gameplayPollFrames = 0;
+            _gameplayInitialized = false;
             HarborlinePhysicalBuilder.ResetForNewSave();
+            HarborlineGameplayBootstrap.ResetForNewSave();
         }
 
         private void OnPreSceneChange()
@@ -155,7 +172,10 @@ namespace ScheduleIMegaExpansion
             _exportedForCurrentLoad = false;
             _harborlineGenerated = false;
             _generationPollFrames = 0;
+            _gameplayPollFrames = 0;
+            _gameplayInitialized = false;
             HarborlinePhysicalBuilder.ResetForNewSave();
+            HarborlineGameplayBootstrap.ResetForNewSave();
         }
 
         private void OnLoadComplete()
