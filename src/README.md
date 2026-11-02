@@ -1,53 +1,51 @@
-# Harborline runtime – implementace a diagnostika
+# Harborline runtime – první nativní herní vlna
 
-Tento projekt je **runtime prototyp**, nikoli hotové rozšíření Harborline. Obsahuje automatickou tvorbu session-local geometrie z Unity primitiv a samostatné read-only diagnostické exportéry.
+Tento projekt je stále rozpracované rozšíření. Vedle fyzického Unity prototypu už obsahuje první skutečné herní integrace přes S1API 3.2.2.
 
-## Co je implementováno v kódu
+## Implementováno ve zdrojovém kódu
 
-Po události S1API GameLifecycle.OnLoadComplete:
-- exportuje nativní regiony, enterable buildings, properties, businesses a podporované standalone phone-map POIs;
-- zapisuje metadata API surface z Assembly-CSharp, S1API, S1MAPI a FishNet;
-- volá pouze PrefabRef.Find() pro kandidátní prefab references a zapisuje komponenty/network status do native-prefabs.csv;
-- pokouší se v single-player najít záznam Docks Warehouse přes S1API.Property.PropertyManager.GetAllProperties() a jeho PropertyName/ExteriorSpawnPosition;
-- vyhledává okolní plochu přes Unity Physics.CheckBox a více raycastů, kontroluje sklon/výškový rozdíl a heuristicky odmítá známé water colliders;
-- po úspěchu vytváří geometrii z GameObject.CreatePrimitive(Cube) – přístavní plochu, silnici, skladový shell, kontejnery, jeřáb, světla, molo a jednoduché props.
+### Nativní NPC – pilot 5 postav
+- **Mason Reed** a **Sierra Voss**: fyzické postavy s rolí PlayerDealer. Používají nativní poplatek za nábor, provizi, pravidla kvality, uložení počtu obchodů, zamčený vztah s možností přímého oslovení a nativní události náboru/smluv.
+- **Caleb Price**, **Nina Brooks**, **Rafael Cole**: fyzičtí zákazníci s různým rozpočtem, počtem objednávek týdně, preferovaným dnem a časem, standardy, přístupem, šancí zavolat policii, závislostí a drogovými afinitami.
+- Vzhled se vytváří herním generátorem přes `Appearance.GenerateRandomAppearance()` a aplikuje přes `Appearance.Build()`.
+- Nativní schedule engine se zapíná přes `Schedule.Enable()`. Konkrétní chození po čtvrti zatím není nastavené, protože nemáme ověřené navmesh trasy a funkční budovy.
+- Prefaby se registrují automaticky přes S1API/FishNet. Runtime tvorba pilotní vlny čeká na `NPC.CustomNpcsReady`, ověřenou pozici a single-player session; ID jsou stabilní a kontrolují se proti `NPC.Get(id)`, aby se nevytvářely duplicity.
 
-Generování se povolí pouze tehdy, když S1API.Entities.Player.All obsahuje právě jednoho hráče. Ve více hráčích nebo při neznámém stavu player registry se nespouští.
+### Nativní obchod a ceník
+`HarborlineShopCatalog` rozšiřuje skutečný **Hardware Store**. Nepoužívá vlastní falešné menu: získá existující `Shop` přes `ShopManager`, načte originální `ItemDefinition` z `ItemManager` a zavolá `Shop.AddItem`. Před přidáním kontroluje duplicitní položky. Neexistující ID v konkrétním herním buildu přeskočí.
 
-## Co to NEZNAMENÁ
+| Předmět | ID | Cena |
+|---|---|---:|
+| Plastic Pot | `plasticpot` | $25 |
+| Moisture-Preserving Pot | `moisturepreservingpot` | $65 |
+| Air Pot | `airpot` | $145 |
+| Suspension Rack | `suspensionrack` | $50 |
+| Halogen Grow Light | `halogengrowlight` | $50 |
+| LED Grow Light | `ledgrowlight` | $95 |
+| Full Spectrum Grow Light | `fullspectrumgrowlight` | $235 |
+| Drying Rack | `dryingrack` | $300 |
+| Mixing Station | `mixingstation` | $575 |
+| Chemistry Station | `chemistrystation` | $1,150 |
+| Lab Oven | `laboven` | $1,150 |
+| Mixing Station MK2 | `mixingstationmk2` | $2,250 |
+| Brick Press | `brickpress` | $900 |
+| Cauldron | `cauldron` | $3,500 |
 
-- Unity primitiva nejsou nativní Schedule I Building, Property, Business ani Shop.
-- Sklad nemá skutečné nativní dveře, obchodní pokladnu ani funkční inventář.
-- Není napojená normální herní mapa ani mapové ikony.
-- Neexistují vlastní Harborline NPC třídy ani volání NPC appearance/customer/dealer/schedule API.
-- Neexistují online objednávky, Realtor záznamy, policejní hlídky/checkpointy ani synchronizace geometrie.
-- Unity objekty jsou session-local; nejsou serializované v save.
-- Umístění je heuristika kolem Docks Warehouse; hranice Docks, výsledná souřadnice a kolize ještě nebyly ověřené v cílové hře.
+Ceny jsou nastavené modifikací jako vlastní prodejní ceny v nativním shopu; nejde o ověřené původní ceny hry. Položky se přidají pouze tehdy, pokud je herní registry skutečně obsahuje.
 
-## Diagnostické soubory
+## Co ještě není hotové
 
-Výstup je v Schedule I/UserData/ScheduleIMegaExpansion/Diagnostics/<timestamp>/:
-- summary.txt
-- native-regions.csv
-- native-buildings.csv
-- native-properties.csv
-- native-businesses.csv
-- standalone-phone-map-pois.csv
-- native-game-api-surface.txt
-- native-prefabs.csv
+- Zbývajících 37 fyzických NPC z cíle 42 a zbylých 27 profilů ze zamýšlených 30.
+- Denní směny dělníků, trasy řidičů, rybářské a turistické chování. Nativní scheduler je zapnutý, ale bez ověřených bodů a dveří nelze tvrdit, že NPC chodí po čtvrti.
+- Samostatný Harborline Supply jako nová fyzická provozovna. Aktuální funkční integrace doplňuje existující Hardware Store, protože S1API veřejně neposkytuje registraci nového Shop.
+- Nové koupitelné podniky a bydlení v Realtoru. Veřejný `PropertyManager` a `BusinessManager` mají čtecí API pro existující záznamy, ale zatím nebyl ověřen bezpečný přidávací hook v cílové verzi Schedule I. Nezabíráme ani nepřepisujeme cizí nemovitosti.
+- Online objednávky přes telefon se sdíleným inventářem, mapa/ikony, nativní budovy/interiéry, policejní hlídky, ukládání nové geometrie a multiplayer.
 
-Zvolená pozice geometrie se zapisuje do UserData/ScheduleIMegaExpansion/Harborline/last-generation.json.
+## Ověření a sestavení
 
-## Build a instalace
+- Build cílí na .NET 6 / Schedule I IL2CPP.
+- Je vyžadován MelonLoader 0.7.3, S1API Forked 3.2.2 a S1MAPI 2.0.1.
+- Pro lokální build nastav `S1APIDllPath` na kompatibilní `S1API.Il2Cpp.MelonLoader.dll`. GitHub Actions stáhne knihovnu z Thunderstore. Knihovna S1API se do našeho balíčku nekopíruje.
+- Kompilace a statické testy neprokazují, že NPC, spawn body a změna nabídky skutečně fungují ve hře. Je potřeba otestovat instalaci v cílové verzi Schedule I.
 
-~~~powershell
-dotnet restore .\ScheduleIMegaExpansion.csproj
-dotnet build .\ScheduleIMegaExpansion.csproj -c Release --no-restore
-~~~
-
-Požadované runtime dependencies: MelonLoader 0.7.3+, S1API Forked 3.2.2+ a S1MAPI 2.0.1+. Thunderstore manifest je v kořeni repozitáře. CI vytváří ScheduleIMegaExpansion-0.2.0.zip.
-
-## Auditní status
-
-Viz docs/implementation-audit.md a world/harborline/implementation-status.json. Testy ověřují zdrojové invarianty a konfiguraci, nikoli běh v Unity/IL2CPP. Plné ověření vyžaduje spuštění v cílové instalaci Schedule I a kontrolu runtime reportu.
-~~~
+Diagnostické soubory se ukládají do `UserData/ScheduleIMegaExpansion/Diagnostics/`; fyzická poloha Harborline do `UserData/ScheduleIMegaExpansion/Harborline/last-generation.json`.
