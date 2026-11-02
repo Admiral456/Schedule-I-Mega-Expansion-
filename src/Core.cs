@@ -5,14 +5,14 @@ using MelonLoader;
 using ScheduleIMegaExpansion.Diagnostics;
 using ScheduleIMegaExpansion.Runtime;
 
-[assembly: MelonInfo(typeof(ScheduleIMegaExpansion.MegaExpansionMod), "Schedule I Mega Expansion", "0.2.0", "Admiral456")]
+[assembly: MelonInfo(typeof(ScheduleIMegaExpansion.MegaExpansionMod), "Schedule I Mega Expansion", "0.3.0", "Admiral456")]
 [assembly: MelonGame("TVGS", "Schedule I")]
 
 namespace ScheduleIMegaExpansion
 {
     /// <summary>
-    /// Runtime bootstrap for the Harborline prototype. S1API is discovered
-    /// dynamically so this project does not ship game/API assemblies.
+    /// Runtime bootstrap for Harborline. Native NPC/shop code is compiled against the installed
+    /// S1API IL2CPP assembly; lifecycle events remain loosely coupled through reflection.
     /// </summary>
     public sealed class MegaExpansionMod : MelonMod
     {
