@@ -124,6 +124,9 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertNotIn(".InstantiateNetworked(", self.prefabs)
         self.assertIn('"unknown-do-not-spawn"', self.prefabs)
         self.assertIn('"unknown"', self.prefabs)
+        self.assertIn("ReadComponentTypes(prefab, out bool componentScanComplete)", self.prefabs)
+        self.assertIn("bool networkStatusKnown = componentScanComplete", self.prefabs)
+        self.assertIn("Partial enumeration must never be treated", self.prefabs)
 
     def test_metadata_scanner_covers_s1mapi_and_fishnet(self):
         self.assertIn('name.IndexOf("S1MAPI"', self.scanner)
