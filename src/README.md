@@ -38,7 +38,7 @@ Copy bin/Release/net6.0/ScheduleIMegaExpansion.dll into the game's Mods folder, 
 .\install.ps1 -GameDir "C:\Program Files (x86)\Steam\steamapps\common\Schedule I"
 ```
 
-The game must already have MelonLoader and S1API installed. The mod discovers S1API dynamically and starts the automatic generation attempt after the native save lifecycle reports that the save is loaded.
+The game must already have MelonLoader 0.7.3+, S1API Forked 3.2.2+ and S1MAPI 2.0.1+ installed. The mod discovers S1API dynamically and starts the automatic generation attempt after the native save lifecycle reports that the save is loaded.
 
 ## Diagnostic output
 
@@ -71,10 +71,14 @@ After a save loads, the mod locates the native Docks Warehouse property, reads i
 The chosen location is recorded in `UserData/ScheduleIMegaExpansion/Harborline/last-generation.json`. The geometry consists of a dock slab, road, warehouse shell/interior props, containers, crane, lamps, quay, pier and cargo props.
 
 Important limits:
-- F7 builds a physical geometry prototype only. It is not yet a native game Building/Property/Business/Shop.
+- The automatic generator creates a physical geometry prototype only. It is not yet a native game Building/Property/Business/Shop.
 - The current prototype is intentionally single-player only. It is not replicated to multiplayer clients.
 - The generated geometry is session-local and is not saved into the vanilla save.
 - Native doors, NPCs, functional business systems, Realtor registration, map projection/icons, police dispatch and multiplayer replication are not yet implemented.
 - The generator is a first-pass placement heuristic. It must be verified in the actual game for the selected footprint, road access and collision. If all candidate areas are blocked or no ground collider is found, it intentionally skips generation.
 - The geometry is session-local and is regenerated after loading a save; it is not yet saved as native world objects.
 - Reloading a save regenerates the session-local geometry; the named root is checked to avoid duplicate creation within the same scene.
+
+## Installable package
+
+The repo root `manifest.json` declares the current Thunderstore dependencies. The CI build produces `ScheduleIMegaExpansion-0.2.0.zip` with the DLL, manifest, README and license at the archive root.
