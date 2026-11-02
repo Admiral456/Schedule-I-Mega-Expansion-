@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "project": "Schedule I Mega Expansion / Harborline",
-  "reviewedCommit": "ac46eb774a48bbfd044969c566e0e931b65ba110",
-  "reviewMethod": "source review against current upstream S1API/S1MAPI public source, repository implementation, static tests and CI. No Schedule I game runtime or user save was available to this audit.",
+  "reviewedCommit": "81395614d920ad08947c979aab83d9c74111a6af",
+  "reviewMethod": "Source review against current upstream S1API/S1MAPI public documentation, repository implementation, static tests and CI status as of 2026-11-02. No Schedule I game runtime or user save was available to this audit.",
   "statusLegend": {
     "implemented_code_unverified_runtime": "Code exists and builds, but target-game execution is not confirmed.",
     "design_only": "Requirements/data exist as a plan or configuration, not executable runtime behavior.",
