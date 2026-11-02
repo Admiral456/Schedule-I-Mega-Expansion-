@@ -29,5 +29,8 @@ New-Item -ItemType Directory -Path $modsDir -Force | Out-Null
 $target = Join-Path $modsDir "ScheduleIMegaExpansion.dll"
 Copy-Item -LiteralPath $DllPath -Destination $target -Force
 
-Write-Host "Installed Schedule I Mega Expansion Harborline prototype to $target"
-Write-Host "Load a single-player save. Stand at the intended Harborline location inside Docks, press F6 to capture the anchor, then F7 to spawn the physical dockyard prototype."
+Write-Host "Installed Schedule I Mega Expansion Harborline runtime prototype to $target"
+Write-Host "Required dependencies: MelonLoader 0.7.3+, S1API Forked 3.2.2+, S1MAPI 2.0.1+."
+Write-Host "Load a single-player save. After the native save-load lifecycle completes, the mod attempts automatic Harborline geometry generation."
+Write-Host "Check UserData\ScheduleIMegaExpansion\Diagnostics and Harborline for runtime survey and placement reports."
+Write-Warning "This build is not a complete district: native buildings, NPCs, shops, Realtor, police, map integration, persistence and multiplayer remain unimplemented or unverified."
