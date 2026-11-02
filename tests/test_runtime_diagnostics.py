@@ -19,6 +19,9 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         cls.prefabs = (ROOT / "src" / "Diagnostics" / "NativePrefabCatalogExporter.cs").read_text(encoding="utf-8")
         cls.installer = (ROOT / "src" / "install.ps1").read_text(encoding="utf-8")
         cls.physical = (ROOT / "src" / "Runtime" / "HarborlinePhysicalBuilder.cs").read_text(encoding="utf-8")
+        cls.npcs = (ROOT / "src" / "Runtime" / "HarborlineNpcRoster.cs").read_text(encoding="utf-8")
+        cls.shop = (ROOT / "src" / "Runtime" / "HarborlineShopCatalog.cs").read_text(encoding="utf-8")
+        cls.build_workflow = (ROOT / ".github" / "workflows" / "build-runtime.yml").read_text(encoding="utf-8")
         cls.root_readme = (ROOT / "README.md").read_text(encoding="utf-8")
         cls.src_readme = (ROOT / "src" / "README.md").read_text(encoding="utf-8")
 
@@ -30,15 +33,22 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIsNotNone(version)
         self.assertEqual(version.text, self.manifest["version_number"])
 
-    def test_runtime_compiles_without_bundling_game_assemblies(self):
-        self.assertEqual(self.project.findall(".//Reference"), [])
+    def test_runtime_references_native_s1api_but_does_not_bundle_it(self):
+        reference = self.project.find(".//Reference[@Include='S1API.Il2Cpp.MelonLoader']")
+        self.assertIsNotNone(reference)
+        self.assertEqual(reference.findtext("Private"), "false")
+        self.assertIn("S1API.Il2Cpp.MelonLoader.dll", reference.findtext("HintPath"))
         packages = {
             element.attrib.get("Include"): element.attrib.get("Version")
             for element in self.project.findall(".//PackageReference")
         }
         self.assertEqual(packages.get("LavaGang.MelonLoader"), "0.7.3")
+        self.assertEqual(packages.get("RefGen.Schedule-I.Il2Cpp"), "0.4.4-f8")
+        self.assertEqual(packages.get("Il2CppInterop.Common"), "1.5.1")
         self.assertNotIn("S1API.Forked", packages)
         self.assertNotIn("S1MAPI", packages)
+        self.assertIn("S1API.Il2Cpp.MelonLoader.dll", self.build_workflow)
+        self.assertIn("ifBars/S1API_Forked/3.2.2", self.build_workflow)
 
     def test_core_uses_native_save_and_scene_lifecycle(self):
         self.assertIn('GetType("S1API.Lifecycle.GameLifecycle", false)', self.core)
@@ -48,6 +58,8 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn("HarborlinePhysicalBuilder.ResetForNewSave();", self.core)
         self.assertIn("private void OnPreSceneChange()", self.core)
         self.assertIn("_saveLoaded = true", self.core)
+        self.assertIn("HarborlineGameplayBootstrap.TryActivate(", self.core)
+        self.assertIn("_gameplayInitialized", self.core)
 
     def test_player_safety_gate_uses_real_s1api_player_registry(self):
         self.assertIn("IsConfirmedSinglePlayer(out int playerCount)", self.physical)
@@ -144,16 +156,56 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertNotIn(".InstantiateNetworked(", diagnostic_helpers)
         self.assertNotIn(".Spawn(", diagnostic_helpers)
 
+    def test_native_npc_pilot_uses_s1api_lifecycle_and_real_roles(self):
+        for npc_id in (
+            "harborline_dealer_mason",
+            "harborline_dealer_sierra",
+            "harborline_customer_caleb",
+            "harborline_customer_nina",
+            "harborline_customer_rafael",
+        ):
+            self.assertIn(npc_id, self.npcs)
+        self.assertEqual(self.npcs.count("public override bool IsDealer => true;"), 2)
+        self.assertEqual(self.npcs.count("public override bool IsCustomer => true;"), 3)
+        self.assertIn("WithDealerDefaults(", self.npcs)
+        self.assertIn("WithCustomerDefaults(", self.npcs)
+        self.assertIn("WithAffinities(", self.npcs)
+        self.assertIn("CustomerStandard.Moderate", self.npcs)
+        self.assertIn("DrugType.Methamphetamine", self.npcs)
+        self.assertIn("Appearance.GenerateRandomAppearance()", self.npcs)
+        self.assertIn("Appearance.Build()", self.npcs)
+        self.assertIn("Schedule.Enable()", self.npcs)
+        self.assertIn("NPC.CustomNpcsReady", self.npcs)
+        self.assertIn("IsConfirmedSinglePlayerSession()", self.npcs)
+        self.assertIn("NPC.Get(id)", self.npcs)
+        self.assertNotIn("EnsureDealSignal()", self.npcs)
+        self.assertNotIn("InitializeActions()", self.npcs)
+
+    def test_shop_stock_uses_native_shop_and_existing_item_registry(self):
+        self.assertIn('ShopManager.GetShopByName("Hardware Store")', self.shop)
+        self.assertIn("ItemManager.GetDefinition(stock.Id)", self.shop)
+        self.assertIn("hardwareStore.AddItem(item, stock.Price)", self.shop)
+        self.assertIn("hardwareStore.HasItem(item.ID)", self.shop)
+        self.assertEqual(self.shop.count("new StockItem("), 14)
+        for item_id in (
+            "plasticpot", "moisturepreservingpot", "airpot",
+            "suspensionrack", "halogengrowlight", "ledgrowlight",
+            "fullspectrumgrowlight", "dryingrack", "mixingstation",
+            "chemistrystation", "laboven", "mixingstationmk2",
+            "brickpress", "cauldron",
+        ):
+            self.assertIn('"' + item_id + '"', self.shop)
+
     def test_thunderstore_manifest_and_package_layout_are_consistent(self):
         self.assertEqual(self.manifest["name"], "ScheduleIMegaExpansion")
-        self.assertEqual(self.manifest["version_number"], "0.2.0")
+        self.assertEqual(self.manifest["version_number"], "0.3.0")
         dependencies = set(self.manifest["dependencies"])
         self.assertIn("LavaGang-MelonLoader-0.7.3", dependencies)
         self.assertIn("ifBars-S1API_Forked-3.2.2", dependencies)
         self.assertIn("ifBars-S1MAPI-2.0.1", dependencies)
-        workflow = (ROOT / ".github" / "workflows" / "build-runtime.yml").read_text(encoding="utf-8")
+        workflow = self.build_workflow
         self.assertIn("package/Mods/", workflow)
-        self.assertIn("ScheduleIMegaExpansion-0.2.0.zip", workflow)
+        self.assertIn("ScheduleIMegaExpansion-0.3.0.zip", workflow)
         for required in (
             "Mods/ScheduleIMegaExpansion.dll",
             "manifest.json",
@@ -186,9 +238,10 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         }
         self.assertTrue(required.issubset(ids))
         by_id = {item["id"]: item for item in self.audit["requirements"]}
-        self.assertEqual(by_id["npc.population"]["status"], "design_only")
-        self.assertEqual(by_id["npc.customer_profiles"]["status"], "design_only")
-        self.assertEqual(by_id["shops.online_orders"]["status"], "design_only")
+        self.assertEqual(by_id["npc.population"]["status"], "implemented_code_unverified_runtime")
+        self.assertEqual(by_id["npc.customer_profiles"]["status"], "implemented_code_unverified_runtime")
+        self.assertEqual(by_id["shops.native_stock"]["status"], "implemented_code_unverified_runtime")
+        self.assertEqual(by_id["shops.online_orders"]["status"], "not_implemented")
         self.assertEqual(by_id["properties.realtor"]["status"], "blocked_unverified_api")
         self.assertEqual(by_id["map.icons"]["status"], "not_implemented")
         self.assertEqual(by_id["police.integration"]["status"], "design_only")
