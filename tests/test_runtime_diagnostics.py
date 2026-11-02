@@ -100,7 +100,9 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn("LavaGang-MelonLoader-0.7.3", dependencies)
         self.assertIn("ifBars-S1API_Forked-3.2.2", dependencies)
         self.assertIn("ifBars-S1MAPI-2.0.1", dependencies)
-        self.assertIn("ScheduleIMegaExpansion-0.2.0.zip", (ROOT / ".github" / "workflows" / "build-runtime.yml").read_text(encoding="utf-8"))
+        workflow = (ROOT / ".github" / "workflows" / "build-runtime.yml").read_text(encoding="utf-8")
+        self.assertIn("package/Mods/", workflow)
+        self.assertIn("ScheduleIMegaExpansion-0.2.0.zip", workflow)
 
     def test_installer_only_copies_the_built_dll(self):
         self.assertIn("Schedule I.exe", self.installer)
