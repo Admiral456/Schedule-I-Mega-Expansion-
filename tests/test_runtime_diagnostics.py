@@ -33,22 +33,18 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIsNotNone(version)
         self.assertEqual(version.text, self.manifest["version_number"])
 
-    def test_runtime_references_native_s1api_but_does_not_bundle_it(self):
-        reference = self.project.find(".//Reference[@Include='S1API.Il2Cpp.MelonLoader']")
-        self.assertIsNotNone(reference)
-        self.assertEqual(reference.findtext("Private"), "false")
-        self.assertIn("S1API.Il2Cpp.MelonLoader.dll", reference.findtext("HintPath"))
+    def test_runtime_uses_official_s1api_package_without_bundling_game_assemblies(self):
+        self.assertEqual(self.project.findall(".//Reference"), [])
         packages = {
             element.attrib.get("Include"): element.attrib.get("Version")
             for element in self.project.findall(".//PackageReference")
         }
         self.assertEqual(packages.get("LavaGang.MelonLoader"), "0.7.3")
-        self.assertEqual(packages.get("RefGen.Schedule-I.Il2Cpp"), "0.4.4-f8")
-        self.assertEqual(packages.get("Il2CppInterop.Common"), "1.5.1")
-        self.assertNotIn("S1API.Forked", packages)
+        self.assertEqual(packages.get("S1API.Forked"), "3.2.2")
+        self.assertNotIn("RefGen.Schedule-I.Il2Cpp", packages)
+        self.assertNotIn("Il2CppInterop.Common", packages)
         self.assertNotIn("S1MAPI", packages)
-        self.assertIn("S1API.Il2Cpp.MelonLoader.dll", self.build_workflow)
-        self.assertIn("ifBars/S1API_Forked/3.2.2", self.build_workflow)
+        self.assertIn('PackageReference Include="S1API.Forked" Version="3.2.2"', self.build_workflow + self.project.read_text() if hasattr(self.project, "read_text") else (ROOT / "src" / "ScheduleIMegaExpansion.csproj").read_text(encoding="utf-8"))
 
     def test_core_uses_native_save_and_scene_lifecycle(self):
         self.assertIn('GetType("S1API.Lifecycle.GameLifecycle", false)', self.core)
@@ -244,7 +240,7 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertEqual(by_id["shops.online_orders"]["status"], "not_implemented")
         self.assertEqual(by_id["properties.realtor"]["status"], "blocked_unverified_api")
         self.assertEqual(by_id["map.icons"]["status"], "not_implemented")
-        self.assertEqual(by_id["police.integration"]["status"], "design_only")
+        self.assertEqual(by_id["police.integration"]["status"], "not_implemented")
         valid_statuses = set(self.audit["statusLegend"])
         for item in self.audit["requirements"]:
             self.assertIn(item["status"], valid_statuses)
