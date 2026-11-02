@@ -54,7 +54,11 @@ namespace ScheduleIMegaExpansion.Runtime
         {
             CleanupGeneratedRoot(RootName);
             CleanupGeneratedRoot(PendingRootName);
-            CleanupActiveRoot();
+            try { CleanupActiveRoot(); }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning("[Schedule I Mega Expansion] Active-root cleanup during scene reset failed: " + ex.Message);
+            }
             _built = false;
             _rootObject = null;
             _rootTransform = null;
@@ -133,24 +137,37 @@ namespace ScheduleIMegaExpansion.Runtime
                 BuildStreetFurniture();
                 BuildQuay();
 
-                Directory.CreateDirectory(Path.Combine(gameRoot, "UserData", "ScheduleIMegaExpansion", "Harborline"));
+                // Rename only after all geometry has been created. Persist the
+                // placement report atomically so a crash cannot leave a truncated
+                // JSON file that looks like a completed generation.
+                SetProperty(rootObject, "name", RootName);
+
+                string reportDirectory = Path.Combine(gameRoot, "UserData", "ScheduleIMegaExpansion", "Harborline");
+                Directory.CreateDirectory(reportDirectory);
+                string reportPath = Path.Combine(reportDirectory, "last-generation.json");
+                string temporaryReportPath = reportPath + ".tmp";
                 File.WriteAllText(
-                    Path.Combine(gameRoot, "UserData", "ScheduleIMegaExpansion", "Harborline", "last-generation.json"),
+                    temporaryReportPath,
                     JsonSerializer.Serialize(new
                     {
                         generatedUtc = DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture),
                         anchorSource = "S1API.Property.PropertyManager Docks Warehouse ExteriorSpawnPosition",
                         nativeRegion = "Docks",
+                        placementRegionVerified = false,
                         x = placement.X,
                         y = placement.Y,
                         z = placement.Z,
                         rotationY = placement.Yaw,
                         root = RootName,
-                        placement = _selectedPlacement
+                        placement = _selectedPlacement,
+                        status = "geometry-created; in-game region/road/collision verification still required"
                     }, new JsonSerializerOptions { WriteIndented = true }));
-                // Only publish the root as complete after every object and the
-                // generation report have been created successfully.
-                SetProperty(rootObject, "name", RootName);
+                if (File.Exists(reportPath))
+                    File.Delete(reportPath);
+                File.Move(temporaryReportPath, reportPath);
+
+                // Only publish the generation as complete after the geometry and
+                // its placement report have both been created successfully.
                 _built = true;
                 _rootObject = null;
                 _rootTransform = null;
@@ -164,9 +181,13 @@ namespace ScheduleIMegaExpansion.Runtime
             {
                 // Roll back the pending hierarchy so the next retry cannot mistake
                 // a partially built dockyard for a successful one.
-                CleanupActiveRoot();
+                try { CleanupActiveRoot(); }
+                catch (Exception cleanupError)
+                {
+                    warn("Harborline rollback cleanup also failed: " + cleanupError.Message);
+                }
                 _built = false;
-                warn("Harborline physical build failed and pending geometry was rolled back: " + ex.GetType().Name + ": " + ex.Message);
+                warn("Harborline physical build failed and pending geometry was rolled back where possible: " + ex.GetType().Name + ": " + ex.Message);
                 warn(ex.StackTrace ?? string.Empty);
                 return false;
             }
@@ -577,27 +598,50 @@ namespace ScheduleIMegaExpansion.Runtime
         private static void Add(string name, float x, float y, float z, float sx, float sy, float sz,
             float r, float g, float b)
         {
-            object primitiveValue = Enum.Parse(_primitiveType!, "Cube");
-            MethodInfo create = _gameObjectType!.GetMethods(BindingFlags.Public | BindingFlags.Static)
-                .First(method => method.Name == "CreatePrimitive"
-                    && method.GetParameters().Length == 1
-                    && method.GetParameters()[0].ParameterType == _primitiveType);
-            object cube = create.Invoke(null, new[] { primitiveValue })!;
-            SetProperty(cube, "name", name);
+            object? cube = null;
+            bool parented = false;
+            try
+            {
+                object primitiveValue = Enum.Parse(_primitiveType!, "Cube");
+                MethodInfo create = _gameObjectType!.GetMethods(BindingFlags.Public | BindingFlags.Static)
+                    .First(method => method.Name == "CreatePrimitive"
+                        && method.GetParameters().Length == 1
+                        && method.GetParameters()[0].ParameterType == _primitiveType);
+                cube = create.Invoke(null, new[] { primitiveValue })
+                    ?? throw new InvalidOperationException("GameObject.CreatePrimitive returned null.");
+                SetProperty(cube, "name", name);
 
-            object transform = GetProperty(cube, "transform")!;
-            MethodInfo? setParent = transform.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .FirstOrDefault(method => method.Name == "SetParent"
-                    && method.GetParameters().Length == 2
-                    && method.GetParameters()[0].ParameterType.IsAssignableFrom(_rootTransform!.GetType()));
-            if (setParent == null)
-                throw new MissingMethodException("Transform.SetParent(Transform, bool) was not found.");
-            setParent.Invoke(transform, new[] { _rootTransform, (object)false });
+                object transform = GetProperty(cube, "transform")
+                    ?? throw new MissingMemberException("Created primitive has no Transform component.");
+                MethodInfo? setParent = transform.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                    .FirstOrDefault(method => method.Name == "SetParent"
+                        && method.GetParameters().Length == 2
+                        && method.GetParameters()[0].ParameterType.IsAssignableFrom(_rootTransform!.GetType()));
+                if (setParent == null)
+                    throw new MissingMethodException("Transform.SetParent(Transform, bool) was not found.");
 
-            SetProperty(transform, "localPosition", NewVector3(x, y, z));
-            SetProperty(transform, "localScale", NewVector3(sx, sy, sz));
-            SetProperty(transform, "localRotation", NewYawQuaternion(0f));
-            SetMaterialColor(cube, r, g, b);
+                setParent.Invoke(transform, new[] { _rootTransform, (object)false });
+                parented = true;
+
+                SetProperty(transform, "localPosition", NewVector3(x, y, z));
+                SetProperty(transform, "localScale", NewVector3(sx, sy, sz));
+                SetProperty(transform, "localRotation", NewYawQuaternion(0f));
+                SetMaterialColor(cube, r, g, b);
+            }
+            catch
+            {
+                // If parenting failed, the primitive is outside the pending root
+                // and must be destroyed explicitly to avoid an orphan in the map.
+                if (cube != null && !parented)
+                {
+                    try { DestroyGameObject(cube); }
+                    catch (Exception cleanupError)
+                    {
+                        MelonLogger.Warning("[Schedule I Mega Expansion] Could not clean up orphaned primitive '" + name + "': " + cleanupError.Message);
+                    }
+                }
+                throw;
+            }
         }
 
         private static void CreateRoot(Anchor anchor, out object rootObject, out object rootTransform)
