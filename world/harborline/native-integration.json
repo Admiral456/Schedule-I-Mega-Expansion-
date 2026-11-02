@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "region": "Harborline",
-  "status": "design-contract; not a runtime implementation",
+  "status": "design-contract for native gameplay systems; first physical geometry runtime exists, but native district integration is not implemented",
   "npc": {
     "system": "S1API.Entities.NPC",
     "appearance": "On the NPC instance: Appearance.GenerateRandomAppearance() followed by Appearance.Build()",
@@ -111,19 +111,20 @@
   },
   "runtimeDiagnostics": {
     "project": "src/ScheduleIMegaExpansion.csproj",
-    "mode": "read-only",
+    "mode": "read-only registry/API survey plus session-local Unity geometry generation",
     "exports": [
       "native Region enum values",
       "registered enterable buildings",
       "native properties and ownership state",
       "native businesses and ownership state",
       "standalone phone-map POIs when available",
-      "metadata-only native map/property/business API surface report"
+      "metadata-only API surface from Assembly-CSharp/S1API/S1MAPI/FishNet",
+      "read-only S1MAPI PrefabRef candidate and component/network survey"
     ],
     "output": "UserData/ScheduleIMegaExpansion/Diagnostics/<timestamp>",
-    "mutatesGameState": false,
+    "mutatesGameState": true,
     "compileTarget": "IL2CPP net6.0",
-    "status": "CI build succeeded; diagnostic DLL exported; in-game execution and generated registry report still require target-game verification",
+    "status": "CI build and static tests can verify source/package integrity; game runtime execution and actual placement are unverified",
     "outputFiles": [
       "summary.txt",
       "native-regions.csv",
@@ -131,17 +132,20 @@
       "native-properties.csv",
       "native-businesses.csv",
       "standalone-phone-map-pois.csv",
-      "native-map-property-api.txt"
+      "native-game-api-surface.txt",
+      "native-prefabs.csv"
     ],
     "compileRequiresGameAssemblies": false,
     "buildWorkflow": ".github/workflows/build-runtime.yml",
-    "latestSuccessfulBuild": {
-      "commit": "b6980893e5657092b2bf3ffde76755f060945fac",
-      "workflowRunId": 41326124145,
-      "artifactId": 13091860050,
-      "artifactName": "ScheduleIMegaExpansion-runtime-diagnostic",
-      "dllSha256": "13705821581789260b094da42210cf4b1ce1b0652b1e5effe9532c864231ebd0",
-      "dllSizeBytes": 43520
-    }
+    "readOnlySurvey": true
+  },
+  "runtimeGeometry": {
+    "status": "implemented-code-unverified-runtime",
+    "description": "Session-local Unity primitive geometry after save-load, with Docks Warehouse anchor, occupancy/ground checks and fail-closed single-player gate.",
+    "nativeBuildingRegistration": false,
+    "nativePropertyRegistration": false,
+    "nativeMapRegistration": false,
+    "savePersistence": false,
+    "multiplayer": false
   }
 }
