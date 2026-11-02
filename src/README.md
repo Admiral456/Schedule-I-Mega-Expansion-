@@ -1,6 +1,6 @@
 # Harborline runtime – první nativní herní vlna
 
-Tento projekt je stále rozpracované rozšíření. Vedle fyzického Unity prototypu už obsahuje první skutečné herní integrace přes S1API 3.2.2.
+Tento projekt je stále rozpracované rozšíření. Unity primitiva nejsou nativní Schedule I Building, Property, Business ani Shop. Vedle fyzického Unity prototypu už obsahuje první skutečné herní integrace přes S1API 3.2.2.
 
 ## Implementováno ve zdrojovém kódu
 
