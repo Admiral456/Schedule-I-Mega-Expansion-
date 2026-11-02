@@ -10,7 +10,8 @@ After a save finishes loading, the mod discovers S1API dynamically and exports n
 - native businesses and ownership state (S1API.Property.BusinessManager.GetAllBusinesses);
 - exact native Region enum values;
 - standalone phone-map POIs, when the installed S1API assembly exposes that optional API;
-- a metadata-only report of native map, region, property, business, NPC, avatar, schedule, door, navigation and law-enforcement types and member signatures.
+- a metadata-only report of native map, region, property, business, NPC, avatar, schedule, door, navigation and law-enforcement types and member signatures;
+- a read-only S1MAPI prefab survey using documented `PrefabRef.Find()` lookups for known doors, storage and interaction prefabs, including component types and NetworkObject detection.
 
 The diagnostic survey does not mutate native registries. After a save loads, the automatic generator locates the native Docks Warehouse property, searches nearby for flat unobstructed ground and creates real Unity GameObjects with renderers and primitive colliders. It does not yet register a native Building, Property, Business or Shop, and it does not create native doors, NPCs, map icons, inventories or police behaviors.
 
@@ -55,6 +56,7 @@ Files:
 - native-businesses.csv
 - standalone-phone-map-pois.csv
 - native-game-api-surface.txt
+- native-prefabs.csv
 
 ## Why this is needed
 
@@ -62,20 +64,11 @@ The public S1API property and business managers expose existing collections for 
 
 MapPOI is a standalone phone-map marker API. It is not equivalent to a native shop/property pin or ownership marker.
 
-## Physical Harborline prototype (single-player only)
+## Automatic physical Harborline prototype (single-player only)
 
-After loading into a save, stand at the intended Harborline connection point inside the existing Docks area and face toward the open space where the prototype should be placed.
+After a save loads, the mod locates the native Docks Warehouse property, reads its exterior spawn point and scans nearby sites for flat unobstructed ground. It then creates the physical dockyard geometry automatically. No hotkeys or manual anchor capture are used.
 
-- Press **F6** to capture your in-game position and facing direction.
-- Press **F7** to create the physical dockyard slice.
-
-The anchor is saved to:
-
-```
-Schedule I/UserData/ScheduleIMegaExpansion/Harborline/harborline-anchor.json
-```
-
-The geometry is placed in front of the captured anchor and consists of visible Unity cube meshes with primitive colliders: ground slab, road and lane markings, walk-in warehouse shell and interior props, shipping containers, crane structure, lamps, quay, pier and cargo props. The warehouse front has a doorway opening so the interior can be entered.
+The chosen location is recorded in `UserData/ScheduleIMegaExpansion/Harborline/last-generation.json`. The geometry consists of a dock slab, road, warehouse shell/interior props, containers, crane, lamps, quay, pier and cargo props.
 
 Important limits:
 - F7 builds a physical geometry prototype only. It is not yet a native game Building/Property/Business/Shop.
@@ -84,4 +77,4 @@ Important limits:
 - Native doors, NPCs, functional business systems, Realtor registration, map projection/icons, police dispatch and multiplayer replication are not yet implemented.
 - The generator is a first-pass placement heuristic. It must be verified in the actual game for the selected footprint, road access and collision. If all candidate areas are blocked or no ground collider is found, it intentionally skips generation.
 - The geometry is session-local and is regenerated after loading a save; it is not yet saved as native world objects.
-- Reloading a save will not create duplicates if the named root is still present in the loaded scene.
+- Reloading a save regenerates the session-local geometry; the named root is checked to avoid duplicate creation within the same scene.
