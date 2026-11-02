@@ -1,5 +1,5 @@
 name: Build Harborline runtime mod
-# Build against the same native S1API and IL2CPP branch used by the shipped mod.
+# Build against the official S1API compile-time package; runtime S1API comes from manifest dependency.
 
 on:
   push:
@@ -26,22 +26,10 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "6.0.x"
-      - name: Download the matching S1API IL2CPP assembly
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/s1api"
-          curl --fail --location --retry 3 \
-            "https://thunderstore.io/package/download/ifBars/S1API_Forked/3.2.2/" \
-            --output "$RUNNER_TEMP/s1api-forked.zip"
-          unzip -q "$RUNNER_TEMP/s1api-forked.zip" -d "$RUNNER_TEMP/s1api-package"
-          S1API_DLL="$(find "$RUNNER_TEMP/s1api-package" -type f -name 'S1API.Il2Cpp.MelonLoader.dll' -print -quit)"
-          test -n "$S1API_DLL"
-          cp "$S1API_DLL" "$RUNNER_TEMP/s1api/S1API.Il2Cpp.MelonLoader.dll"
       - name: Restore
-        run: dotnet restore src/ScheduleIMegaExpansion.csproj -p:S1APIDllPath="$RUNNER_TEMP/s1api/S1API.Il2Cpp.MelonLoader.dll"
+        run: dotnet restore src/ScheduleIMegaExpansion.csproj
       - name: Build
-        run: dotnet build src/ScheduleIMegaExpansion.csproj --configuration Release --no-restore -p:S1APIDllPath="$RUNNER_TEMP/s1api/S1API.Il2Cpp.MelonLoader.dll"
+        run: dotnet build src/ScheduleIMegaExpansion.csproj --configuration Release --no-restore
       - name: Assemble Thunderstore package
         run: |
           mkdir -p package/Mods
