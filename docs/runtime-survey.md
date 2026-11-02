@@ -1,30 +1,45 @@
-# Runtime world survey
+# Runtime survey and physical prototype
 
-The first runtime build is a read-only diagnostic mod. It discovers S1API at runtime and exports the registries exposed by the installed Schedule I/S1API build. It does not need Schedule I game assemblies to compile. The .NET 6 build and ZIP artifact have now succeeded in GitHub Actions; the mod has not yet been run inside the game.
+The current build is a mixed runtime mod:
+- diagnostic exporters are read-only and inventory installed native registries/API signatures;
+- the automatic Harborline prototype creates session-local Unity geometry in a confirmed single-player session.
 
-## Build and install
+The .NET 6 build and CI tests validate compilation, package layout and source-level invariants. They do **not** prove that the mod runs correctly in Schedule I. No user game runtime report has been inspected yet.
 
-1. Build the project in src with the .NET 6 SDK, as described in src/README.md, or download the GitHub Actions artifact named ScheduleIMegaExpansion-runtime-diagnostic.
-2. Copy ScheduleIMegaExpansion.dll into Schedule I/Mods. The install.ps1 helper can copy it for you.
-3. Start the game and load a normal save. The report is automatically written after the native S1API save-load lifecycle signals completion.
+## Install and run
 
-## Output
+1. Install MelonLoader 0.7.3+, S1API Forked 3.2.2+ and S1MAPI 2.0.1+.
+2. Copy ScheduleIMegaExpansion.dll to Schedule I/Mods or use src/install.ps1.
+3. Start a single-player save.
+4. After the native S1API OnLoadComplete lifecycle event, the mod exports diagnostics and attempts automatic geometry generation.
+5. Inspect logs and the generated reports. If no safe placement is found, the builder logs a warning and does not create geometry.
+
+## Diagnostic output
 
 Schedule I/UserData/ScheduleIMegaExpansion/Diagnostics/<timestamp>/
 
-- native-regions.csv: the exact Region enum names and numeric values from the installed S1API.
-- native-buildings.csv: names registered as enterable native game buildings.
-- native-properties.csv: property name/code/price/ownership and exposed spawn locations.
-- native-businesses.csv: business name/code/price/ownership and exposed spawn locations.
-- standalone-phone-map-pois.csv: phone-map POI markers, if supported by the installed S1API build.
-- native-game-api-surface.txt: metadata-only report of relevant game map, region, property and business types/member signatures.
-- summary.txt: assembly version, counts and errors.
+- summary.txt – API version, export counts and errors.
+- native-regions.csv – installed Region enum values.
+- native-buildings.csv – names from S1API Building lookup.
+- native-properties.csv – existing property names/codes/prices/ownership/spawn positions.
+- native-businesses.csv – existing business records and ownership.
+- standalone-phone-map-pois.csv – standalone phone-map POIs if available.
+- native-game-api-surface.txt – metadata-only signatures from Assembly-CSharp, S1API, S1MAPI and FishNet.
+- native-prefabs.csv – candidate prefab references found through S1MAPI PrefabRef.Find() and the component/network inspection status.
 
-## Safety
+The chosen prototype geometry anchor is recorded in Schedule I/UserData/ScheduleIMegaExpansion/Harborline/last-generation.json.
 
-- The build does not spawn or move anything.
-- It does not alter ownership, prices, stock, NPCs, map markers or save data.
-- It does not infer world coordinates from the concept map.
-- Standalone POIs are not equivalent to native shop/business/property map pins.
-- S1API's Region enum exposes the original six game regions. Harborline is therefore planned as a physical subdistrict inside Docks, not a fabricated enum value. Its eventual coordinates still need to be checked against the Docks region/navigation boundaries.
-- A successful export only inventories native registries; it does not prove that custom property registration is possible through public API.
+## Runtime safety
+
+- The physical builder only proceeds when S1API.Entities.Player.All contains exactly one player.
+- It anchors from the native Docks Warehouse property position, not a 2D concept map.
+- It scans nearby candidate sites and requires collision-free footprint checks plus multiple ground raycasts.
+- It rejects known water collider names/tags/layers, but this is a heuristic and does not guarantee detection of unnamed water surfaces.
+- The generated objects are session-local Unity primitives. They are not native registered buildings and are not saved into the game's save.
+- Multiplayer, networked prefab instantiation and custom NPC spawning are intentionally not enabled.
+
+## Native integration limits
+
+S1API's public PropertyManager and BusinessManager methods inspected so far enumerate existing records. No supported public hook to register a new Realtor property/business has been confirmed. Normal-map projection, map icons, road/navmesh extension, native doors, shops, online orders, NPC behavior and police dispatch remain unimplemented.
+
+See docs/implementation-audit.md and world/harborline/implementation-status.json for the requirement-by-requirement status.
