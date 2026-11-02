@@ -323,6 +323,10 @@ namespace ScheduleIMegaExpansion.Runtime
 
     internal static class HarborlineNpcRegistrar
     {
+        private static bool _warnedPlayerGate;
+        private static bool _warnedPrefabReadiness;
+        private static bool _warnedPlacement;
+
         private static readonly string[] StableIds =
         {
             "harborline_dealer_mason",
@@ -336,13 +340,31 @@ namespace ScheduleIMegaExpansion.Runtime
         {
             if (!HarborlinePhysicalBuilder.IsConfirmedSinglePlayerSession())
             {
-                warn("Harborline NPC creation is waiting for a confirmed single-player host. Multiplayer spawning remains disabled until the full host/late-join test.");
+                if (!_warnedPlayerGate)
+                {
+                    _warnedPlayerGate = true;
+                    warn("Harborline NPC creation is waiting for a confirmed single-player host. Multiplayer spawning remains disabled until the full host/late-join test.");
+                }
+                return false;
+            }
+
+            if (!NPC.CustomNpcsReady)
+            {
+                if (!_warnedPrefabReadiness)
+                {
+                    _warnedPrefabReadiness = true;
+                    warn("Waiting for S1API to finish registering Harborline NPC prefabs through FishNet.");
+                }
                 return false;
             }
 
             if (!HarborlineNpcSpawnPoints.TryGet(0, out _))
             {
-                warn("Harborline NPC creation is waiting for the measured dockyard placement.");
+                if (!_warnedPlacement)
+                {
+                    _warnedPlacement = true;
+                    warn("Harborline NPC creation is waiting for the measured dockyard placement.");
+                }
                 return false;
             }
 
@@ -367,6 +389,13 @@ namespace ScheduleIMegaExpansion.Runtime
             log("Native Harborline NPC wave ready: " + created + " newly created, " +
                 alreadyPresent + " already present. Stable NPC IDs: " + string.Join(", ", StableIds));
             return true;
+        }
+
+        public static void ResetForNewSave()
+        {
+            _warnedPlayerGate = false;
+            _warnedPrefabReadiness = false;
+            _warnedPlacement = false;
         }
 
         private static void CreateIfMissing<T>(
