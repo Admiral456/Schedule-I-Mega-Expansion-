@@ -76,6 +76,6 @@ Pro mod manager je připraven manifest `manifest.json`. Balíček obsahuje samot
 python -m unittest discover -s tests -v
 ```
 
-Runtime mod se sestavuje jako .NET 6 IL2CPP projekt. Lokálně je třeba předat cestu ke kompatibilnímu `S1API.Il2Cpp.MelonLoader.dll` přes `-p:S1APIDllPath=...`; GitHub Actions získá DLL z Thunderstore a vytváří ZIP artefakt. Do hry se instaluje až po ověření s MelonLoader a S1API.
+Runtime mod se sestavuje jako .NET 6 projekt s oficiálním `S1API.Forked` NuGet 3.2.2 a MelonLoader. GitHub Actions provede restore, build a vytvoří ZIP artefakt. Runtime S1API zajišťuje deklarovaná závislost v manifestu.
 
 Současný fyzický prototyp není finální Harborline. Kompletní audit: docs/implementation-audit.md. Strojově čitelný stav: world/harborline/implementation-status.json.
