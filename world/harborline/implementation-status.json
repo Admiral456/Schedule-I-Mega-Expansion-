@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 1,
+  "project": "Schedule I Mega Expansion / Harborline",
+  "reviewedCommit": "67b52b939bb9e36cd96522cdd6fdcc876d618002",
+  "reviewMethod": "source review against current upstream S1API/S1MAPI public source, repository implementation, static tests and CI. No Schedule I game runtime or user save was available to this audit.",
+  "statusLegend": {
+    "implemented_code_unverified_runtime": "Code exists and builds, but target-game execution is not confirmed.",
+    "design_only": "Requirements/data exist as a plan or configuration, not executable runtime behavior.",
+    "not_implemented": "No connected implementation exists in this repository.",
+    "blocked_unverified_api": "The public registration/integration path has not been established from the inspected API.",
+    "not_verified_in_game": "Requires the installed game, save data, or runtime output."
+  },
+  "requirements": [
+    {
+      "id": "runtime.bootstrap",
+      "requirement": "MelonLoader mod loads and subscribes to native save/scene lifecycle.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "src/Core.cs",
+        "S1API.Lifecycle.GameLifecycle events: OnPreLoad, OnLoadComplete, OnPreSceneChange"
+      ],
+      "remaining": "Run the packaged DLL in the target Schedule I installation and confirm lifecycle log messages."
+    },
+    {
+      "id": "diagnostics.registries",
+      "requirement": "Read existing native region, building, property, business and phone-map registries.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "src/Diagnostics/WorldSnapshotExporter.cs",
+        "native-regions.csv",
+        "native-buildings.csv",
+        "native-properties.csv",
+        "native-businesses.csv",
+        "standalone-phone-map-pois.csv"
+      ],
+      "remaining": "Run in game and inspect exported row counts and errors; public manager APIs only enumerate existing registrations."
+    },
+    {
+      "id": "diagnostics.prefabs",
+      "requirement": "Find candidate S1MAPI prefabs and report their component/network status without spawning them.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "src/Diagnostics/NativePrefabCatalogExporter.cs",
+        "native-prefabs.csv",
+        "PrefabRef.Find()"
+      ],
+      "remaining": "Validate that Find() resolves the documented prefab names and that IL2CPP component inspection reports reliable network status in game."
+    },
+    {
+      "id": "diagnostics.api_surface",
+      "requirement": "Survey map, building, property, NPC, door, navigation, police and networking APIs.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "src/Diagnostics/NativeApiSurfaceScanner.cs",
+        "native-game-api-surface.txt"
+      ],
+      "remaining": "Inspect the report from the user's installed game; source-level reflection inventory does not confirm that any specific gameplay hook works."
+    },
+    {
+      "id": "world.automatic_geometry",
+      "requirement": "Create a physical Harborline geometry slice automatically after save load.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "src/Runtime/HarborlinePhysicalBuilder.cs",
+        "S1API.Property.PropertyManager.GetAllProperties()",
+        "PropertyWrapper.PropertyName",
+        "PropertyWrapper.ExteriorSpawnPosition",
+        "Unity GameObject.CreatePrimitive"
+      ],
+      "remaining": "Test automatic generation in game, verify the exact Docks Warehouse record and visual placement. Current pieces are generic Unity cubes, not production models or native registered buildings."
+    },
+    {
+      "id": "world.placement",
+      "requirement": "Place the district in a valid open site inside the existing Docks region.",
+      "status": "not_verified_in_game",
+      "evidence": [
+        "Docks Warehouse property anchor and Physics.CheckBox/Raycast sampling exist in code."
+      ],
+      "remaining": "No captured runtime property list, Docks bounds, map projection, world transform, navmesh or scene screenshot is available. Candidate radii 42–104m are a heuristic and do not prove that the selected candidate is inside Docks or connected to a road."
+    },
+    {
+      "id": "world.water_safety",
+      "requirement": "Avoid water, steep terrain and occupied structures.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "Physics.CheckBox footprint test",
+        "five-point ground raycast sampling",
+        "slope/height checks",
+        "water name/tag/layer token filter"
+      ],
+      "remaining": "Water filtering is heuristic; generic/unlabelled water colliders can still pass. Test on the real Docks shoreline and add a verified terrain/region boundary check before treating placement as safe."
+    },
+    {
+      "id": "world.roads_navigation",
+      "requirement": "Connect Harborline roads and pedestrian paths to native road/navigation graph.",
+      "status": "not_implemented",
+      "evidence": [
+        "Only primitive road geometry is spawned; no native road graph or NavigationBuilder call is connected."
+      ],
+      "remaining": "Need exact native road/scene data, navmesh or verified S1MAPI NavigationBuilder integration and in-game path tests."
+    },
+    {
+      "id": "buildings.interiors",
+      "requirement": "Create functional native buildings and enterable interiors.",
+      "status": "not_implemented",
+      "evidence": [
+        "Prototype warehouse is a collection of cubes; no S1API Building registration or S1MAPI BuildingBuilder/InteriorBuilder runtime integration."
+      ],
+      "remaining": "Replace prototype shell with verified native prefabs/building registration and functional, navigable interiors."
+    },
+    {
+      "id": "doors.interactions",
+      "requirement": "Create working native doors and interactive objects.",
+      "status": "not_implemented",
+      "evidence": [
+        "Prefab catalog only looks up references; no Instantiate or InstantiateNetworked path is called."
+      ],
+      "remaining": "Verify actual prefab components, host/server spawn path, interactions, client operation and save/load."
+    },
+    {
+      "id": "properties.realtor",
+      "requirement": "Register purchasable businesses/properties in the native Realtor and ownership systems.",
+      "status": "blocked_unverified_api",
+      "evidence": [
+        "S1API PropertyManager and BusinessManager expose GetAll/GetOwned/Find enumeration methods; no additive custom registration method has been established."
+      ],
+      "remaining": "Find a supported native registration hook in installed game APIs/source or implement using a verified game extension point. Do not list sites as purchasable until this works."
+    },
+    {
+      "id": "map.icons",
+      "requirement": "Show correct native building/shop/business/owned-property icons on the normal game map.",
+      "status": "not_implemented",
+      "evidence": [
+        "No map canvas extension, map bounds/world transform, native building classification registration or ownership-driven icon update is connected."
+      ],
+      "remaining": "Discover and verify map projection and registration APIs in the target game; standalone MapPOI is not a substitute."
+    },
+    {
+      "id": "npc.population",
+      "requirement": "Spawn 42 physical native NPCs, initially activate about 18, with 2 dealers.",
+      "status": "design_only",
+      "evidence": [
+        "packs/Harborline/roster.json contains targets and design rules; no custom NPC implementation class or NPCPrefabBuilder runtime code exists."
+      ],
+      "remaining": "Implement real S1API.Entities.NPC subclasses, ConfigurePrefab identity/spawn/region/customer/dealer/schedule and native network lifecycle; start with the design's 5-NPC test phase."
+    },
+    {
+      "id": "npc.appearance",
+      "requirement": "Generate each NPC appearance with the game's own appearance generator and preserve it.",
+      "status": "design_only",
+      "evidence": [
+        "The appearance API is documented in data; no runtime NPC calls Appearance.GenerateRandomAppearance() or Appearance.Build()."
+      ],
+      "remaining": "Call the instance API in the actual NPC OnCreated lifecycle and verify persisted appearance, uniqueness and late join."
+    },
+    {
+      "id": "npc.customer_profiles",
+      "requirement": "Implement 30 customer profiles with product/effect preferences mapped to real product IDs.",
+      "status": "design_only",
+      "evidence": [
+        "packs/Harborline/customer-designs.json contains 30 generic profiles; each currently has mappingStatus marked design-only."
+      ],
+      "remaining": "Map preferences to exact supported native product/effect IDs and NPC customer APIs; add validation against the target game's available product catalog."
+    },
+    {
+      "id": "npc.schedules",
+      "requirement": "Use native NPC schedules and allow NPCs to enter buildings.",
+      "status": "not_implemented",
+      "evidence": [
+        "Design docs mention schedules and StayInBuilding; no Harborline NPC classes or schedule builders are instantiated."
+      ],
+      "remaining": "Implement verified schedule actions and test nav links/doors."
+    },
+    {
+      "id": "shops.online_orders",
+      "requirement": "Physical shops and Hyland Network online orders share inventory/catalogue.",
+      "status": "design_only",
+      "evidence": [
+        "anchors.json describes channels and shared catalogue as required behavior; no shop inventory, order flow or phone-app handler code exists."
+      ],
+      "remaining": "Connect both purchase channels to one authoritative native inventory/order service; test simultaneous purchases and stock consistency."
+    },
+    {
+      "id": "police.integration",
+      "requirement": "Native police checks, patrol and dispatch coverage across Harborline.",
+      "status": "design_only",
+      "evidence": [
+        "Design JSON asks to use native police; no police dispatch, patrol or checkpoint runtime code is present."
+      ],
+      "remaining": "Verify native dispatch/region/nav coverage and add host-authoritative checkpoint/patrol registration."
+    },
+    {
+      "id": "multiplayer",
+      "requirement": "Host-authoritative synchronized geometry, NPCs, doors, stock and interactions.",
+      "status": "not_implemented",
+      "evidence": [
+        "Current physical generator deliberately refuses to run unless S1API.Entities.Player.All contains exactly one player."
+      ],
+      "remaining": "Implement networked generation/spawn and persistence before enabling co-op."
+    },
+    {
+      "id": "persistence",
+      "requirement": "Save/load custom world geometry and gameplay state without duplication.",
+      "status": "not_implemented",
+      "evidence": [
+        "Unity geometry is session-local; last-generation.json is diagnostic output only, not a save integration."
+      ],
+      "remaining": "Use native saveable objects or an explicit mod save-data lifecycle; verify reload, transition and crash recovery."
+    },
+    {
+      "id": "packaging",
+      "requirement": "Produce installable Thunderstore package with matching dependencies/version.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "manifest.json",
+        "src/ScheduleIMegaExpansion.csproj",
+        ".github/workflows/build-runtime.yml"
+      ],
+      "remaining": "Check package installation in a clean profile with the exact dependency versions and target game build."
+    },
+    {
+      "id": "runtime.test",
+      "requirement": "Prove in-game objects appear in the correct positions and all systems work.",
+      "status": "not_verified_in_game",
+      "evidence": [
+        "CI compile and static tests only; no user game log, diagnostics folder or runtime screenshot was provided."
+      ],
+      "remaining": "Run in the actual Schedule I installation and inspect diagnostic files, logs, generated placement and gameplay behavior."
+    }
+  ],
+  "overallVerdict": "The repository is not yet a complete or fully integrated Harborline mod. It contains a buildable runtime prototype, automatic session-local geometry generation and read-only diagnostics. The original NPC, property/realtor, map, shop/online order, police, native interaction, save-persistence and multiplayer requirements are not implemented or not verified."
+}
