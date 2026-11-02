@@ -80,6 +80,10 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn("DestroyGameObject(", self.physical)
         self.assertIn('SetProperty(rootObject, "name", RootName)', self.physical)
         self.assertIn("pending geometry was rolled back", self.physical)
+        self.assertIn("temporaryReportPath", self.physical)
+        self.assertIn("placementRegionVerified = false", self.physical)
+        self.assertIn('if (cube != null && !parented)', self.physical)
+        self.assertIn("DestroyGameObject(cube)", self.physical)
 
     def test_physical_slice_is_unity_geometry_not_a_native_business(self):
         self.assertIn("CreatePrimitive", self.physical)
@@ -178,6 +182,13 @@ class RuntimeDiagnosticTests(unittest.TestCase):
             "multiplayer", "persistence", "runtime.test",
         }
         self.assertTrue(required.issubset(ids))
+        by_id = {item["id"]: item for item in self.audit["requirements"]}
+        self.assertEqual(by_id["npc.population"]["status"], "design_only")
+        self.assertEqual(by_id["npc.customer_profiles"]["status"], "design_only")
+        self.assertEqual(by_id["shops.online_orders"]["status"], "design_only")
+        self.assertEqual(by_id["properties.realtor"]["status"], "blocked_unverified_api")
+        self.assertEqual(by_id["map.icons"]["status"], "not_implemented")
+        self.assertEqual(by_id["police.integration"]["status"], "design_only")
         valid_statuses = set(self.audit["statusLegend"])
         for item in self.audit["requirements"]:
             self.assertIn(item["status"], valid_statuses)
