@@ -27,14 +27,17 @@ jobs:
         run: dotnet restore src/ScheduleIMegaExpansion.csproj
       - name: Build
         run: dotnet build src/ScheduleIMegaExpansion.csproj --configuration Release --no-restore
-      - name: Prepare Harborline mod artifact
+      - name: Assemble Thunderstore package
         run: |
-          mkdir -p artifact
-          cp src/bin/Release/net6.0/ScheduleIMegaExpansion.dll artifact/
-          cp src/README.md artifact/README.txt
-      - name: Upload Harborline mod artifact
+          mkdir -p package
+          cp src/bin/Release/net6.0/ScheduleIMegaExpansion.dll package/
+          cp manifest.json package/
+          cp README.md package/
+          cp LICENSE package/
+          (cd package && zip -r ../ScheduleIMegaExpansion-0.2.0.zip .)
+      - name: Upload installable mod package
         uses: actions/upload-artifact@v4
         with:
-          name: ScheduleIMegaExpansion-harborline-prototype
-          path: artifact/*
+          name: ScheduleIMegaExpansion-0.2.0
+          path: ScheduleIMegaExpansion-0.2.0.zip
           if-no-files-found: error
