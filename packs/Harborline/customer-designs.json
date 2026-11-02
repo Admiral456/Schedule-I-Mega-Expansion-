@@ -36,7 +36,7 @@
       "avoidEffects": [
         "Explosive"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_02",
@@ -58,7 +58,7 @@
       "avoidEffects": [
         "Focused"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_03",
@@ -80,7 +80,7 @@
       "avoidEffects": [
         "Sedating"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_04",
@@ -103,7 +103,7 @@
       "avoidEffects": [
         "Calming"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_05",
@@ -126,7 +126,7 @@
       "avoidEffects": [
         "Lethal"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_06",
@@ -148,7 +148,7 @@
       "avoidEffects": [
         "Foggy"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_07",
@@ -171,7 +171,7 @@
       "avoidEffects": [
         "Toxic"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_08",
@@ -193,7 +193,7 @@
       "avoidEffects": [
         "Sedating"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_09",
@@ -216,7 +216,7 @@
       "avoidEffects": [
         "Slippery"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_10",
@@ -239,7 +239,7 @@
       "avoidEffects": [
         "Energizing"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_11",
@@ -261,7 +261,7 @@
       "avoidEffects": [
         "Explosive"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_12",
@@ -284,7 +284,7 @@
       "avoidEffects": [
         "Lethal"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_13",
@@ -307,7 +307,7 @@
       "avoidEffects": [
         "Calming"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_14",
@@ -331,7 +331,7 @@
       "avoidEffects": [
         "Foggy"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_15",
@@ -354,7 +354,7 @@
       "avoidEffects": [
         "Slippery"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_16",
@@ -377,7 +377,7 @@
       "avoidEffects": [
         "Spicy"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_17",
@@ -400,7 +400,7 @@
       "avoidEffects": [
         "Foggy"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_18",
@@ -423,7 +423,7 @@
       "avoidEffects": [
         "Energizing"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_19",
@@ -446,7 +446,7 @@
       "avoidEffects": [
         "Euphoric"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_20",
@@ -469,7 +469,7 @@
       "avoidEffects": [
         "Sedating"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_21",
@@ -492,7 +492,7 @@
       "avoidEffects": [
         "Thought-Provoking"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_22",
@@ -515,7 +515,7 @@
       "avoidEffects": [
         "Lethal"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_23",
@@ -538,7 +538,7 @@
       "avoidEffects": [
         "Tropic Thunder"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_24",
@@ -561,7 +561,7 @@
       "avoidEffects": [
         "Calming"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_25",
@@ -582,7 +582,7 @@
         "Thought-Provoking"
       ],
       "avoidEffects": [],
-      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_26",
@@ -605,7 +605,7 @@
       "avoidEffects": [
         "Sneaky"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_27",
@@ -628,7 +628,7 @@
       "avoidEffects": [
         "Explosive"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_28",
@@ -651,7 +651,7 @@
       "avoidEffects": [
         "Toxic"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_29",
@@ -674,7 +674,7 @@
       "avoidEffects": [
         "Gingeritis"
       ],
-      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_30",
@@ -695,7 +695,7 @@
         "Refreshing"
       ],
       "avoidEffects": [],
-      "mappingStatus": "design-only; map to Personnel customer schema and verify effect/product identifiers before release"
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     }
   ]
 }
