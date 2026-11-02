@@ -11,8 +11,8 @@ using ScheduleIMegaExpansion.Runtime;
 namespace ScheduleIMegaExpansion
 {
     /// <summary>
-    /// Runtime diagnostic bootstrap. S1API is discovered dynamically so this
-    /// project can compile without shipping or referencing game assemblies.
+    /// Runtime bootstrap for the Harborline prototype. S1API is discovered
+    /// dynamically so this project does not ship game/API assemblies.
     /// </summary>
     public sealed class MegaExpansionMod : MelonMod
     {
@@ -31,7 +31,7 @@ namespace ScheduleIMegaExpansion
 
         public override void OnInitializeMelon()
         {
-            MelonLogger.Msg("[Schedule I Mega Expansion] Read-only world survey initialized.");
+            MelonLogger.Msg("[Schedule I Mega Expansion] Harborline runtime initialized; awaiting native save load.");
             TrySubscribeToS1ApiLifecycle();
         }
 
