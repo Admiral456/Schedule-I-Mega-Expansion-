@@ -82,8 +82,7 @@ namespace ScheduleIMegaExpansion.Runtime
                 .WithDealerType(DealerType.PlayerDealer)
                 .AllowInsufficientQuality(false)
                 .AllowExcessQuality(true)
-                .WithCompletedDealsVariable("harborline_mason_completed_deals"))
-                .WithSchedule(plan => plan.EnsureDealSignal());
+                .WithCompletedDealsVariable("harborline_mason_completed_deals"));
         }
 
         protected override void OnCreated()
@@ -109,8 +108,7 @@ namespace ScheduleIMegaExpansion.Runtime
                 .WithDealerType(DealerType.PlayerDealer)
                 .AllowInsufficientQuality(false)
                 .AllowExcessQuality(true)
-                .WithCompletedDealsVariable("harborline_sierra_completed_deals"))
-                .WithSchedule(plan => plan.EnsureDealSignal());
+                .WithCompletedDealsVariable("harborline_sierra_completed_deals"));
         }
 
         protected override void OnCreated()
@@ -221,7 +219,6 @@ namespace ScheduleIMegaExpansion.Runtime
             try
             {
                 npc.Schedule.Enable();
-                npc.Schedule.InitializeActions();
             }
             catch (Exception ex)
             {
