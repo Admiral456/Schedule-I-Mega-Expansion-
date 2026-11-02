@@ -1,0 +1,11 @@
+{
+  "name": "ScheduleIMegaExpansion",
+  "version_number": "0.2.0",
+  "website_url": "https://github.com/Admiral456/Schedule-I-Mega-Expansion-",
+  "description": "Automatic Harborline physical world prototype and native prefab survey for Schedule I.",
+  "dependencies": [
+    "LavaGang-MelonLoader-0.7.3",
+    "ifBars-S1API_Forked-3.2.2",
+    "ifBars-S1MAPI-2.0.1"
+  ]
+}
