@@ -1,54 +1,32 @@
-# Harborline runtime prototype
+# Harborline runtime – implementace a diagnostika
 
-This is the first compiled physical runtime prototype for Schedule I Mega Expansion. It includes a read-only native registry survey and an automatic physical dockyard geometry slice.
+Tento projekt je **runtime prototyp**, nikoli hotové rozšíření Harborline. Obsahuje automatickou tvorbu session-local geometrie z Unity primitiv a samostatné read-only diagnostické exportéry.
 
-## What it does
+## Co je implementováno v kódu
 
-After a save finishes loading, the mod discovers S1API dynamically and exports native registries:
-- registered enterable buildings (S1API.Map.Building.GetAll);
-- native properties and ownership state (S1API.Property.PropertyManager.GetAllProperties);
-- native businesses and ownership state (S1API.Property.BusinessManager.GetAllBusinesses);
-- exact native Region enum values;
-- standalone phone-map POIs, when the installed S1API assembly exposes that optional API;
-- a metadata-only report of native map, region, property, business, NPC, avatar, schedule, door, navigation and law-enforcement types and member signatures;
-- a read-only S1MAPI prefab survey using documented `PrefabRef.Find()` lookups for known doors, storage and interaction prefabs, including component types and NetworkObject detection.
+Po události S1API GameLifecycle.OnLoadComplete:
+- exportuje nativní regiony, enterable buildings, properties, businesses a podporované standalone phone-map POIs;
+- zapisuje metadata API surface z Assembly-CSharp, S1API, S1MAPI a FishNet;
+- volá pouze PrefabRef.Find() pro kandidátní prefab references a zapisuje komponenty/network status do native-prefabs.csv;
+- pokouší se v single-player najít záznam Docks Warehouse přes S1API.Property.PropertyManager.GetAllProperties() a jeho PropertyName/ExteriorSpawnPosition;
+- vyhledává okolní plochu přes Unity Physics.CheckBox a více raycastů, kontroluje sklon/výškový rozdíl a heuristicky odmítá známé water colliders;
+- po úspěchu vytváří geometrii z GameObject.CreatePrimitive(Cube) – přístavní plochu, silnici, skladový shell, kontejnery, jeřáb, světla, molo a jednoduché props.
 
-The diagnostic survey does not mutate native registries. After a save loads, the automatic generator locates the native Docks Warehouse property, searches nearby for flat unobstructed ground and creates real Unity GameObjects with renderers and primitive colliders. It does not yet register a native Building, Property, Business or Shop, and it does not create native doors, NPCs, map icons, inventories or police behaviors.
+Generování se povolí pouze tehdy, když S1API.Entities.Player.All obsahuje právě jednoho hráče. Ve více hráčích nebo při neznámém stavu player registry se nespouští.
 
-## Build
+## Co to NEZNAMENÁ
 
-Requirements:
-- Windows or another platform with the .NET 6 SDK;
-- no game assemblies are needed at compile time.
+- Unity primitiva nejsou nativní Schedule I Building, Property, Business ani Shop.
+- Sklad nemá skutečné nativní dveře, obchodní pokladnu ani funkční inventář.
+- Není napojená normální herní mapa ani mapové ikony.
+- Neexistují vlastní Harborline NPC třídy ani volání NPC appearance/customer/dealer/schedule API.
+- Neexistují online objednávky, Realtor záznamy, policejní hlídky/checkpointy ani synchronizace geometrie.
+- Unity objekty jsou session-local; nejsou serializované v save.
+- Umístění je heuristika kolem Docks Warehouse; hranice Docks, výsledná souřadnice a kolize ještě nebyly ověřené v cílové hře.
 
-From this folder:
+## Diagnostické soubory
 
-```powershell
-dotnet restore .\ScheduleIMegaExpansion.csproj
-dotnet build .\ScheduleIMegaExpansion.csproj -c Release --no-restore
-```
-
-The GitHub Actions workflow also builds this project and uploads a ZIP artifact named ScheduleIMegaExpansion-harborline-prototype.
-
-## Install
-
-Copy bin/Release/net6.0/ScheduleIMegaExpansion.dll into the game's Mods folder, or run:
-
-```powershell
-.\install.ps1 -GameDir "C:\Program Files (x86)\Steam\steamapps\common\Schedule I"
-```
-
-The game must already have MelonLoader 0.7.3+, S1API Forked 3.2.2+ and S1MAPI 2.0.1+ installed. The mod discovers S1API dynamically and starts the automatic generation attempt after the native save lifecycle reports that the save is loaded.
-
-## Diagnostic output
-
-After loading a normal save, the registry survey is written to:
-
-```
-Schedule I/UserData/ScheduleIMegaExpansion/Diagnostics/<timestamp>/
-```
-
-Files:
+Výstup je v Schedule I/UserData/ScheduleIMegaExpansion/Diagnostics/<timestamp>/:
 - summary.txt
 - native-regions.csv
 - native-buildings.csv
@@ -56,29 +34,20 @@ Files:
 - native-businesses.csv
 - standalone-phone-map-pois.csv
 - native-game-api-surface.txt
-- native-prefabs.csv (documented S1MAPI references, with unknown network status when component inspection is unavailable)
+- native-prefabs.csv
 
-## Why this is needed
+Zvolená pozice geometrie se zapisuje do UserData/ScheduleIMegaExpansion/Harborline/last-generation.json.
 
-The public S1API property and business managers expose existing collections for reading. The installed runtime API scan is used to check whether the target game build exposes an additive registration path for new Property/Business records; do not assume one exists. The diagnostic snapshot records the actual native names, codes, prices, ownership state and available spawn points so the next implementation can target real game systems instead of inventing identifiers.
+## Build a instalace
 
-MapPOI is a standalone phone-map marker API. It is not equivalent to a native shop/property pin or ownership marker.
+~~~powershell
+dotnet restore .\ScheduleIMegaExpansion.csproj
+dotnet build .\ScheduleIMegaExpansion.csproj -c Release --no-restore
+~~~
 
-## Automatic physical Harborline prototype (single-player only)
+Požadované runtime dependencies: MelonLoader 0.7.3+, S1API Forked 3.2.2+ a S1MAPI 2.0.1+. Thunderstore manifest je v kořeni repozitáře. CI vytváří ScheduleIMegaExpansion-0.2.0.zip.
 
-After a save loads, the mod locates the native Docks Warehouse property, reads its exterior spawn point and scans nearby sites for flat unobstructed ground. It then creates the physical dockyard geometry automatically. No hotkeys or manual anchor capture are used.
+## Auditní status
 
-The chosen location is recorded in `UserData/ScheduleIMegaExpansion/Harborline/last-generation.json`. The geometry consists of a dock slab, road, warehouse shell/interior props, containers, crane, lamps, quay, pier and cargo props.
-
-Important limits:
-- The automatic generator creates a physical geometry prototype only. It is not yet a native game Building/Property/Business/Shop.
-- The current prototype is intentionally single-player only. It is not replicated to multiplayer clients.
-- The generated geometry is session-local and is not saved into the vanilla save.
-- Native doors, NPCs, functional business systems, Realtor registration, map projection/icons, police dispatch and multiplayer replication are not yet implemented.
-- The generator is a first-pass placement heuristic. It must be verified in the actual game for the selected footprint, road access and collision. If all candidate areas are blocked or no ground collider is found, it intentionally skips generation.
-- The geometry is session-local and is regenerated after loading a save; it is not yet saved as native world objects.
-- Reloading a save regenerates the session-local geometry; the named root is checked to avoid duplicate creation within the same scene.
-
-## Installable package
-
-The repo root `manifest.json` declares the current Thunderstore dependencies. The CI build produces `ScheduleIMegaExpansion-0.2.0.zip` with the DLL, manifest, README and license at the archive root.
+Viz docs/implementation-audit.md a world/harborline/implementation-status.json. Testy ověřují zdrojové invarianty a konfiguraci, nikoli běh v Unity/IL2CPP. Plné ověření vyžaduje spuštění v cílové instalaci Schedule I a kontrolu runtime reportu.
+~~~
