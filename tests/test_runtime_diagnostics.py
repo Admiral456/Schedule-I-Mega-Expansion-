@@ -43,6 +43,9 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn("WorldSnapshotExporter.Export(", self.core)
         self.assertIn("_loggedLifecycleError", self.core)
         self.assertIn("_subscriptionPollFrames < 120", self.core)
+        self.assertIn('"OnPreSceneChange"', self.core)
+        self.assertIn("private void OnPreSceneChange()", self.core)
+        self.assertIn("HarborlinePhysicalBuilder.ResetForNewSave();", self.core)
 
     def test_exporter_reads_native_game_registries(self):
         self.assertIn('FindLoadedType("S1API.Map.Building")', self.exporter)
@@ -92,6 +95,10 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn('TryFindClearPlacement(', self.physical)
         self.assertIn('CheckBox', self.physical)
         self.assertIn('Raycast', self.physical)
+        self.assertIn("IsLikelyWaterCollider", self.physical)
+        self.assertIn("PendingRootName", self.physical)
+        self.assertIn("CleanupActiveRoot()", self.physical)
+        self.assertIn("DestroyGameObject(", self.physical)
         self.assertNotIn('F6', self.physical)
         self.assertNotIn('F7', self.physical)
 
@@ -106,10 +113,31 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn("package/Mods/", workflow)
         self.assertIn("ScheduleIMegaExpansion-0.2.0.zip", workflow)
 
+    def test_docs_do_not_claim_full_implementation_or_read_only_total_mod(self):
+        self.assertNotIn("diagnostický runtime nic nemění", self.root_readme)
+        self.assertIn("nejsou v runtime implementované", self.root_readme.lower())
+        self.assertIn("does not yet register a native Building", self.src_readme)
+
+    def test_audit_matrix_covers_all_requested_systems(self):
+        ids = {item["id"] for item in self.audit["requirements"]}
+        required = {"runtime.bootstrap", "diagnostics.registries", "diagnostics.prefabs", "world.automatic_geometry", "world.placement", "world.roads_navigation", "buildings.interiors", "doors.interactions", "properties.realtor", "map.icons", "npc.population", "npc.appearance", "npc.customer_profiles", "npc.schedules", "shops.online_orders", "police.integration", "multiplayer", "persistence", "runtime.test"}
+        self.assertTrue(required.issubset(ids))
+        for item in self.audit["requirements"]:
+            self.assertIn(item["status"], set(self.audit["statusLegend"]))
+            self.assertTrue(item["evidence"], item["id"])
+            self.assertTrue(item["remaining"], item["id"])
+
+    def test_no_manual_hotkey_instructions_remain(self):
+        for source in (self.root_readme, self.src_readme, self.installer):
+            self.assertNotIn("F6", source)
+            self.assertNotIn("F7", source)
+
     def test_installer_only_copies_the_built_dll(self):
         self.assertIn("Schedule I.exe", self.installer)
         self.assertIn("ScheduleIMegaExpansion.dll", self.installer)
         self.assertIn("Copy-Item", self.installer)
+        self.assertNotIn("F6", self.installer)
+        self.assertNotIn("F7", self.installer)
 
 
 if __name__ == "__main__":
