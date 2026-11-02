@@ -1,10 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using MelonLoader;
 using S1API.Entities;
 using S1API.Economy;
 using S1API.Map;
+using S1API.Products;
 using UnityEngine;
 
 namespace ScheduleIMegaExpansion.Runtime
@@ -16,19 +15,10 @@ namespace ScheduleIMegaExpansion.Runtime
     /// </summary>
     internal static class HarborlineNpcSpawnPoints
     {
-        private static readonly Vector2[] LocalSlots =
-        {
-            new Vector2(-4.5f, 10.0f), // dealer: warehouse west loading bay
-            new Vector2(4.5f, 10.0f),  // dealer: warehouse east loading bay
-            new Vector2(-17.0f, -9.0f),// customer: market/crate side
-            new Vector2(-1.5f, -11.0f),// customer: loading apron
-            new Vector2(15.0f, 7.0f)   // customer: access road side
-        };
-
         public static bool TryGet(int slot, out Vector3 position)
         {
             position = Vector3.zero;
-            if (slot < 0 || slot >= LocalSlots.Length)
+            if (slot < 0 || slot > 4)
                 return false;
 
             if (!HarborlinePhysicalBuilder.TryGetPlannedNpcSpawnPosition(
@@ -68,6 +58,10 @@ namespace ScheduleIMegaExpansion.Runtime
 
     public sealed class HarborlineDealerMason : NPC
     {
+        private Action? _recruitedHandler;
+        private Action? _contractAcceptedHandler;
+        private Action? _recommendedHandler;
+
         public override bool IsPhysical => true;
         public override bool IsDealer => true;
 
@@ -83,17 +77,59 @@ namespace ScheduleIMegaExpansion.Runtime
                 .AllowInsufficientQuality(false)
                 .AllowExcessQuality(true)
                 .WithCompletedDealsVariable("harborline_mason_completed_deals"));
+            builder.WithRelationshipDefaults(relationship => relationship
+                .WithDelta(1.5f)
+                .SetUnlocked(false)
+                .SetUnlockType(NPCRelationship.UnlockType.DirectApproach));
         }
 
         protected override void OnCreated()
         {
             base.OnCreated();
             HarborlineNpcLifecycle.InitializePhysicalNpc(this);
+            WireDealerEvents();
+        }
+
+        protected override void OnDestroyed()
+        {
+            base.OnDestroyed();
+            UnwireDealerEvents();
+        }
+
+        private void WireDealerEvents()
+        {
+            if (Dealer == null)
+                return;
+            _recruitedHandler ??= () => SendTextMessage("I'm ready to work. Let's get started.");
+            _contractAcceptedHandler ??= () => SendTextMessage("I've accepted a new customer contract.");
+            _recommendedHandler ??= () => SendTextMessage("A customer sent you my way. Good to meet you.");
+            Dealer.OnRecruited -= _recruitedHandler;
+            Dealer.OnRecruited += _recruitedHandler;
+            Dealer.OnContractAccepted -= _contractAcceptedHandler;
+            Dealer.OnContractAccepted += _contractAcceptedHandler;
+            Dealer.OnRecommended -= _recommendedHandler;
+            Dealer.OnRecommended += _recommendedHandler;
+        }
+
+        private void UnwireDealerEvents()
+        {
+            if (Dealer == null)
+                return;
+            if (_recruitedHandler != null)
+                Dealer.OnRecruited -= _recruitedHandler;
+            if (_contractAcceptedHandler != null)
+                Dealer.OnContractAccepted -= _contractAcceptedHandler;
+            if (_recommendedHandler != null)
+                Dealer.OnRecommended -= _recommendedHandler;
         }
     }
 
     public sealed class HarborlineDealerSierra : NPC
     {
+        private Action? _recruitedHandler;
+        private Action? _contractAcceptedHandler;
+        private Action? _recommendedHandler;
+
         public override bool IsPhysical => true;
         public override bool IsDealer => true;
 
@@ -109,12 +145,50 @@ namespace ScheduleIMegaExpansion.Runtime
                 .AllowInsufficientQuality(false)
                 .AllowExcessQuality(true)
                 .WithCompletedDealsVariable("harborline_sierra_completed_deals"));
+            builder.WithRelationshipDefaults(relationship => relationship
+                .WithDelta(1.5f)
+                .SetUnlocked(false)
+                .SetUnlockType(NPCRelationship.UnlockType.DirectApproach));
         }
 
         protected override void OnCreated()
         {
             base.OnCreated();
             HarborlineNpcLifecycle.InitializePhysicalNpc(this);
+            WireDealerEvents();
+        }
+
+        protected override void OnDestroyed()
+        {
+            base.OnDestroyed();
+            UnwireDealerEvents();
+        }
+
+        private void WireDealerEvents()
+        {
+            if (Dealer == null)
+                return;
+            _recruitedHandler ??= () => SendTextMessage("I'm ready to work. Let's get started.");
+            _contractAcceptedHandler ??= () => SendTextMessage("I've accepted a new customer contract.");
+            _recommendedHandler ??= () => SendTextMessage("A customer sent you my way. Good to meet you.");
+            Dealer.OnRecruited -= _recruitedHandler;
+            Dealer.OnRecruited += _recruitedHandler;
+            Dealer.OnContractAccepted -= _contractAcceptedHandler;
+            Dealer.OnContractAccepted += _contractAcceptedHandler;
+            Dealer.OnRecommended -= _recommendedHandler;
+            Dealer.OnRecommended += _recommendedHandler;
+        }
+
+        private void UnwireDealerEvents()
+        {
+            if (Dealer == null)
+                return;
+            if (_recruitedHandler != null)
+                Dealer.OnRecruited -= _recruitedHandler;
+            if (_contractAcceptedHandler != null)
+                Dealer.OnContractAccepted -= _contractAcceptedHandler;
+            if (_recommendedHandler != null)
+                Dealer.OnRecommended -= _recommendedHandler;
         }
     }
 
@@ -133,9 +207,15 @@ namespace ScheduleIMegaExpansion.Runtime
                 .WithOrdersPerWeek(1, 2)
                 .WithPreferredOrderDay("Monday")
                 .WithOrderTime(630)
-                .WithStandards("Moderate")
+                .WithStandards(CustomerStandard.Moderate)
+                .AllowDirectApproach(true)
                 .WithCallPoliceChance(0.02f)
-                .WithDependence(0.10f, 0.25f));
+                .WithDependence(0.10f, 0.25f)
+                .WithAffinities(new[]
+                {
+                    (DrugType.Marijuana, 0.75f),
+                    (DrugType.Methamphetamine, -0.25f)
+                }));
         }
 
         protected override void OnCreated()
@@ -160,9 +240,15 @@ namespace ScheduleIMegaExpansion.Runtime
                 .WithOrdersPerWeek(2, 3)
                 .WithPreferredOrderDay("Wednesday")
                 .WithOrderTime(1200)
-                .WithStandards("High")
+                .WithStandards(CustomerStandard.High)
+                .AllowDirectApproach(true)
                 .WithCallPoliceChance(0.04f)
-                .WithDependence(0.20f, 0.35f));
+                .WithDependence(0.20f, 0.35f)
+                .WithAffinities(new[]
+                {
+                    (DrugType.Methamphetamine, 0.75f),
+                    (DrugType.Marijuana, -0.30f)
+                }));
         }
 
         protected override void OnCreated()
@@ -187,9 +273,16 @@ namespace ScheduleIMegaExpansion.Runtime
                 .WithOrdersPerWeek(1, 3)
                 .WithPreferredOrderDay("Friday")
                 .WithOrderTime(1930)
-                .WithStandards("VeryHigh")
+                .WithStandards(CustomerStandard.VeryHigh)
+                .AllowDirectApproach(true)
                 .WithCallPoliceChance(0.07f)
-                .WithDependence(0.05f, 0.20f));
+                .WithDependence(0.05f, 0.20f)
+                .WithAffinities(new[]
+                {
+                    (DrugType.Cocaine, 0.70f),
+                    (DrugType.Shrooms, 0.35f),
+                    (DrugType.Methamphetamine, -0.30f)
+                }));
         }
 
         protected override void OnCreated()
