@@ -102,7 +102,7 @@ class RuntimeDiagnosticTests(unittest.TestCase):
             self.assertIn(token, self.exporter)
         self.assertIn("NativeApiSurfaceScanner.Export(", self.exporter)
         self.assertIn("NativePrefabCatalogExporter.Export(", self.exporter)
-        self.assertIn("native-prefabs.csv", self.exporter)
+        self.assertIn("native-prefabs.csv", self.prefabs)
         self.assertIn("native-game-api-surface.txt", self.scanner)
         for filename in (
             "native-regions.csv",
