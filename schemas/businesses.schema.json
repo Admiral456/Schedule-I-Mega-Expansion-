@@ -1,0 +1,11 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"Business registry",
+  "type":"object",
+  "required":["schemaVersion","businesses"],
+  "properties":{
+    "schemaVersion":{"type":"integer","minimum":1},
+    "businesses":{"type":"array","items":{"type":"object","required":["id","provinceId","displayName","kind","physicalPoiId","purchasable"],"properties":{"id":{"type":"string","pattern":"^sime\\.business\\."},"provinceId":{"type":"string","pattern":"^sime\\.province\\."},"displayName":{"type":"string"},"kind":{"type":"string"},"physicalPoiId":{"type":"string"},"purchasable":{"type":"boolean"},"realtorListingId":{"type":["string","null"]},"onlinePhoneAppId":{"type":["string","null"]},"sharedInventoryId":{"type":["string","null"]}},"additionalProperties":false}}
+  },
+  "additionalProperties":false
+}

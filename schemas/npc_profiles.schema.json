@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "NPC profiles",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "profiles"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 2
+    },
+    "profiles": {
+      "type": "array",
+      "minItems": 9,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "provinceId",
+          "role",
+          "presence",
+          "preferences",
+          "relationship"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^sime\\.npc\\."
+          },
+          "name": {
+            "type": "string"
+          },
+          "provinceId": {
+            "type": "string",
+            "pattern": "^sime\\.province\\."
+          },
+          "role": {
+            "type": "string"
+          },
+          "presence": {
+            "enum": [
+              "physical_and_contact",
+              "physical",
+              "contact_only_until_navigation_verified"
+            ]
+          },
+          "preferences": {
+            "type": "object",
+            "required": [
+              "preferredProductIds",
+              "neutralProductIds",
+              "rejectedProductIds",
+              "priceSensitivity",
+              "budgetBand",
+              "budgetLimit"
+            ],
+            "properties": {
+              "preferredProductIds": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^sime\\.product\\."
+                }
+              },
+              "neutralProductIds": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^sime\\.product\\."
+                }
+              },
+              "rejectedProductIds": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^sime\\.product\\."
+                }
+              },
+              "priceSensitivity": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "budgetBand": {
+                "enum": [
+                  "low",
+                  "medium",
+                  "high",
+                  "very_high"
+                ]
+              },
+              "budgetLimit": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false
+          },
+          "relationship": {
+            "type": "object",
+            "required": [
+              "provider",
+              "initialization"
+            ],
+            "properties": {
+              "provider": {
+                "const": "schedule_i_native"
+              },
+              "initialization": {
+                "const": "use_native_default"
+              }
+            },
+            "additionalProperties": false
+          },
+          "scheduleId": {
+            "type": "string",
+            "pattern": "^sime\\.schedule\\."
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

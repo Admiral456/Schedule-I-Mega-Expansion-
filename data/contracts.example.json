@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "contracts": [
+    {
+      "id": "sime.contract.harborline.freight_intro",
+      "provinceId": "sime.province.harborline",
+      "category": "freight",
+      "title": "First Harbor Freight Run",
+      "description": "Move a scheduled stock shipment between the port depot and a business.",
+      "repeatable": false,
+      "unlock": {"reputation": 0, "requiresBusinessId": null},
+      "reward": {"cash": 850, "reputation": 4},
+      "deadlineWorldMinutes": 360
+    },
+    {
+      "id": "sime.contract.ridgeview.quarry_supply",
+      "provinceId": "sime.province.ridgeview",
+      "category": "industrial_supply",
+      "title": "Quarry Supply Request",
+      "description": "Deliver requested supplies to the processing yard.",
+      "repeatable": true,
+      "unlock": {"reputation": 10, "requiresBusinessId": null},
+      "reward": {"cash": 1250, "reputation": 6},
+      "deadlineWorldMinutes": 480
+    },
+    {
+      "id": "sime.contract.lakeside.resort_stock",
+      "provinceId": "sime.province.lakeside",
+      "category": "hospitality",
+      "title": "Resort Restock",
+      "description": "Fulfil a scheduled restock request for the Lakeside Resort.",
+      "repeatable": true,
+      "unlock": {"reputation": 15, "requiresBusinessId": "sime.business.lakeside.resort"},
+      "reward": {"cash": 1600, "reputation": 8},
+      "deadlineWorldMinutes": 720
+    }
+  ]
+}

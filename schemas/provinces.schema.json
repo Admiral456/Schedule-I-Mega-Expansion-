@@ -1,0 +1,15 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"Province registry",
+  "type":"object",
+  "required":["schemaVersion","worldId","vanillaDistricts","provinces","coordinateStatus"],
+  "properties":{
+    "schemaVersion":{"type":"integer","minimum":1},
+    "worldId":{"type":"string"},
+    "vanillaDistricts":{"type":"array","items":{"type":"string"}},
+    "coordinateStatus":{"enum":["unsurveyed","surveyed","greybox_validated","production"]},
+    "note":{"type":"string"},
+    "provinces":{"type":"array","minItems":3,"maxItems":3,"items":{"type":"object","required":["id","name","theme","featureFlag","poiIds"],"properties":{"id":{"type":"string","pattern":"^sime\\.province\\."},"name":{"type":"string"},"theme":{"type":"string"},"plannedConnection":{"type":"string"},"featureFlag":{"type":"string"},"poiIds":{"type":"array","items":{"type":"string"}}},"additionalProperties":false}}
+  },
+  "additionalProperties":false
+}

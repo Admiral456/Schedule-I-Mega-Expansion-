@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "note": "Illustrative expansion product IDs for customer-preference tests. These are not yet mapped to Schedule I runtime item definitions.",
+  "products": [
+    {
+      "id": "sime.product.batch.standard",
+      "displayName": "Standard Batch",
+      "category": "customer_product",
+      "tier": "standard"
+    },
+    {
+      "id": "sime.product.batch.industrial",
+      "displayName": "Industrial Batch",
+      "category": "customer_product",
+      "tier": "industrial"
+    },
+    {
+      "id": "sime.product.batch.premium",
+      "displayName": "Premium Batch",
+      "category": "customer_product",
+      "tier": "premium"
+    }
+  ]
+}

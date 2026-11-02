@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "generation": {
+    "hostAuthority": true,
+    "maxActiveOrdersPerCustomer": 1,
+    "minWorldMinutesBetweenOrders": 180,
+    "respectCustomerSchedule": true,
+    "respectBudget": true,
+    "respectProductPreferences": true,
+    "requireKnownContact": true
+  },
+  "reputation": {
+    "min": -100,
+    "max": 100,
+    "onTimeCompletion": 3,
+    "lateCompletion": -2,
+    "failedOrder": -8,
+    "disputeResolvedFairly": 2
+  }
+}

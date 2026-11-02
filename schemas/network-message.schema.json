@@ -1,0 +1,18 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"Mega Expansion network message",
+  "type":"object",
+  "required":["protocolVersion","messageId","sessionId","senderSteamId","sequence","messageType","payload"],
+  "properties":{
+    "protocolVersion":{"type":"integer","minimum":1},
+    "messageId":{"type":"string","minLength":1},
+    "sessionId":{"type":"string","minLength":1},
+    "senderSteamId":{"type":"string","minLength":1},
+    "sequence":{"type":"integer","minimum":0},
+    "requestId":{"type":["string","null"]},
+    "messageType":{"enum":["SnapshotRequest","SnapshotResponse","ShopPurchaseRequested","ShopPurchaseCommitted","OrderOffered","OrderAccepted","OrderCompleted","ReputationChanged","BusinessPurchaseRequested","BusinessPurchaseCommitted","ContractUpdated","PoliceEventUpdated","WorldRevisionChanged"]},
+    "worldRevision":{"type":["integer","null"],"minimum":0},
+    "payload":{"type":"object"}
+  },
+  "additionalProperties":false
+}

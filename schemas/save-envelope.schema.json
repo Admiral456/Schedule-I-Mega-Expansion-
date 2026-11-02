@@ -1,0 +1,21 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"Mega Expansion save envelope",
+  "type":"object",
+  "required":["modId","schemaVersion","worldId","worldRevision","provinces","businesses","npcs","orders","contracts","reputation","idempotencyLedger"],
+  "properties":{
+    "modId":{"const":"schedulei.megaexpansion"},
+    "schemaVersion":{"type":"integer","minimum":1},
+    "worldId":{"type":"string","minLength":1},
+    "worldRevision":{"type":"integer","minimum":0},
+    "provinces":{"type":"object"},
+    "businesses":{"type":"object"},
+    "npcs":{"type":"object"},
+    "orders":{"type":"object"},
+    "contracts":{"type":"object"},
+    "reputation":{"type":"object"},
+    "policeEvents":{"type":"object"},
+    "idempotencyLedger":{"type":"array","items":{"type":"string"}}
+  },
+  "additionalProperties":false
+}

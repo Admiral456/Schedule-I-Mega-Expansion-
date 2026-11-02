@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "businesses": [
+    {"id":"sime.business.harborline.portside_supply","provinceId":"sime.province.harborline","displayName":"Portside Supply","kind":"retail_shop","physicalPoiId":"sime.poi.harborline.portside_supply","purchasable":true,"realtorListingId":"sime.realtor.harborline.portside_supply","onlinePhoneAppId":"sime.phone.portside_supply","sharedInventoryId":"sime.inventory.portside_supply"},
+    {"id":"sime.business.harborline.freight_warehouse","provinceId":"sime.province.harborline","displayName":"Harbor Freight Warehouse","kind":"warehouse","physicalPoiId":"sime.poi.harborline.freight_warehouse","purchasable":true,"realtorListingId":"sime.realtor.harborline.freight_warehouse","sharedInventoryId":"sime.inventory.harborline.freight_warehouse"},
+    {"id":"sime.business.harborline.market","provinceId":"sime.province.harborline","displayName":"Harbor Market","kind":"market","physicalPoiId":"sime.poi.harborline.market","purchasable":true,"realtorListingId":"sime.realtor.harborline.market"},
+    {"id":"sime.business.harborline.auto_works","provinceId":"sime.province.harborline","displayName":"Harbor Auto Works","kind":"service_business","physicalPoiId":"sime.poi.harborline.auto_works","purchasable":true,"realtorListingId":"sime.realtor.harborline.auto_works"},
+    {"id":"sime.business.ridgeview.quarry","provinceId":"sime.province.ridgeview","displayName":"Ridgeview Quarry","kind":"industrial_business","physicalPoiId":"sime.poi.ridgeview.quarry","purchasable":true,"realtorListingId":"sime.realtor.ridgeview.quarry"},
+    {"id":"sime.business.lakeside.resort","provinceId":"sime.province.lakeside","displayName":"Lakeside Resort","kind":"hospitality_business","physicalPoiId":"sime.poi.lakeside.resort","purchasable":true,"realtorListingId":"sime.realtor.lakeside.resort"}
+  ]
+}

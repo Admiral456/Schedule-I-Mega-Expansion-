@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "worldId": "schedulei.hyland_point",
+  "vanillaDistricts": ["westville", "northtown", "downtown", "uptown", "docks", "suburbia"],
+  "coordinateStatus": "unsurveyed",
+  "provinces": [
+    {"id":"sime.province.harborline","name":"Harborline Province","theme":"coastal_port_logistics_industry","plannedConnection":"southern_coast_near_docks","featureFlag":"world.harborline.enabled","poiIds":["sime.poi.harborline.portside_supply","sime.poi.harborline.freight_warehouse","sime.poi.harborline.market","sime.poi.harborline.auto_works","sime.poi.harborline.offices","sime.poi.harborline.pier_promenade","sime.poi.harborline.dealer_contact","sime.poi.harborline.police_checkpoint"]},
+    {"id":"sime.province.ridgeview","name":"Ridgeview Province","theme":"mountain_quarry_industry_research","plannedConnection":"northern_or_northeastern_mountain_road","featureFlag":"world.ridgeview.enabled","poiIds":["sime.poi.ridgeview.quarry","sime.poi.ridgeview.processing","sime.poi.ridgeview.industrial_park","sime.poi.ridgeview.research","sime.poi.ridgeview.mountain_depot","sime.poi.ridgeview.workers_housing","sime.poi.ridgeview.police_post"]},
+    {"id":"sime.province.lakeside","name":"Lakeside Province","theme":"lake_marina_resort_recreation","plannedConnection":"eastern_map_edge","featureFlag":"world.lakeside.enabled","poiIds":["sime.poi.lakeside.marina","sime.poi.lakeside.resort","sime.poi.lakeside.villas","sime.poi.lakeside.market","sime.poi.lakeside.campsite","sime.poi.lakeside.restaurants","sime.poi.lakeside.event_grounds","sime.poi.lakeside.police_station"]}
+  ],
+  "note":"Connections are planning hypotheses, not world coordinates. Survey the live game world first."
+}

@@ -1,0 +1,109 @@
+# Verified framework integration baseline
+
+Checked against the current upstream repositories and documentation on 2026-11-01. These are pinned development baselines, not a claim that the complete game mod has been integration-tested.
+
+## IL2CPP runtime matrix
+
+| Component | Baseline | Target/runtime | Role |
+|---|---:|---|---|
+| ifBars/S1API | 3.2.2 | IL2CPP MelonLoader, .NET 6.0 | Native phone apps, per-save-slot Saveables, NPC and game API abstractions |
+| ifBars/S1MAPI | 2.0.1 | IL2CPP build, .NET 6.0 | Procedural meshes, building construction and GLTF/GLB loading |
+| ifBars/SteamNetworkLib | 1.6.0 | IL2CPP release binary; library target .NET Standard 2.1 | Steam lobby and typed P2P messaging |
+| Game-facing mod | development | .NET 6.0 | Matches S1API/S1MAPI IL2CPP targets |
+| Domain Core | development | .NET 6.0 | Game-independent order, purchase, reputation, save and protocol rules |
+
+## S1API: phone apps and save slots
+
+The current ifBars fork exposes a native PhoneApp lifecycle and an attribute-based Saveable system.
+
+Phone apps:
+- derive from S1API.PhoneApp.PhoneApp;
+- define AppName, AppTitle, IconLabel and IconFileName;
+- build their UI in OnCreatedUI(GameObject container);
+- are auto-discovered when the phone HomeScreen starts, so do not manually register them.
+
+Saveables:
+- directly inherit S1API.Internal.Abstraction.Saveable;
+- are concrete public classes with a public parameterless constructor;
+- mark persisted fields with S1API.Saveables.SaveableField;
+- use OnLoaded / OnSaved and optional SaveableLoadOrder.
+
+S1API automatically discovers Saveable subclasses. ModSaveableRegistry is obsolete and must not be used.
+
+Our first game adapter stores the versioned expansion document as one raw JSON string field. It validates namespace and schema before deserializing into typed state. Unknown/newer data is left read-only and the original raw string is preserved, preventing an older build from silently overwriting fields it does not understand.
+
+References:
+- https://github.com/ifBars/S1API
+- https://ifbars.github.io/S1API/docs/phone-app.html
+- https://ifbars.github.io/S1API/docs/save-system.html
+
+## SteamNetworkLib lifecycle and messages
+
+Current SteamNetworkLib guidance and source confirm:
+1. Create SteamNetworkClient from OnInitializeMelon.
+2. Steamworks may not be ready yet; attempt TryInitialize() after the Menu scene and retry.
+3. Call ProcessIncomingMessages() only after IsInitialized is true.
+4. Dispose the client from OnDeinitializeMelon.
+
+For custom gameplay messages, use TypedP2PMessage<TPayload> with a parameterless message constructor and small serializable DTOs. The handler receives native CSteamID as its sender argument. SendMessageToPlayerAsync also takes native CSteamID, while MemberInfo.SteamId64 is useful for stable dictionary keys and JSON.
+
+Use stable IDs and primitive values in payloads. Do not send CSteamID, Unity objects, live item instances or scene references inside your DTOs. The request/response helper is the recommended pattern for host-approved checkout and other mutating operations.
+
+The current ScheduleINetworkBootstrap only performs initialization and a compatibility hello handshake. It does not yet synchronize orders, shops, businesses, NPCs or world snapshots.
+
+References:
+- https://github.com/ifBars/SteamNetworkLib
+- https://ifbars.github.io/SteamNetworkLib/docs/getting-started.html
+- https://ifbars.github.io/SteamNetworkLib/docs/p2p-messaging.html
+- https://ifbars.github.io/SteamNetworkLib/docs/data-synchronization.html
+
+## S1MAPI scope and limitation
+
+The current S1MAPI release has separate Mono and IL2CPP builds. Its IL2CPP project target is .NET 6.0 and its generated assembly is S1MAPI_Il2cpp. The framework describes procedural meshes, building construction and GLTF/GLB loading; this is enough to begin a geometry greybox spike.
+
+It does not prove that Schedule I can stream new world regions, stitch terrain, rebuild navigation, extend vehicle traffic routes or expose the new regions in the vanilla map UI. Those remain separate in-game technical spikes.
+
+Reference:
+- https://github.com/ifBars/S1MAPI
+- https://ifbars.github.io/S1MAPI/docs/getting-started.html
+
+## Schedule I money, shops and item delivery
+
+The public S1API Money documentation currently lists `GetCashBalance()` and `ChangeCashBalance(float amount, ...)`. The Shops API lists resolving existing shops and adding/removing sale catalogue entries, while ItemManager resolves item definitions. These APIs are useful building blocks, but they do not alone prove an atomic player purchase or a physical stock transfer. In particular, a catalogue listing is not a quantity-bearing stock reservation, and an add-to-inventory helper does not prove a safe matching removal API.
+
+The expansion therefore keeps player cash, live player inventory and physical store stock behind an explicit integration boundary. Do not enable checkout by combining a one-way item grant with a money debit. The required host transaction, compensation and local-assembly inspection are documented in [GAME_ECONOMY_ADAPTER.md](GAME_ECONOMY_ADAPTER.md).
+
+## Native Schedule I gameplay systems to reuse first
+
+The S1API 3.2.2 documentation exposes native systems for NPC lifecycle and prefab configuration, customer contracts, dealers, suppliers, dialogue injection, relationships, daily schedules, law enforcement, item definitions, existing shop catalogues, property/business wrappers and delivery status. The implementation map and limitations are maintained in [NATIVE_SYSTEM_REUSE_AUDIT.md](NATIVE_SYSTEM_REUSE_AUDIT.md).
+
+Integration rules:
+
+- Native `NPCCustomer` owns ordinary in-world customer offers, contracts, delivery requests and its native relationship lifecycle. The custom `NpcOrderOfferGenerator` is limited to tests/simulation and expansion-only remote/online order rules.
+- Use `NPCDealer` and its native `DealerType` for an expansion rival or recruitable dealer. Use `NPCSupplier` for wholesale supplier logistics where its physical supplier model fits; it is not automatically a replacement for a public retail shop.
+- Use native NPC dialogue injection for extra branches and native schedules/relationships rather than another schedule or friendship engine.
+- Use `LawManager` and `LawController` for wanted state, patrols and checkpoint/law intensity. Intensity is global; new province patrols need real route and navigation objects.
+- Use `ItemManager`/vanilla item definitions and `ShopManager`/existing shop catalogues first. Catalogue operations do not prove quantity stock or an atomic purchase.
+- Use native property/business objects and the original Realtor flow if registration can be proven. Do not invent a second ownership screen.
+- Observe native delivery status through the documented read surface; do not fabricate or mutate deliveries outside the native lifecycle.
+
+The game-facing assembly still has to be compiled against the exact local IL2CPP DLLs and exercised in-game. Documentation availability is not proof that the local game build exposes the same runtime behavior.
+
+## Local developer prerequisites
+
+Install matching dependencies for the same Schedule I public build and Steam Default / IL2CPP branch. Do not commit game assemblies or third-party DLLs.
+
+Default paths used by src/GameIntegration/GameIntegration.csproj:
+- MelonLoader: GameDir/MelonLoader/net6/MelonLoader.dll
+- IL2CPP assemblies: GameDir/MelonLoader/Il2CppAssemblies/
+- S1API: GameDir/Mods/S1API.Il2Cpp.MelonLoader.dll
+- SteamNetworkLib: libs/SteamNetworkLib/Il2cpp/SteamNetworkLib.dll (download the matching IL2CPP release; this folder is git-ignored)
+
+Override individual MSBuild properties when your local installation differs:
+GameDir, MelonLoaderDll, Il2CppAssembliesDir, S1ApiDll, SteamNetworkLibDll.
+
+Build command:
+
+    dotnet build src/GameIntegration/GameIntegration.csproj -c Release -p:GameDir="D:\SteamLibrary\steamapps\common\Schedule I"
+
+The game-facing project is not built by GitHub CI because the repository does not contain the player's game assemblies or third-party release DLLs. CI runs the independent domain-core tests and validates the project data instead.

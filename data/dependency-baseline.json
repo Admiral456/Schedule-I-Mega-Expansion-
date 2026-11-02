@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "checkedOn": "2026-11-01",
+  "gameTarget": {
+    "branch": "Steam Default",
+    "runtime": "IL2CPP",
+    "targetFramework": "net6.0",
+    "gameBuild": "must be captured from local install before integration test"
+  },
+  "dependencies": [
+    {
+      "id": "ifbars.s1api",
+      "version": "3.2.2",
+      "runtime": "IL2CPP",
+      "targetFramework": "net6.0",
+      "license": "MIT",
+      "role": "phone apps, Saveables, NPC and game API",
+      "status": "pinned development baseline; local game integration pending",
+      "url": "https://github.com/ifBars/S1API"
+    },
+    {
+      "id": "ifbars.s1mapi",
+      "version": "2.0.1",
+      "runtime": "IL2CPP",
+      "targetFramework": "net6.0",
+      "license": "GPL-3.0-or-later",
+      "role": "procedural meshes, buildings and GLTF/GLB",
+      "status": "pinned candidate; geometry prototype pending; redistribution review required",
+      "url": "https://github.com/ifBars/S1MAPI"
+    },
+    {
+      "id": "ifbars.steamnetworklib",
+      "version": "1.6.0",
+      "runtime": "IL2CPP-compatible binary",
+      "targetFramework": "netstandard2.1",
+      "license": "MIT",
+      "role": "Steam lobby and typed P2P transport",
+      "status": "pinned development baseline; two-player runtime test pending",
+      "url": "https://github.com/ifBars/SteamNetworkLib"
+    }
+  ]
+}

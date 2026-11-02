@@ -1,0 +1,236 @@
+{
+  "schemaVersion": 2,
+  "profiles": [
+    {
+      "id": "sime.npc.harborline.morgan_reed",
+      "name": "Morgan Reed",
+      "provinceId": "sime.province.harborline",
+      "role": "shopkeeper",
+      "presence": "physical_and_contact",
+      "preferences": {
+        "preferredProductIds": [
+          "sime.product.batch.standard"
+        ],
+        "neutralProductIds": [
+          "sime.product.batch.industrial"
+        ],
+        "rejectedProductIds": [
+          "sime.product.batch.premium"
+        ],
+        "priceSensitivity": 0.65,
+        "budgetBand": "medium",
+        "budgetLimit": 1200
+      },
+      "relationship": {
+        "provider": "schedule_i_native",
+        "initialization": "use_native_default"
+      },
+      "scheduleId": "sime.schedule.harborline.shopkeeper_day"
+    },
+    {
+      "id": "sime.npc.harborline.casey_ward",
+      "name": "Casey Ward",
+      "provinceId": "sime.province.harborline",
+      "role": "dock_worker",
+      "presence": "contact_only_until_navigation_verified",
+      "preferences": {
+        "preferredProductIds": [
+          "sime.product.batch.standard"
+        ],
+        "neutralProductIds": [
+          "sime.product.batch.industrial"
+        ],
+        "rejectedProductIds": [
+          "sime.product.batch.premium"
+        ],
+        "priceSensitivity": 0.82,
+        "budgetBand": "low",
+        "budgetLimit": 850
+      },
+      "relationship": {
+        "provider": "schedule_i_native",
+        "initialization": "use_native_default"
+      },
+      "scheduleId": "sime.schedule.harborline.dockworker_early"
+    },
+    {
+      "id": "sime.npc.harborline.ellis_shaw",
+      "name": "Ellis Shaw",
+      "provinceId": "sime.province.harborline",
+      "role": "warehouse_supervisor",
+      "presence": "contact_only_until_navigation_verified",
+      "preferences": {
+        "preferredProductIds": [
+          "sime.product.batch.industrial"
+        ],
+        "neutralProductIds": [
+          "sime.product.batch.standard"
+        ],
+        "rejectedProductIds": [],
+        "priceSensitivity": 0.28,
+        "budgetBand": "medium",
+        "budgetLimit": 3500
+      },
+      "relationship": {
+        "provider": "schedule_i_native",
+        "initialization": "use_native_default"
+      },
+      "scheduleId": "sime.schedule.harborline.warehouse_afternoon"
+    },
+    {
+      "id": "sime.npc.ridgeview.jordan_pike",
+      "name": "Jordan Pike",
+      "provinceId": "sime.province.ridgeview",
+      "role": "industrial_customer",
+      "presence": "contact_only_until_navigation_verified",
+      "preferences": {
+        "preferredProductIds": [
+          "sime.product.batch.industrial",
+          "sime.product.batch.standard"
+        ],
+        "neutralProductIds": [
+          "sime.product.batch.premium"
+        ],
+        "rejectedProductIds": [],
+        "priceSensitivity": 0.3,
+        "budgetBand": "high",
+        "budgetLimit": 4000
+      },
+      "relationship": {
+        "provider": "schedule_i_native",
+        "initialization": "use_native_default"
+      },
+      "scheduleId": "sime.schedule.ridgeview.quarry_day"
+    },
+    {
+      "id": "sime.npc.ridgeview.avery_cole",
+      "name": "Avery Cole",
+      "provinceId": "sime.province.ridgeview",
+      "role": "workshop_mechanic",
+      "presence": "contact_only_until_navigation_verified",
+      "preferences": {
+        "preferredProductIds": [
+          "sime.product.batch.industrial"
+        ],
+        "neutralProductIds": [
+          "sime.product.batch.standard"
+        ],
+        "rejectedProductIds": [
+          "sime.product.batch.premium"
+        ],
+        "priceSensitivity": 0.48,
+        "budgetBand": "medium",
+        "budgetLimit": 2100
+      },
+      "relationship": {
+        "provider": "schedule_i_native",
+        "initialization": "use_native_default"
+      },
+      "scheduleId": "sime.schedule.ridgeview.workshop_evening"
+    },
+    {
+      "id": "sime.npc.ridgeview.quinn_hayes",
+      "name": "Quinn Hayes",
+      "provinceId": "sime.province.ridgeview",
+      "role": "research_technician",
+      "presence": "contact_only_until_navigation_verified",
+      "preferences": {
+        "preferredProductIds": [
+          "sime.product.batch.premium"
+        ],
+        "neutralProductIds": [
+          "sime.product.batch.industrial"
+        ],
+        "rejectedProductIds": [
+          "sime.product.batch.standard"
+        ],
+        "priceSensitivity": 0.22,
+        "budgetBand": "very_high",
+        "budgetLimit": 5200
+      },
+      "relationship": {
+        "provider": "schedule_i_native",
+        "initialization": "use_native_default"
+      },
+      "scheduleId": "sime.schedule.ridgeview.research_day"
+    },
+    {
+      "id": "sime.npc.lakeside.taylor_brooks",
+      "name": "Taylor Brooks",
+      "provinceId": "sime.province.lakeside",
+      "role": "vip_customer",
+      "presence": "contact_only_until_navigation_verified",
+      "preferences": {
+        "preferredProductIds": [
+          "sime.product.batch.premium"
+        ],
+        "neutralProductIds": [
+          "sime.product.batch.industrial"
+        ],
+        "rejectedProductIds": [
+          "sime.product.batch.standard"
+        ],
+        "priceSensitivity": 0.15,
+        "budgetBand": "very_high",
+        "budgetLimit": 9000
+      },
+      "relationship": {
+        "provider": "schedule_i_native",
+        "initialization": "use_native_default"
+      },
+      "scheduleId": "sime.schedule.lakeside.investor_afternoon"
+    },
+    {
+      "id": "sime.npc.lakeside.riley_morgan",
+      "name": "Riley Morgan",
+      "provinceId": "sime.province.lakeside",
+      "role": "marina_operator",
+      "presence": "contact_only_until_navigation_verified",
+      "preferences": {
+        "preferredProductIds": [
+          "sime.product.batch.standard"
+        ],
+        "neutralProductIds": [
+          "sime.product.batch.premium"
+        ],
+        "rejectedProductIds": [
+          "sime.product.batch.industrial"
+        ],
+        "priceSensitivity": 0.42,
+        "budgetBand": "medium",
+        "budgetLimit": 2800
+      },
+      "relationship": {
+        "provider": "schedule_i_native",
+        "initialization": "use_native_default"
+      },
+      "scheduleId": "sime.schedule.lakeside.marina_morning"
+    },
+    {
+      "id": "sime.npc.lakeside.skylar_james",
+      "name": "Skylar James",
+      "provinceId": "sime.province.lakeside",
+      "role": "restaurant_owner",
+      "presence": "contact_only_until_navigation_verified",
+      "preferences": {
+        "preferredProductIds": [
+          "sime.product.batch.premium"
+        ],
+        "neutralProductIds": [
+          "sime.product.batch.standard"
+        ],
+        "rejectedProductIds": [
+          "sime.product.batch.industrial"
+        ],
+        "priceSensitivity": 0.72,
+        "budgetBand": "medium",
+        "budgetLimit": 1650
+      },
+      "relationship": {
+        "provider": "schedule_i_native",
+        "initialization": "use_native_default"
+      },
+      "scheduleId": "sime.schedule.lakeside.restaurant_evening"
+    }
+  ]
+}
