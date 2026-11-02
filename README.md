@@ -33,12 +33,16 @@ NPC role a cílové počty jsou v `packs/Harborline/roster.json`: nově 42 fyzic
 
 Diagnostický IL2CPP projekt cílí na .NET 6 a MelonLoader 0.7.3; S1API se objevuje dynamicky až v běžící hře, takže sestavení nevyžaduje kopii herních DLL. Výstup musí být ověřen proti skutečně nainstalované verzi S1API v cílové hře. Viz [S1API Custom NPCs](https://ifbars.github.io/S1API/docs/custom-npcs.html), [NPCAppearance](https://ifbars.github.io/S1API/api/S1API.Entities.NPCAppearance.html) a [S1MAPI](https://ifbars.github.io/S1MAPI/).
 
+## Instalace a závislosti
+
+Pro mod manager je připraven manifest `manifest.json`. Balíček obsahuje samotný DLL a automaticky vyžaduje MelonLoader 0.7.3, S1API Forked 3.2.2 a S1MAPI 2.0.1. Všechny tři jsou samostatné knihovny; DLL modu je neobsahuje.
+
 ## Aktuální stav a limity
 
-- Větev nyní obsahuje sestavitelný runtime mod s první fyzickou prototypovou částí Harborline. Po načtení uložené hry se automaticky hledá vhodná plocha v okolí nativní nemovitosti Docks Warehouse a vytvoří se fyzický přístavní areál z Unity objektů s kolizemi. Nejde zatím o finální nativní budovy/obchody a nespawnuje NPC.
+- Větev nyní obsahuje runtime prototyp včetně read-only katalogu známých S1MAPI prefabů. Po načtení uložené hry se automaticky hledá vhodná plocha v okolí Docks Warehouse a vytvoří se fyzický přístavní areál. Nejde zatím o finální nativní budovy/obchody a nespawnuje NPC.
 - Umístění se odvozuje z nativní pozice Docks Warehouse a runtime fyzikálních kontrol; nepoužívají se souřadnice odhadnuté z obrázku mapy.
 - Nákup businessů, obchodní inventář, policie a Hyland Network se napojí na původní systémy až po ověření jejich API v cílové verzi hry.
-- GitHub Actions sestavuje diagnostický IL2CPP mod a balí DLL do artefaktu. Samotný běh ve hře a jeho výstup ještě nejsou ověřeny; diagnostický runtime nic nemění a vyčítá původní registry pro další implementaci.
+- GitHub Actions sestavuje IL2CPP mod a balí instalovatelný Thunderstore ZIP. Samotný běh ve hře a jeho výstup ještě nejsou ověřeny; diagnostický runtime nic nemění a vyčítá původní registry pro další implementaci.
 
 ## Struktura
 
