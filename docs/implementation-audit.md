@@ -1,6 +1,6 @@
 # Harborline – audit implementace a propojení systémů
 
-**Auditní základ:** větev `feat/harborline-foundation`, commit `67b52b939bb9e36cd96522cdd6fdcc876d618002`. Kontrola zdrojového kódu, projektových dat, statických testů a veřejného zdrojového kódu S1API/S1MAPI. Audit nebyl spuštěn uvnitř uživatelovy instalace Schedule I.
+**Auditní základ:** větev `feat/harborline-foundation`, commit `ac46eb774a48bbfd044969c566e0e931b65ba110`. Kontrola zdrojového kódu, projektových dat, statických testů a veřejného zdrojového kódu S1API/S1MAPI. Audit nebyl spuštěn uvnitř uživatelovy instalace Schedule I.
 
 ## Výsledek
 
@@ -49,3 +49,13 @@
 ## Auditní data
 
 Strojově čitelná matice je v `world/harborline/implementation-status.json`. Každá položka má jeden ze stavů `implemented_code_unverified_runtime`, `design_only`, `not_implemented`, `blocked_unverified_api` nebo `not_verified_in_game`.
+
+## Finální CI kontrola po opravách
+
+Auditovaný runtime kód: `ac46eb774a48bbfd044969c566e0e931b65ba110`.
+
+- Statická validace a automatické testy: úspěch, GitHub Actions run `41431858850`.
+- .NET 6 build a vytvoření Thunderstore ZIP: úspěch, run `41431858837`.
+- Artefakt `ScheduleIMegaExpansion-0.2.0`: ID `13133824318`.
+
+Tyto kontroly nepotvrzují běh hry. Přesné souřadnice, prostorové hranice Docks, kolize na skutečném terénu, vykreslení v IL2CPP, mapové ikony ani interakce nebyly ověřeny uvnitř Schedule I.
