@@ -1,6 +1,6 @@
 # Harborline – audit implementace a propojení systémů
 
-**Auditní základ:** větev `feat/harborline-foundation`, commit `ac46eb774a48bbfd044969c566e0e931b65ba110`. Kontrola zdrojového kódu, projektových dat, statických testů a veřejného zdrojového kódu S1API/S1MAPI. Audit nebyl spuštěn uvnitř uživatelovy instalace Schedule I.
+**Auditní základ:** větev `feat/harborline-foundation`, commit `81395614d920ad08947c979aab83d9c74111a6af` (kontrola zdrojového kódu a požadavků k 2. 11. 2026). Kontrola zdrojového kódu, projektových dat, statických testů a veřejného zdrojového kódu S1API/S1MAPI. Audit nebyl spuštěn uvnitř uživatelovy instalace Schedule I.
 
 ## Výsledek
 
@@ -52,7 +52,7 @@ Strojově čitelná matice je v `world/harborline/implementation-status.json`. K
 
 ## Finální CI kontrola po opravách
 
-Auditovaný runtime kód: `ac46eb774a48bbfd044969c566e0e931b65ba110`.
+Auditovaný runtime kód: `81395614d920ad08947c979aab83d9c74111a6af`.
 
 - Statická validace a automatické testy: úspěch, GitHub Actions run `41431858850`.
 - .NET 6 build a vytvoření Thunderstore ZIP: úspěch, run `41431858837`.
