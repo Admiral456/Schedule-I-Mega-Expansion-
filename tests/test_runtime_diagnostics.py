@@ -1,3 +1,4 @@
+import json
 import unittest
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -10,7 +11,7 @@ class RuntimeDiagnosticTests(unittest.TestCase):
     def setUpClass(cls):
         cls.project_path = ROOT / "src" / "ScheduleIMegaExpansion.csproj"
         cls.project = ET.parse(cls.project_path).getroot()
-        cls.manifest = __import__("json").loads((ROOT / "manifest.json").read_text(encoding="utf-8"))
+        cls.manifest = json.loads((ROOT / "manifest.json").read_text(encoding="utf-8"))
         cls.core = (ROOT / "src" / "Core.cs").read_text(encoding="utf-8")
         cls.exporter = (ROOT / "src" / "Diagnostics" / "WorldSnapshotExporter.cs").read_text(encoding="utf-8")
         cls.scanner = (ROOT / "src" / "Diagnostics" / "NativeApiSurfaceScanner.cs").read_text(encoding="utf-8")
