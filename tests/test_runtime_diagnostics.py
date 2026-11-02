@@ -54,7 +54,9 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn("native-prefabs.csv", self.prefabs)
         self.assertIn("S1MAPI.Core.PrefabRef", self.prefabs)
         self.assertIn("native-game-api-surface.txt", self.scanner)
-        for token in ("Door", "Police", "Navigation", "NPC", "Avatar", "Schedule", "Customer", "Dealer"):
+        self.assertIn('name.IndexOf("S1MAPI"', self.scanner)
+        self.assertIn('name.IndexOf("FishNet"', self.scanner)
+        for token in ("Door", "Police", "Navigation", "NPC", "Avatar", "Schedule", "Customer", "Dealer", "PrefabPlacer", "BuildingBuilder", "NetworkObject"):
             self.assertIn('"'+token+'"', self.scanner)
 
     def test_diagnostic_does_not_mutate_game_state(self):
