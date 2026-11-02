@@ -23,7 +23,10 @@ namespace ScheduleIMegaExpansion.Diagnostics
             "NPCEnterableBuilding", "POI", "Door", "Police", "Law",
             "Dispatch", "Patrol", "Checkpoint", "Navigation", "NavMesh",
             "Path", "Avatar", "Schedule", "Customer", "Dealer", "NPC",
-            "Shop", "Store", "DeliveryLocation", "Parking"
+            "Shop", "Store", "DeliveryLocation", "Parking", "Prefab",
+            "BuildingBuilder", "PrefabPlacer", "NavigationBuilder", "MeshRef",
+            "TerrainClearer", "TerrainFlattener", "BuildingPartRegistry",
+            "NetworkObject", "NetworkManager", "SpawnablePrefabs"
         };
 
         private static readonly string[] InterestingMemberTokens =
@@ -98,7 +101,9 @@ namespace ScheduleIMegaExpansion.Diagnostics
         {
             string name = assembly.GetName().Name ?? string.Empty;
             return name.IndexOf("Assembly-CSharp", StringComparison.OrdinalIgnoreCase) >= 0
-                || name.IndexOf("S1API", StringComparison.OrdinalIgnoreCase) >= 0;
+                || name.IndexOf("S1API", StringComparison.OrdinalIgnoreCase) >= 0
+                || name.IndexOf("S1MAPI", StringComparison.OrdinalIgnoreCase) >= 0
+                || name.IndexOf("FishNet", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private static bool IsRelevantNativeType(Type type)
@@ -116,7 +121,8 @@ namespace ScheduleIMegaExpansion.Diagnostics
             {
                 "Property", "Business", "Region", "Map", "Building",
                 "Door", "Police", "Dispatch", "Navigation", "NavMesh",
-                "NPC", "Avatar", "Schedule", "Customer", "Dealer"
+                "NPC", "Avatar", "Schedule", "Customer", "Dealer",
+                "Prefab", "BuildingBuilder", "PrefabPlacer", "NetworkObject"
             };
 
             foreach (string token in highPriority)
