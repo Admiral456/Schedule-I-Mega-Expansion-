@@ -5,7 +5,7 @@ using MelonLoader;
 using ScheduleIMegaExpansion.Diagnostics;
 using ScheduleIMegaExpansion.Runtime;
 
-[assembly: MelonInfo(typeof(ScheduleIMegaExpansion.MegaExpansionMod), "Schedule I Mega Expansion", "0.1.0", "Admiral456")]
+[assembly: MelonInfo(typeof(ScheduleIMegaExpansion.MegaExpansionMod), "Schedule I Mega Expansion", "0.2.0", "Admiral456")]
 [assembly: MelonGame("TVGS", "Schedule I")]
 
 namespace ScheduleIMegaExpansion
