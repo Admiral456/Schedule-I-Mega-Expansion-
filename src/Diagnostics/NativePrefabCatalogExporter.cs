@@ -86,6 +86,7 @@ namespace ScheduleIMegaExpansion.Diagnostics
                     List<string> components = ReadComponentTypes(prefab);
                     bool hasNetworkObject = components.Any(name =>
                         name.IndexOf("NetworkObject", StringComparison.OrdinalIgnoreCase) >= 0);
+                    bool networkStatusKnown = components.Count > 0;
                     found++;
                     if (hasNetworkObject)
                         networked++;
@@ -96,9 +97,15 @@ namespace ScheduleIMegaExpansion.Diagnostics
                         candidate.Value,
                         "true",
                         instanceName,
-                        hasNetworkObject.ToString(CultureInfo.InvariantCulture).ToLowerInvariant(),
+                        networkStatusKnown
+                            ? hasNetworkObject.ToString(CultureInfo.InvariantCulture).ToLowerInvariant()
+                            : "unknown",
                         string.Join("; ", components),
-                        hasNetworkObject ? "network-spawn-required" : "review-before-placement"
+                        hasNetworkObject
+                            ? "network-spawn-required"
+                            : networkStatusKnown
+                                ? "review-before-placement"
+                                : "unknown-do-not-spawn"
                     });
                 }
                 catch (Exception ex)
