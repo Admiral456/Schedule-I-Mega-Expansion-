@@ -45,7 +45,7 @@ Ceny jsou nastavené modifikací jako vlastní prodejní ceny v nativním shopu;
 
 - Build cílí na .NET 6 / Schedule I IL2CPP.
 - Je vyžadován MelonLoader 0.7.3, S1API Forked 3.2.2 a S1MAPI 2.0.1.
-- Pro lokální build nastav `S1APIDllPath` na kompatibilní `S1API.Il2Cpp.MelonLoader.dll`. GitHub Actions stáhne knihovnu z Thunderstore. Knihovna S1API se do našeho balíčku nekopíruje.
+- Pro lokální build stačí `dotnet restore` a `dotnet build`; projekt používá oficiální NuGet balíček `S1API.Forked` 3.2.2. Runtime mod manager stáhne S1API samostatně podle manifestu.
 - Kompilace a statické testy neprokazují, že NPC, spawn body a změna nabídky skutečně fungují ve hře. Je potřeba otestovat instalaci v cílové verzi Schedule I.
 
 Diagnostické soubory se ukládají do `UserData/ScheduleIMegaExpansion/Diagnostics/`; fyzická poloha Harborline do `UserData/ScheduleIMegaExpansion/Harborline/last-generation.json`.
