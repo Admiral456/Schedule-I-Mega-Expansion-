@@ -16,6 +16,10 @@ namespace ScheduleIMegaExpansion.Runtime
     {
         private sealed record StockItem(string Id, float Price);
 
+        private static bool _loggedMissingNativeShop;
+        private static readonly HashSet<string> LoggedMissingItems = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private static readonly HashSet<string> LoggedRejectedItems = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
         private static readonly StockItem[] ExpansionStock =
         {
             new StockItem("plasticpot", 25f),
@@ -34,6 +38,13 @@ namespace ScheduleIMegaExpansion.Runtime
             new StockItem("cauldron", 3500f)
         };
 
+        public static void ResetForNewSave()
+        {
+            _loggedMissingNativeShop = false;
+            LoggedMissingItems.Clear();
+            LoggedRejectedItems.Clear();
+        }
+
         public static bool TryApply(Action<string> log, Action<string> warn)
         {
             try
@@ -44,7 +55,11 @@ namespace ScheduleIMegaExpansion.Runtime
                     string names = string.Join(", ", ShopManager.GetAllShops()
                         .Where(shop => shop != null)
                         .Select(shop => shop.Name));
-                    warn("Native shop 'Hardware Store' was not found. Loaded native shops: " + names);
+                    if (!_loggedMissingNativeShop)
+                    {
+                        _loggedMissingNativeShop = true;
+                        warn("Native shop 'Hardware Store' was not found. Loaded native shops: " + names);
+                    }
                     return false;
                 }
 
@@ -58,7 +73,8 @@ namespace ScheduleIMegaExpansion.Runtime
                     if (item == null)
                     {
                         unavailable++;
-                        MelonLogger.Warning("[Schedule I Mega Expansion] Native item ID is unavailable in this game build: " + stock.Id);
+                        if (LoggedMissingItems.Add(stock.Id))
+                            MelonLogger.Warning("[Schedule I Mega Expansion] Native item ID is unavailable in this game build: " + stock.Id);
                         continue;
                     }
 
@@ -76,7 +92,8 @@ namespace ScheduleIMegaExpansion.Runtime
                     }
                     else
                     {
-                        warn("Native shop refused item '" + item.ID + "'. The entry was not replaced or duplicated.");
+                        if (LoggedRejectedItems.Add(item.ID))
+                            warn("Native shop refused item '" + item.ID + "'. The entry was not replaced or duplicated.");
                     }
                 }
 
@@ -95,22 +112,27 @@ namespace ScheduleIMegaExpansion.Runtime
 
     internal static class HarborlineGameplayBootstrap
     {
+        private static bool _npcApplied;
         private static bool _shopApplied;
 
         public static bool TryActivate(Action<string> log, Action<string> warn)
         {
-            bool npcsReady = HarborlineNpcRegistrar.EnsureInitialWave(log, warn);
+            if (!_npcApplied)
+                _npcApplied = HarborlineNpcRegistrar.EnsureInitialWave(log, warn);
             if (!_shopApplied)
                 _shopApplied = HarborlineShopCatalog.TryApply(log, warn);
 
-            if (npcsReady && _shopApplied)
+            if (_npcApplied && _shopApplied)
                 log("Harborline native gameplay slice activated: 2 native dealers, 3 native customer NPCs and extended Hardware Store stock.");
-            return npcsReady && _shopApplied;
+            return _npcApplied && _shopApplied;
         }
 
         public static void ResetForNewSave()
         {
+            _npcApplied = false;
             _shopApplied = false;
+            HarborlineNpcRegistrar.ResetForNewSave();
+            HarborlineShopCatalog.ResetForNewSave();
         }
     }
 }
