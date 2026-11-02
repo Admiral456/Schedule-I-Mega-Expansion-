@@ -32,8 +32,8 @@ jobs:
         run: dotnet build src/ScheduleIMegaExpansion.csproj --configuration Release --no-restore
       - name: Assemble Thunderstore package
         run: |
-          mkdir -p package
-          cp src/bin/Release/net6.0/ScheduleIMegaExpansion.dll package/
+          mkdir -p package/Mods
+          cp src/bin/Release/net6.0/ScheduleIMegaExpansion.dll package/Mods/
           cp manifest.json package/
           cp README.md package/
           cp LICENSE package/
