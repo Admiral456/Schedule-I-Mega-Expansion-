@@ -213,20 +213,34 @@ namespace ScheduleIMegaExpansion.Runtime
 
             MethodInfo? checkBox = physics.GetMethods(BindingFlags.Public | BindingFlags.Static)
                 .Where(method => method.Name == "CheckBox")
-                .OrderBy(method => method.GetParameters().Length)
+                .OrderByDescending(method => method.GetParameters().Length)
                 .FirstOrDefault(method =>
                 {
                     ParameterInfo[] p = method.GetParameters();
-                    return p.Length >= 2 && p[0].ParameterType == _vector3Type && p[1].ParameterType == _vector3Type;
-                });
+                    return p.Length >= 3
+                        && p[0].ParameterType == _vector3Type
+                        && p[1].ParameterType == _vector3Type
+                        && p[2].ParameterType == _quaternionType;
+                })
+                ?? physics.GetMethods(BindingFlags.Public | BindingFlags.Static)
+                    .FirstOrDefault(method =>
+                    {
+                        ParameterInfo[] p = method.GetParameters();
+                        return method.Name == "CheckBox"
+                            && p.Length == 2
+                            && p[0].ParameterType == _vector3Type
+                            && p[1].ParameterType == _vector3Type;
+                    });
             MethodInfo? raycast = physics.GetMethods(BindingFlags.Public | BindingFlags.Static)
-                .FirstOrDefault(method =>
+                .Where(method =>
                 {
                     ParameterInfo[] p = method.GetParameters();
                     return method.Name == "Raycast" && p.Length >= 3 && p[0].ParameterType == rayType
                         && p[1].ParameterType.IsByRef && p[1].ParameterType.GetElementType() == hitType
                         && p[2].ParameterType == typeof(float);
-                });
+                })
+                .OrderByDescending(method => method.GetParameters().Length)
+                .FirstOrDefault();
 
             if (checkBox == null || raycast == null)
                 throw new MissingMethodException("Required Physics.CheckBox or Physics.Raycast overload was not found.");
@@ -331,6 +345,10 @@ namespace ScheduleIMegaExpansion.Runtime
                     return false;
 
                 object hitInfo = args[1]!;
+                object? collider = GetMemberValue(hitInfo, "collider");
+                if (collider == null || IsLikelyWaterCollider(collider))
+                    return false;
+
                 object? point = GetMemberValue(hitInfo, "point");
                 object? normal = GetMemberValue(hitInfo, "normal");
                 if (point == null || normal == null
@@ -348,6 +366,53 @@ namespace ScheduleIMegaExpansion.Runtime
 
             groundY = heights.Average();
             return true;
+        }
+
+        private static bool IsLikelyWaterCollider(object collider)
+        {
+            object? gameObject = GetMemberValue(collider, "gameObject");
+            string identity = string.Join(" ",
+                new[]
+                {
+                    Convert.ToString(GetMemberValue(collider, "name"), CultureInfo.InvariantCulture),
+                    Convert.ToString(GetMemberValue(collider, "tag"), CultureInfo.InvariantCulture),
+                    Convert.ToString(GetMemberValue(gameObject ?? collider, "name"), CultureInfo.InvariantCulture),
+                    Convert.ToString(GetMemberValue(gameObject ?? collider, "tag"), CultureInfo.InvariantCulture)
+                }.Where(value => !string.IsNullOrWhiteSpace(value)));
+
+            string normalized = identity.ToLowerInvariant();
+            string[] waterTokens = { "water", "ocean", "sea", "lake", "river", "pool", "canal", "flood" };
+            if (waterTokens.Any(token => normalized.Contains(token)))
+                return true;
+
+            // Unity projects commonly use a dedicated Water/Ocean layer even
+            // when the collider GameObject has a generic name.
+            object? layerValue = GetMemberValue(gameObject ?? collider, "layer");
+            if (layerValue != null)
+            {
+                try
+                {
+                    Type? layerMaskType = FindType("UnityEngine.LayerMask");
+                    MethodInfo? layerToName = layerMaskType?.GetMethod(
+                        "LayerToName", BindingFlags.Public | BindingFlags.Static,
+                        null, new[] { typeof(int) }, null);
+                    if (layerToName != null)
+                    {
+                        string layerName = Convert.ToString(
+                            layerToName.Invoke(null, new[] { Convert.ToInt32(layerValue, CultureInfo.InvariantCulture) }),
+                            CultureInfo.InvariantCulture) ?? string.Empty;
+                        string layer = layerName.ToLowerInvariant();
+                        if (waterTokens.Any(token => layer.Contains(token)))
+                            return true;
+                    }
+                }
+                catch
+                {
+                    // Layer-name lookup is a supplemental water-safety check.
+                }
+            }
+
+            return false;
         }
 
         private static bool TryReadVector(object value, out float x, out float y, out float z)
