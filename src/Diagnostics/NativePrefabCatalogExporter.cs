@@ -83,10 +83,10 @@ namespace ScheduleIMegaExpansion.Diagnostics
                     }
 
                     string instanceName = Convert.ToString(ReadMember(prefab, "name"), CultureInfo.InvariantCulture) ?? candidate.Key;
-                    List<string> components = ReadComponentTypes(prefab);
+                    List<string> components = ReadComponentTypes(prefab, out bool componentScanComplete);
                     bool hasNetworkObject = components.Any(name =>
                         name.IndexOf("NetworkObject", StringComparison.OrdinalIgnoreCase) >= 0);
-                    bool networkStatusKnown = components.Count > 0;
+                    bool networkStatusKnown = componentScanComplete;
                     found++;
                     if (hasNetworkObject)
                         networked++;
@@ -124,8 +124,9 @@ namespace ScheduleIMegaExpansion.Diagnostics
             return found;
         }
 
-        private static List<string> ReadComponentTypes(object prefab)
+        private static List<string> ReadComponentTypes(object prefab, out bool scanComplete)
         {
+            scanComplete = false;
             var result = new List<string>();
             try
             {
@@ -143,21 +144,26 @@ namespace ScheduleIMegaExpansion.Diagnostics
                     return result;
 
                 object? values = getComponents.Invoke(prefab, new object[] { componentType });
-                if (values is IEnumerable enumerable)
+                if (!(values is IEnumerable enumerable))
+                    return result;
+
+                foreach (object? component in enumerable)
                 {
-                    foreach (object? component in enumerable)
-                    {
-                        if (component == null)
-                            continue;
-                        string name = component.GetType().FullName ?? component.GetType().Name;
-                        if (!result.Contains(name, StringComparer.Ordinal))
-                            result.Add(name);
-                    }
+                    if (component == null)
+                        continue;
+                    string name = component.GetType().FullName ?? component.GetType().Name;
+                    if (!result.Contains(name, StringComparer.Ordinal))
+                        result.Add(name);
                 }
+
+                scanComplete = true;
             }
             catch
             {
                 // Component inspection is optional; a successful Find() is still useful.
+                // Partial enumeration must never be treated as proof that a prefab
+                // has no NetworkObject component.
+                scanComplete = false;
             }
 
             return result.OrderBy(name => name, StringComparer.Ordinal).ToList();
