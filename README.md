@@ -35,7 +35,7 @@ Diagnostický IL2CPP projekt cílí na .NET 6 a MelonLoader 0.7.3; S1API se obje
 
 ## Aktuální stav a limity
 
-- Větev nyní obsahuje sestavitelný runtime mod s první fyzickou prototypovou částí Harborline. Po zachycení herního bodu (F6) lze ve hře vytvořit přístavní areál z reálných Unity objektů s kolizemi (F7). Nejde zatím o finální nativní budovy/obchody a nespawnuje NPC.
+- Větev nyní obsahuje sestavitelný runtime mod s první fyzickou prototypovou částí Harborline. Po načtení uložené hry se automaticky hledá vhodná plocha v okolí nativní nemovitosti Docks Warehouse a vytvoří se fyzický přístavní areál z Unity objektů s kolizemi. Nejde zatím o finální nativní budovy/obchody a nespawnuje NPC.
 - Umístění se odvozuje z nativní pozice Docks Warehouse a runtime fyzikálních kontrol; nepoužívají se souřadnice odhadnuté z obrázku mapy.
 - Nákup businessů, obchodní inventář, policie a Hyland Network se napojí na původní systémy až po ověření jejich API v cílové verzi hry.
 - GitHub Actions sestavuje diagnostický IL2CPP mod a balí DLL do artefaktu. Samotný běh ve hře a jeho výstup ještě nejsou ověřeny; diagnostický runtime nic nemění a vyčítá původní registry pro další implementaci.
@@ -48,7 +48,7 @@ Diagnostický IL2CPP projekt cílí na .NET 6 a MelonLoader 0.7.3; S1API se obje
 - `docs/npc-generation-and-multiplayer.md` – náhodné preference, nativní generování vzhledu, policie a multiplayer.
 - `docs/native-map-buildings-interiors.md` – herní mapa, nativní ikony/vlastnictví, dveře a funkční interiéry.
 - `world/harborline/native-integration.json` – nativní integrační pravidla a kontrolní brány.
-- `src/` – první IL2CPP diagnostický runtime projekt v režimu pouze pro čtení; exportuje původní registry hry.
+- `src/` – IL2CPP runtime mod s automatickým fyzickým prototypem a read-only průzkumem nativních registrů a prefabs.
 - `world/harborline/anchors.json` – seznam lokalit a míst k zaměření.
 - `world/harborline/expansion-plan.json` – plán větší oblasti a pěti podčástí.
 - `world/harborline/prefabs.json` – katalog původních prefabů ověřených přímo ve hře.
