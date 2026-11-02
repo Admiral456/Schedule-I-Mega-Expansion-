@@ -8,24 +8,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
     <Version>0.3.0</Version>
-    <S1APIDllPath Condition="'$(S1APIDllPath)' == ''">$(MSBuildProjectDirectory)/../lib/S1API.Il2Cpp.MelonLoader.dll</S1APIDllPath>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="LavaGang.MelonLoader" Version="0.7.3" PrivateAssets="all" NoWarn="NU1701" />
-    <!-- Compile against the same IL2CPP game branch as the shipped S1API runtime. -->
-    <PackageReference Include="RefGen.Schedule-I.Il2Cpp" Version="0.4.4-f8" PrivateAssets="all" />
-    <PackageReference Include="Il2CppInterop.Common" Version="1.5.1" PrivateAssets="all" />
+    <PackageReference Include="S1API.Forked" Version="3.2.2" />
   </ItemGroup>
 
-  <ItemGroup Condition="Exists('$(S1APIDllPath)')">
-    <Reference Include="S1API.Il2Cpp.MelonLoader">
-      <HintPath>$(S1APIDllPath)</HintPath>
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-
-  <Target Name="RequireS1APIReference" BeforeTargets="ResolveReferences" Condition="!Exists('$(S1APIDllPath)')">
-    <Error Text="S1API IL2CPP reference was not found at '$(S1APIDllPath)'. Download S1API Forked 3.2.2 or pass -p:S1APIDllPath=/path/to/S1API.Il2Cpp.MelonLoader.dll." />
-  </Target>
+  <!-- S1API is a runtime dependency supplied by the mod manager; the API package is compile-time only. -->
 </Project>
