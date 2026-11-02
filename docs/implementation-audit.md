@@ -1,61 +1,88 @@
-# Harborline – audit implementace a propojení systémů
+# Harborline – audit implementace
 
-**Auditní základ:** větev `feat/harborline-foundation`, commit `81395614d920ad08947c979aab83d9c74111a6af` (kontrola zdrojového kódu a požadavků k 2. 11. 2026). Kontrola zdrojového kódu, projektových dat, statických testů a veřejného zdrojového kódu S1API/S1MAPI. Audit nebyl spuštěn uvnitř uživatelovy instalace Schedule I.
+**Kontrolovaný stav:** větev `feat/harborline-foundation`, vývojová verze 0.3.0.
+**Metoda:** kontrola C# implementace, S1API Forked 3.2.2 public source/API, konfiguračních dat a automatických testů. Audit nebyl proveden uvnitř Schedule I hry.
 
-## Výsledek
+## Co se nově skutečně implementuje přes nativní API
 
-**Projekt není ve stavu plně funkčního rozšíření.** Je v něm skutečný MelonLoader runtime prototyp, automatická tvorba session-local geometrie přístavu a diagnostika nativních registrů/prefabů. Zásadní požadavky na NPC, Realtor, mapu, obchody, online objednávky, policii, nativní interakce, ukládání a multiplayer zatím nejsou napojené.
+| Oblast | Kód | Co dělá | Ověření |
+|---|---|---|---|
+| NPC – první vlna | `HarborlineNpcRoster.cs` | 5 fyzických S1API NPC: 2 dealeři, 3 zákazníci | Čeká na spuštění ve hře |
+| Dealeři | `WithDealerDefaults` | PlayerDealer, poplatek, provize, pravidla kvality, počitadlo smluv a nativní dealer události | Čeká na nábor a obchodní test |
+| Zákazníci | `WithCustomerDefaults` | Tři různé rozpočty, frekvence/čas objednávek, standardy, affinities, policejní šance a dependence | Čeká na test objednávek |
+| Vzhled | `Appearance.GenerateRandomAppearance()` + `Build()` | Náhodný vzhled vytvořený herním generátorem při OnCreated | Čeká na render/save-load test |
+| NPC scheduler | `Schedule.Enable()` | Zapne nativní scheduler komponentu | Denní trasy zatím nejsou nastavené |
+| Sortiment | `HarborlineShopCatalog.cs` | 14 existujících vanilla item definitions přidá do nativního Hardware Store | Čeká na kontrolu shop UI a nákupu |
+| Ceny | `Shop.AddItem(item, customPrice)` | Používá ceny definované v mod katalogu, ne vlastní nákupní UI | Čeká na herní nákupní test |
+| Fyzická čtvrť | `HarborlinePhysicalBuilder.cs` | Geometrický prototyp Unity primitiv | Umístění dosud neověřeno ve hře |
 
-## Co je skutečně v kódu
+### První nativní NPC
 
-| Oblast | Stav auditu | Co lze doložit |
+**Dealeři**
+- Mason Reed – PlayerDealer, nábor $2,500, provize 18 %.
+- Sierra Voss – PlayerDealer, nábor $4,000, provize 15 %.
+
+Oba mají nativní dealer defaults, omezení kvality, vlastní completed-deals proměnnou a reakce na události náboru, smlouvy a doporučení.
+
+**Zákazníci**
+- Caleb Price – $180–$420 týdenního rozpočtu, 1–2 objednávky týdně, pondělí 06:30, Moderate, afinita Marijuana +0.75 / Methamphetamine −0.25.
+- Nina Brooks – $450–$850, 2–3 objednávky týdně, středa 12:00, High, afinita Methamphetamine +0.75 / Marijuana −0.30.
+- Rafael Cole – $800–$1,600, 1–3 objednávky týdně, pátek 19:30, VeryHigh, afinita Cocaine +0.70 / Shrooms +0.35 / Methamphetamine −0.30.
+
+Hodnoty jsou uložené v nativním CustomerDataBuilder. Policejní šance a dependence se nastavují individuálně. Kompletní 30členný zákaznický roster zatím dokončený není.
+
+### Sortiment přidaný do nativního Hardware Store
+
+| Předmět / item ID | Cena |
+|---|---:|
+| Plastic Pot / `plasticpot` | $25 |
+| Moisture-Preserving Pot / `moisturepreservingpot` | $65 |
+| Air Pot / `airpot` | $145 |
+| Suspension Rack / `suspensionrack` | $50 |
+| Halogen Grow Light / `halogengrowlight` | $50 |
+| LED Grow Light / `ledgrowlight` | $95 |
+| Full Spectrum Grow Light / `fullspectrumgrowlight` | $235 |
+| Drying Rack / `dryingrack` | $300 |
+| Mixing Station / `mixingstation` | $575 |
+| Chemistry Station / `chemistrystation` | $1,150 |
+| Lab Oven / `laboven` | $1,150 |
+| Mixing Station MK2 / `mixingstationmk2` | $2,250 |
+| Brick Press / `brickpress` | $900 |
+| Cauldron / `cauldron` | $3,500 |
+
+Kód používá `ItemManager.GetDefinition`, ověří existenci položky i to, zda už v obchodě je, a poté zavolá nativní `Shop.AddItem`. Neznámé item IDs přeskočí. Ceny jsou vlastní konfigurované prodejní ceny.
+
+## Co zůstává nedokončené
+
+| Oblast | Stav | Co chybí |
 |---|---|---|
-| MelonLoader bootstrap | Kód existuje, runtime neověřen | `src/Core.cs` |
-| Save/scene lifecycle | Kód existuje, runtime neověřen | `OnPreLoad`, `OnLoadComplete`, `OnPreSceneChange` |
-| Automatická fyzická geometrie | Kód existuje, runtime neověřen | `HarborlinePhysicalBuilder` vytváří Unity primitiva s kolizemi |
-| Kotva Docks Warehouse | API ověřené ve zdroji S1API; konkrétní záznam neověřen | `PropertyManager.GetAllProperties()`, `PropertyName`, `ExteriorSpawnPosition` |
-| Kontrola terénu | Heuristika, runtime neověřen | `Physics.CheckBox`, raycast, sklon, výška a názvy/vrstvy vody |
-| Multiplayerová ochrana | Opravena podle S1API wrapperu | `S1API.Entities.Player.All`; generování povolí pouze při přesně jednom hráči |
-| Prefab katalog | Kód existuje, runtime neověřen | `PrefabRef.Find()`, `native-prefabs.csv` |
-| API scanner | Kód existuje, runtime neověřen | Assembly-CSharp, S1API, S1MAPI, FishNet |
+| Cílových 42 NPC | Částečně | Implementováno 5; zbývá 37 |
+| 30 zákaznických profilů | Částečně | Implementováno 3; zbývá 27 |
+| Denní režimy NPC | Nedokončeno | Ověřené navmesh trasy, body a native building visits |
+| Harborline Supply – nová provozovna | Nedokončeno | S1API veřejně poskytuje čtení existujících shopů a přidání itemu do nich; registrace nového Shop nebyla doložena |
+| Online objednávky | Nedokončeno | Není propojená phone order cesta se stejným inventářem a skladovostí |
+| Koupitelné podniky / Realtor | Blokováno neověřeným API | `PropertyManager` a `BusinessManager` zpřístupňují existující záznamy; ověřený aditivní registrační hook pro novou Property/Business není znám |
+| Nové mapové ikony | Nedokončeno | Chybí ověřený map registry/projekce a vlastnické změny |
+| Funkční budovy/interiéry/dveře | Nedokončeno | Současný shell není nativní building a není průchozí interiér |
+| Policie | Nedokončeno | Není připojený nativní dispatch/patrol/checkpoint flow |
+| Save geometrie | Nedokončeno | Fyzická geometrie je zatím session-local |
+| Multiplayer | Zablokováno | NPC a geometrie jsou v této pilotní fázi omezené na single-player; host/client/late join nebyl testován |
 
-## Co není dokončeno
+## Bezpečnost a integrace
 
-**Mapa a pozice:** žádné z osmi míst nemá zaměřené herní souřadnice. Neznáme ověřené hranice Docks, mapové bounds, world-to-map transform ani spojení s nativní silniční/navmesh sítí. Hledání volného terénu 42–104 metrů od Warehouse je pouze heuristika; samo o sobě nedokazuje, že výsledek leží uvnitř Docks.
+- S1API automaticky registruje custom NPC prefaby. Kód čeká na `NPC.CustomNpcsReady` a nepokouší se o ruční legacy preregistraci.
+- Každé NPC má stabilní ID; před vytvořením se kontroluje `NPC.Get(id)`.
+- NPC spawn je navázán na stejnou vybranou pozici geometrie a používá nativní region `Docks`.
+- Multi-player gate zůstává fail-closed, dokud neproběhne test server-authority a late join.
+- Obchod upravuje jen existující Hardware Store. Nezakládá vlastní nákupní rozhraní ani falešné produkty.
+- Nové Realtor listings nebudou vytvářeny zápisem do interních seznamů bez ověřené nativní registrační cesty.
 
-**Budovy:** současná stavba je tvořena generickými Unity krychlemi. Není zaregistrovaná jako nativní Building, Property, Business nebo Shop a nemá produkční prefabový interiér.
+## Ověření před vydáním
 
-**NPC:** žádná nová NPC třída ani volání `NPCPrefabBuilder` v runtime neexistuje. Čísla 42/18/30/2 jsou cílové hodnoty v JSON, ne vytvořené herní entity. Volání nativního generátoru vzhledu je pouze popsáno v datech.
+1. Build proti S1API 3.2.2 a odpovídajícím Schedule I IL2CPP references musí projít v CI.
+2. V cílové hře ověřit spawn všech pěti NPC, jejich komponenty, vzhled, uložení a další načtení.
+3. Ověřit, že Hardware Store zobrazuje všech 14 položek s uvedenými cenami a nákup skutečně odečítá peníze a vydává item.
+4. Získat runtime diagnostiky pro Docks property/regions a nativní PropertyManager, BusinessManager, map, shop a building registry.
+5. Teprve poté implementovat další NPC, vlastní prodejnu, telefonní objednávky, Realtor listings a jejich propojení se stejnou inventurou.
 
-**Obchody:** neexistuje připojení inventáře, pokladen ani online objednávek. Popis sdíleného katalogu je návrh.
-
-**Realtor a vlastnictví:** veřejné `PropertyManager`/`BusinessManager` v prohlédnutém S1API zdroji enumerují existující záznamy. Veřejný hook pro registraci nové nemovitosti/podniku není prokázán. Žádný nový nákupní záznam proto nevzniká.
-
-**Mapové ikony:** není připojena mapa, world-to-map transform, nativní klasifikace budov ani vlastnické ikony.
-
-**Policie:** nejsou napojené hlídky, dispatch ani checkpointy.
-
-**Dveře/interakce:** prefaby se pouze vyhledávají; žádný nativní door/storage/shop prefab se ve hře nevytváří.
-
-**Ukládání a multiplayer:** geometrie je pouze session-local. Mod ji po načtení znovu vytváří; neukládá se do save. Co-op je záměrně zablokovaný.
-
-## Co je potřeba pro skutečné potvrzení
-
-1. Spustit tento build v cílové verzi Schedule I a získat `summary.txt`, `native-properties.csv`, `native-buildings.csv`, `native-businesses.csv`, `native-game-api-surface.txt` a `native-prefabs.csv`.
-2. Ověřit, že ve hře existuje přesný záznam Docks Warehouse, že generátor vybere skutečně volnou plochu v Docks a že modely nekolidují s původní mapou ani vodou.
-3. Teprve po runtime průzkumu implementovat nativní NPC, budovy, dveře, mapu, obchodní flow a policii.
-4. Otestovat save/load, přechod do menu, pozdní připojení hráče a host/client režim.
-
-## Auditní data
-
-Strojově čitelná matice je v `world/harborline/implementation-status.json`. Každá položka má jeden ze stavů `implemented_code_unverified_runtime`, `design_only`, `not_implemented`, `blocked_unverified_api` nebo `not_verified_in_game`.
-
-## Finální CI kontrola po opravách
-
-Auditovaný runtime kód: `81395614d920ad08947c979aab83d9c74111a6af`.
-
-- Statická validace a automatické testy: úspěch, GitHub Actions run `41431858850`.
-- .NET 6 build a vytvoření Thunderstore ZIP: úspěch, run `41431858837`.
-- Artefakt `ScheduleIMegaExpansion-0.2.0`: ID `13133824318`.
-
-Tyto kontroly nepotvrzují běh hry. Přesné souřadnice, prostorové hranice Docks, kolize na skutečném terénu, vykreslení v IL2CPP, mapové ikony ani interakce nebyly ověřeny uvnitř Schedule I.
+**Závěr:** PR #13 nyní obsahuje první nativní gameplay slice pro NPC, dealery a rozšíření existujícího obchodu. Nejde ještě o hotový Harborline: nový Realtor business inventory, samostatná Harborline prodejna, online objednávky, plné osídlení 42 NPC a další district systémy zůstávají před námi.
