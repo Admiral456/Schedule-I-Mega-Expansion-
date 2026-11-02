@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "status": "catalog-export-enabled; runtime-verification-pending",
+  "status": "candidate-catalog-export-enabled; runtime-verification-pending",
   "runtimeReport": "UserData/ScheduleIMegaExpansion/Diagnostics/<timestamp>/native-prefabs.csv",
   "catalogBehavior": "Read-only S1MAPI PrefabRef.Find() scan; the mod never instantiates discovered prefabs during catalog export.",
-  "purpose": "Registry of exact Schedule I prefabs and meshes verified in the current game build.",
+  "purpose": "Candidate Schedule I/S1MAPI prefab names to be checked in the installed game. No entries are marked verified until native-prefabs.csv and an in-game inspection confirm them.",
   "entries": [],
   "rules": [
     "Record exact asset names from runtime discovery; do not guess names.",
@@ -14,10 +14,30 @@
     "Use InteriorBuilder or mesh references for static decoration."
   ],
   "documentedExamplesToVerify": [
-    { "name": "ATM", "networked": true },
-    { "name": "ModularSwitch", "networked": true },
-    { "name": "SlidingDoors", "networked": true },
-    { "name": "Door", "networked": true },
-    { "name": "Storage", "networked": true }
+    {
+      "name": "ATM",
+      "networked": true,
+      "verified": false
+    },
+    {
+      "name": "ModularSwitch",
+      "networked": true,
+      "verified": false
+    },
+    {
+      "name": "SlidingDoors",
+      "networked": true,
+      "verified": false
+    },
+    {
+      "name": "Door",
+      "networked": true,
+      "verified": false
+    },
+    {
+      "name": "Storage",
+      "networked": true,
+      "verified": false
+    }
   ]
 }
