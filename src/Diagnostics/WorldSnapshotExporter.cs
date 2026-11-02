@@ -42,6 +42,15 @@ namespace ScheduleIMegaExpansion.Diagnostics
             WriteProperties(outputDirectory, summary, warn);
             WriteBusinesses(outputDirectory, summary, warn);
             WriteStandaloneMapPois(outputDirectory, summary, warn);
+            try
+            {
+                int prefabsFound = NativePrefabCatalogExporter.Export(outputDirectory, summary, warn);
+                summary.Add("NativePrefabReferencesFound=" + prefabsFound.ToString(CultureInfo.InvariantCulture));
+            }
+            catch (Exception ex)
+            {
+                AddError("NativePrefabs", ex, summary, warn);
+            }
 
             try
             {
