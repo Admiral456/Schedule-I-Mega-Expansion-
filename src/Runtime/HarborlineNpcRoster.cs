@@ -1,10 +1,10 @@
 using System;
 using MelonLoader;
+using System.Reflection;
 using S1API.Entities;
 using S1API.Economy;
 using S1API.Map;
 using S1API.Products;
-using UnityEngine;
 
 namespace ScheduleIMegaExpansion.Runtime
 {
@@ -15,18 +15,67 @@ namespace ScheduleIMegaExpansion.Runtime
     /// </summary>
     internal static class HarborlineNpcSpawnPoints
     {
-        public static bool TryGet(int slot, out Vector3 position)
+        public static bool TryGet(int slot, out float x, out float y, out float z)
         {
-            position = Vector3.zero;
+            x = y = z = 0f;
             if (slot < 0 || slot > 4)
                 return false;
 
-            if (!HarborlinePhysicalBuilder.TryGetPlannedNpcSpawnPosition(
-                    slot, out float x, out float y, out float z))
+            return HarborlinePhysicalBuilder.TryGetPlannedNpcSpawnPosition(
+                slot, out x, out y, out z);
+        }
+
+        private static object CreateNativeVector3(float x, float y, float z)
+        {
+            PropertyInfo? position = typeof(NPC).GetProperty(
+                "Position", BindingFlags.Public | BindingFlags.Instance);
+            Type? vectorType = position?.PropertyType;
+            if (vectorType == null)
+                throw new MissingMemberException("S1API NPC.Position property type could not be resolved.");
+
+            object? value = Activator.CreateInstance(vectorType, new object[] { x, y, z });
+            return value ?? throw new InvalidOperationException("Could not construct the native Unity Vector3 value.");
+        }
+
+        private static bool TryConfigurePrefabSpawnPosition(
+            NPCPrefabBuilder builder, float x, float y, float z)
+        {
+            try
+            {
+                MethodInfo? method = typeof(NPCPrefabBuilder).GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                    .FirstOrDefault(candidate => candidate.Name == "WithSpawnPosition"
+                        && candidate.GetParameters().Length == 1);
+                if (method == null)
+                    return false;
+                method.Invoke(builder, new[] { CreateNativeVector3(x, y, z) });
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning("[Schedule I Mega Expansion] Could not attach a measured spawn point to the NPC prefab: " + ex.Message);
+                return false;
+            }
+        }
+
+        public static bool TryApplyRuntimePosition(NPC npc, int slot)
+        {
+            if (!TryGet(slot, out float x, out float y, out float z))
                 return false;
 
-            position = new Vector3(x, y, z);
-            return true;
+            try
+            {
+                PropertyInfo? position = npc.GetType().GetProperty(
+                    "Position", BindingFlags.Public | BindingFlags.Instance);
+                if (position?.CanWrite != true)
+                    return false;
+                position.SetValue(npc, CreateNativeVector3(x, y, z));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning("[Schedule I Mega Expansion] Could not position NPC '" + npc.ID + "': " + ex.Message);
+                return false;
+            }
         }
 
         public static void Configure(
@@ -39,20 +88,12 @@ namespace ScheduleIMegaExpansion.Runtime
             builder.WithIdentity(id, firstName, lastName)
                 .WithRegion(Region.Docks);
 
-            if (TryGet(slot, out Vector3 position))
-                builder.WithSpawnPosition(position);
-            else
-                MelonLogger.Warning("[Schedule I Mega Expansion] Native NPC prefab '" + id +
-                    "' was registered before Harborline ground placement was measurable. " +
-                    "The runtime registrar will position its instance after the dockyard is built.");
-        }
-
-        public static Vector3 GetRuntimePosition(int slot)
-        {
-            if (!TryGet(slot, out Vector3 position))
-                throw new InvalidOperationException(
-                    "Harborline has no verified ground spawn point yet; NPC creation is deferred.");
-            return position;
+            if (!TryGet(slot, out float x, out float y, out float z)
+                || !TryConfigurePrefabSpawnPosition(builder, x, y, z))
+            {
+                MelonLogger.Msg("[Schedule I Mega Expansion] NPC '" + id +
+                    "' will receive its measured position after the dockyard is generated.");
+            }
         }
     }
 
@@ -358,7 +399,7 @@ namespace ScheduleIMegaExpansion.Runtime
                 return false;
             }
 
-            if (!HarborlineNpcSpawnPoints.TryGet(0, out _))
+            if (!HarborlineNpcSpawnPoints.TryGet(0, out _, out _, out _))
             {
                 if (!_warnedPlacement)
                 {
@@ -412,9 +453,10 @@ namespace ScheduleIMegaExpansion.Runtime
             }
 
             T npc = factory();
-            // S1API's prefab builder already carries this spawn point. Assign it again on the
-            // created wrapper so the first save's instance and subsequent reloads agree.
-            npc.Position = HarborlineNpcSpawnPoints.GetRuntimePosition(slot);
+            // Prefer the native prefab spawn point; reapply after creation so geometry and NPC
+            // share the exact measured coordinates even if S1API scanned prefabs before world load.
+            if (!HarborlineNpcSpawnPoints.TryApplyRuntimePosition(npc, slot))
+                throw new InvalidOperationException("Native position assignment failed for '" + id + "'.");
             created++;
         }
     }
