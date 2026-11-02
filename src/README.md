@@ -56,7 +56,7 @@ Files:
 - native-businesses.csv
 - standalone-phone-map-pois.csv
 - native-game-api-surface.txt
-- native-prefabs.csv
+- native-prefabs.csv (documented S1MAPI references, with unknown network status when component inspection is unavailable)
 
 ## Why this is needed
 
