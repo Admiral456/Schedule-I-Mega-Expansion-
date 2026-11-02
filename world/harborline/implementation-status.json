@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "project": "Schedule I Mega Expansion / Harborline",
-  "reviewedCommit": "67b52b939bb9e36cd96522cdd6fdcc876d618002",
+  "reviewedCommit": "ac46eb774a48bbfd044969c566e0e931b65ba110",
   "reviewMethod": "source review against current upstream S1API/S1MAPI public source, repository implementation, static tests and CI. No Schedule I game runtime or user save was available to this audit.",
   "statusLegend": {
     "implemented_code_unverified_runtime": "Code exists and builds, but target-game execution is not confirmed.",
@@ -228,5 +228,16 @@
       "remaining": "Run in the actual Schedule I installation and inspect diagnostic files, logs, generated placement and gameplay behavior."
     }
   ],
-  "overallVerdict": "The repository is not yet a complete or fully integrated Harborline mod. It contains a buildable runtime prototype, automatic session-local geometry generation and read-only diagnostics. The original NPC, property/realtor, map, shop/online order, police, native interaction, save-persistence and multiplayer requirements are not implemented or not verified."
+  "overallVerdict": "The repository is not yet a complete or fully integrated Harborline mod. It contains a buildable runtime prototype, automatic session-local geometry generation and read-only diagnostics. The original NPC, property/realtor, map, shop/online order, police, native interaction, save-persistence and multiplayer requirements are not implemented or not verified.",
+  "validation": {
+    "checkedCommit": "ac46eb774a48bbfd044969c566e0e931b65ba110",
+    "staticValidationRunId": 41431858850,
+    "staticValidationConclusion": "success",
+    "runtimeBuildRunId": 41431858837,
+    "runtimeBuildConclusion": "success",
+    "thunderstoreArtifactId": 13133824318,
+    "thunderstoreArtifactName": "ScheduleIMegaExpansion-0.2.0",
+    "runtimeGameExecution": "not performed",
+    "caveat": "CI success establishes compilation, JSON/package integrity and source tests only. It does not verify Unity/IL2CPP runtime behavior or the actual Docks placement."
+  }
 }
