@@ -21,7 +21,9 @@ namespace ScheduleIMegaExpansion.Runtime
     internal static class HarborlinePhysicalBuilder
     {
         private const string RootName = "ScheduleIMegaExpansion_Harborline_PhysicalPreview";
+        private const string PendingRootName = RootName + "_Pending";
         private static bool _built;
+        private static object? _rootObject;
         private static object? _rootTransform;
         private static Type? _gameObjectType;
         private static Type? _primitiveType;
@@ -50,7 +52,11 @@ namespace ScheduleIMegaExpansion.Runtime
 
         public static void ResetForNewSave()
         {
+            CleanupGeneratedRoot(RootName);
+            CleanupGeneratedRoot(PendingRootName);
+            CleanupActiveRoot();
             _built = false;
+            _rootObject = null;
             _rootTransform = null;
             _placementAttempts = 0;
             _reportedMissingDocksAnchor = false;
@@ -66,12 +72,22 @@ namespace ScheduleIMegaExpansion.Runtime
             _placementAttempts++;
             try
             {
-                if (IsMultiplayerSession())
+                if (!IsConfirmedSinglePlayer(out int playerCount))
                 {
                     if (_placementAttempts == 1)
-                        warn("Harborline auto-generation is disabled in multiplayer until all geometry is spawned through the host network.");
+                    {
+                        string reason = playerCount == 0
+                            ? "S1API player registry is not ready"
+                            : playerCount > 1
+                                ? "multiple players are connected"
+                                : "the S1API player registry is unavailable";
+                        warn("Harborline auto-generation is waiting for a confirmed single-player session (" + reason + "). Multiplayer generation requires host-authoritative network spawning.");
+                    }
                     return false;
                 }
+
+                // Remove an orphaned pending root left by an interrupted earlier attempt.
+                CleanupGeneratedRoot(PendingRootName);
 
                 if (FindExistingRoot())
                 {
@@ -102,6 +118,7 @@ namespace ScheduleIMegaExpansion.Runtime
                 }
 
                 CreateRoot(placement, out object rootObject, out object rootTransform);
+                _rootObject = rootObject;
                 _rootTransform = rootTransform;
 
                 Add("Dockyard ground slab", 0f, -0.28f, 0f, 54f, 0.55f, 28f, 0.34f, 0.36f, 0.37f);
@@ -116,7 +133,6 @@ namespace ScheduleIMegaExpansion.Runtime
                 BuildStreetFurniture();
                 BuildQuay();
 
-                _built = true;
                 Directory.CreateDirectory(Path.Combine(gameRoot, "UserData", "ScheduleIMegaExpansion", "Harborline"));
                 File.WriteAllText(
                     Path.Combine(gameRoot, "UserData", "ScheduleIMegaExpansion", "Harborline", "last-generation.json"),
@@ -132,6 +148,12 @@ namespace ScheduleIMegaExpansion.Runtime
                         root = RootName,
                         placement = _selectedPlacement
                     }, new JsonSerializerOptions { WriteIndented = true }));
+                // Only publish the root as complete after every object and the
+                // generation report have been created successfully.
+                SetProperty(rootObject, "name", RootName);
+                _built = true;
+                _rootObject = null;
+                _rootTransform = null;
                 log("Harborline generated automatically from the native Docks Warehouse property anchor.");
                 log("Physical slice spawned at X=" + F(placement.X) + " Y=" + F(placement.Y) + " Z=" + F(placement.Z) + " yaw=" + F(placement.Yaw));
                 log("Created under root object: " + RootName);
@@ -140,7 +162,11 @@ namespace ScheduleIMegaExpansion.Runtime
             }
             catch (Exception ex)
             {
-                warn("Harborline physical build failed: " + ex.GetType().Name + ": " + ex.Message);
+                // Roll back the pending hierarchy so the next retry cannot mistake
+                // a partially built dockyard for a successful one.
+                CleanupActiveRoot();
+                _built = false;
+                warn("Harborline physical build failed and pending geometry was rolled back: " + ex.GetType().Name + ": " + ex.Message);
                 warn(ex.StackTrace ?? string.Empty);
                 return false;
             }
@@ -352,10 +378,50 @@ namespace ScheduleIMegaExpansion.Runtime
 
         private static bool FindExistingRoot()
         {
+            return FindGameObject(RootName) != null;
+        }
+
+        private static object? FindGameObject(string name)
+        {
             Type? gameObject = FindType("UnityEngine.GameObject");
             MethodInfo? find = gameObject?.GetMethod("Find", BindingFlags.Public | BindingFlags.Static,
                 null, new[] { typeof(string) }, null);
-            return find?.Invoke(null, new object[] { RootName }) != null;
+            return find?.Invoke(null, new object[] { name });
+        }
+
+        private static void CleanupActiveRoot()
+        {
+            if (_rootObject != null)
+                DestroyGameObject(_rootObject);
+            _rootObject = null;
+            _rootTransform = null;
+        }
+
+        private static void CleanupGeneratedRoot(string name)
+        {
+            try
+            {
+                object? root = FindGameObject(name);
+                if (root != null)
+                    DestroyGameObject(root);
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning("[Schedule I Mega Expansion] Could not clean up " + name + ": " + ex.Message);
+            }
+        }
+
+        private static void DestroyGameObject(object gameObject)
+        {
+            Type? unityObject = FindType("UnityEngine.Object");
+            MethodInfo? destroy = unityObject?.GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .FirstOrDefault(method =>
+                    method.Name == "Destroy"
+                    && method.GetParameters().Length == 1
+                    && method.GetParameters()[0].ParameterType.IsAssignableFrom(gameObject.GetType()));
+            if (destroy == null)
+                throw new MissingMethodException("UnityEngine.Object.Destroy(Object) was not found for rollback.");
+            destroy.Invoke(null, new[] { gameObject });
         }
 
         private static void BuildWarehouse()
@@ -471,7 +537,7 @@ namespace ScheduleIMegaExpansion.Runtime
 
         private static void CreateRoot(Anchor anchor, out object rootObject, out object rootTransform)
         {
-            rootObject = Activator.CreateInstance(_gameObjectType!, new object[] { RootName })!;
+            rootObject = Activator.CreateInstance(_gameObjectType!, new object[] { PendingRootName })!;
             rootTransform = GetProperty(rootObject, "transform")!;
             SetProperty(rootTransform, "position", NewVector3(anchor.X, anchor.Y, anchor.Z));
             SetProperty(rootTransform, "rotation", NewYawQuaternion(anchor.Yaw));
@@ -500,23 +566,31 @@ namespace ScheduleIMegaExpansion.Runtime
             return method.Invoke(gameObject, new object[] { componentType })!;
         }
 
-        private static bool IsMultiplayerSession()
+        private static bool IsConfirmedSinglePlayer(out int playerCount)
         {
-            // Be conservative: any connected player list with more than one
-            // participant means a local-only preview would desynchronize clients.
-            Type? playerType = FindType("Il2CppScheduleOne.PlayerScripts.Player")
-                ?? FindType("ScheduleOne.PlayerScripts.Player")
-                ?? FindType("Player");
-            if (playerType == null)
-                return true;
+            playerCount = 0;
 
-            object? players = GetStaticProperty(playerType, "PlayerList")
-                ?? playerType.GetField("PlayerList", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)?.GetValue(null);
+            // S1API exposes wrapped players through S1API.Entities.Player.All.
+            // Do not probe the underlying ScheduleOne Player type: it does not
+            // expose the public PlayerList contract used by this mod.
+            Type? playerType = FindType("S1API.Entities.Player");
+            if (playerType == null)
+                return false;
+
+            object? players = playerType.GetField("All",
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)?.GetValue(null)
+                ?? GetStaticProperty(playerType, "All");
             if (players == null)
-                return true;
+                return false;
 
             object? count = GetMemberValue(players, "Count");
-            return count == null || Convert.ToInt32(count, CultureInfo.InvariantCulture) > 1;
+            if (count == null)
+                return false;
+
+            playerCount = Convert.ToInt32(count, CultureInfo.InvariantCulture);
+            // Exactly one fully registered S1API player confirms single-player.
+            // Zero means the wrapper registry is not ready; >1 means multiplayer.
+            return playerCount == 1;
         }
 
         private static void EnsureUnityTypes()
@@ -569,8 +643,9 @@ namespace ScheduleIMegaExpansion.Runtime
         private static void SetProperty(object instance, string name, object? value)
         {
             PropertyInfo? property = instance.GetType().GetProperty(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            if (property?.CanWrite == true)
-                property.SetValue(instance, value, null);
+            if (property?.CanWrite != true)
+                throw new MissingMemberException(instance.GetType().FullName, name + " writable property");
+            property.SetValue(instance, value, null);
         }
 
         private static float ReadFloat(object instance, string name)
