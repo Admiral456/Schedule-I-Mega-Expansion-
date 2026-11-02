@@ -10,6 +10,7 @@ class RuntimeDiagnosticTests(unittest.TestCase):
     def setUpClass(cls):
         cls.project_path = ROOT / "src" / "ScheduleIMegaExpansion.csproj"
         cls.project = ET.parse(cls.project_path).getroot()
+        cls.manifest = __import__("json").loads((ROOT / "manifest.json").read_text(encoding="utf-8"))
         cls.core = (ROOT / "src" / "Core.cs").read_text(encoding="utf-8")
         cls.exporter = (ROOT / "src" / "Diagnostics" / "WorldSnapshotExporter.cs").read_text(encoding="utf-8")
         cls.scanner = (ROOT / "src" / "Diagnostics" / "NativeApiSurfaceScanner.cs").read_text(encoding="utf-8")
@@ -21,6 +22,8 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         target = self.project.find("./PropertyGroup/TargetFramework")
         self.assertIsNotNone(target)
         self.assertEqual(target.text, "net6.0")
+        version = self.project.find("./PropertyGroup/Version")
+        self.assertEqual(version.text, self.manifest["version_number"])
 
     def test_runtime_can_compile_without_game_assemblies(self):
         references = self.project.findall(".//Reference")
@@ -49,7 +52,6 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn("NativePrefabCatalogExporter.Export(", self.exporter)
         self.assertIn("native-prefabs.csv", self.prefabs)
         self.assertIn("S1MAPI.Core.PrefabRef", self.prefabs)
-        self.assertIn("InstantiateNetworked", self.prefabs) if False else None
         self.assertIn("native-game-api-surface.txt", self.scanner)
         for token in ("Door", "Police", "Navigation", "NPC", "Avatar", "Schedule", "Customer", "Dealer"):
             self.assertIn('"'+token+'"', self.scanner)
@@ -63,6 +65,7 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertNotIn(".Invoke(", self.scanner)
         self.assertNotIn(".Instantiate(", self.prefabs)
         self.assertNotIn(".InstantiateNetworked(", self.prefabs)
+        self.assertIn('"unknown-do-not-spawn"', self.prefabs)
 
     def test_harborline_physical_slice_uses_real_unity_objects_and_colliders(self):
         self.assertIn('CreatePrimitive', self.physical)
@@ -88,6 +91,15 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn('Raycast', self.physical)
         self.assertNotIn('F6', self.physical)
         self.assertNotIn('F7', self.physical)
+
+    def test_thunderstore_manifest_declares_runtime_dependencies(self):
+        self.assertEqual(self.manifest["name"], "ScheduleIMegaExpansion")
+        self.assertEqual(self.manifest["version_number"], "0.2.0")
+        dependencies = set(self.manifest["dependencies"])
+        self.assertIn("LavaGang-MelonLoader-0.7.3", dependencies)
+        self.assertIn("ifBars-S1API_Forked-3.2.2", dependencies)
+        self.assertIn("ifBars-S1MAPI-2.0.1", dependencies)
+        self.assertIn("ScheduleIMegaExpansion-0.2.0.zip", (ROOT / ".github" / "workflows" / "build-runtime.yml").read_text(encoding="utf-8"))
 
     def test_installer_only_copies_the_built_dll(self):
         self.assertIn("Schedule I.exe", self.installer)
