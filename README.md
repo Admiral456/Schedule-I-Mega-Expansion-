@@ -39,7 +39,7 @@ NPC role a cílové počty jsou v `packs/Harborline/roster.json`: nově 42 fyzic
 
 - **MelonLoader + S1API Forked** – nativní NPC, zákaznická/dealerská ekonomika, vzhled, rozvrhy, předměty a obchody.
 - **S1MAPI** – budovy a interiéry pouze pro prvky, které nelze vhodně znovu použít z původní hry.
-- Projekt se kompiluje proti IL2CPP S1API runtime DLL a game reference balíčkům. Build workflow si odpovídající S1API 3.2.2 stáhne z Thunderstore; S1API DLL se do našeho ZIPu nepřibaluje, protože ji hra dostává jako deklarovanou závislost. Viz [S1API Custom NPCs](https://ifbars.github.io/S1API/docs/custom-npcs.html), [NPCAppearance](https://ifbars.github.io/S1API/api/S1API.Entities.NPCAppearance.html) a [S1MAPI](https://ifbars.github.io/S1MAPI/).
+- Projekt používá oficiální compile-time balíček `S1API.Forked` 3.2.2 z NuGetu. Hra načítá vlastní IL2CPP runtime sestavení S1API z deklarované Thunderstore závislosti; S1API DLL se do našeho ZIPu nepřibaluje. Viz [S1API Custom NPCs](https://ifbars.github.io/S1API/docs/custom-npcs.html), [NPCAppearance](https://ifbars.github.io/S1API/api/S1API.Entities.NPCAppearance.html) a [S1MAPI](https://ifbars.github.io/S1MAPI/).
 
 ## Instalace a závislosti
 
