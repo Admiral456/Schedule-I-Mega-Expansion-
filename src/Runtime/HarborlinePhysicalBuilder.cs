@@ -49,6 +49,7 @@ namespace ScheduleIMegaExpansion.Runtime
         private static bool _reportedMissingDocksAnchor;
         private static bool _reportedNoClearSite;
         private static string? _selectedPlacement;
+        private static Anchor? _lastPlacementAnchor;
 
         public static void ResetForNewSave()
         {
@@ -66,6 +67,68 @@ namespace ScheduleIMegaExpansion.Runtime
             _reportedMissingDocksAnchor = false;
             _reportedNoClearSite = false;
             _selectedPlacement = null;
+            _lastPlacementAnchor = null;
+        }
+
+        /// <summary>
+        /// Returns a stable spawn point inside the same candidate footprint used by the physical dockyard.
+        /// NPC prefabs may ask for this before the geometry is committed, so the chosen anchor is cached
+        /// and reused by TryAutoGenerate rather than independently searching for a second location.
+        /// </summary>
+        public static bool TryGetPlannedNpcSpawnPosition(int slot, out float x, out float y, out float z)
+        {
+            x = y = z = 0f;
+            if (slot < 0 || slot > 4)
+                return false;
+
+            try
+            {
+                if (!_lastPlacementAnchor.HasValue)
+                {
+                    if (!TryFindDocksWarehouseAnchor(out Anchor docksAnchor))
+                        return false;
+                    EnsureUnityTypes();
+                    if (!TryFindClearPlacement(docksAnchor, out Anchor planned))
+                        return false;
+                    _lastPlacementAnchor = planned;
+                    _selectedPlacement = "reserved for native NPCs: " + _selectedPlacement;
+                }
+
+                Anchor placement = _lastPlacementAnchor.Value;
+                float localX = slot switch
+                {
+                    0 => -4.5f,
+                    1 => 4.5f,
+                    2 => -17.0f,
+                    3 => -1.5f,
+                    _ => 15.0f
+                };
+                float localZ = slot switch
+                {
+                    0 => 10.0f,
+                    1 => 10.0f,
+                    2 => -9.0f,
+                    3 => -11.0f,
+                    _ => 7.0f
+                };
+                float radians = placement.Yaw * (float)Math.PI / 180f;
+                float cos = (float)Math.Cos(radians);
+                float sin = (float)Math.Sin(radians);
+                x = placement.X + localX * cos + localZ * sin;
+                y = placement.Y;
+                z = placement.Z - localX * sin + localZ * cos;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning("[Schedule I Mega Expansion] Could not resolve native NPC spawn point: " + ex.Message);
+                return false;
+            }
+        }
+
+        public static bool IsConfirmedSinglePlayerSession()
+        {
+            return IsConfirmedSinglePlayer(out _);
         }
 
         public static bool TryAutoGenerate(string gameRoot, Action<string> log, Action<string> warn)
@@ -95,6 +158,8 @@ namespace ScheduleIMegaExpansion.Runtime
 
                 if (FindExistingRoot())
                 {
+                    if (!_lastPlacementAnchor.HasValue && !TryLoadPlacementReport(gameRoot))
+                        warn("The existing Harborline root was found but its placement report could not be read; NPC placement will remain disabled until coordinates are recovered.");
                     _built = true;
                     log("Existing Harborline world root found; skipped duplicate generation.");
                     return true;
@@ -111,7 +176,16 @@ namespace ScheduleIMegaExpansion.Runtime
                 }
 
                 EnsureUnityTypes();
-                if (!TryFindClearPlacement(docksAnchor, out Anchor placement))
+                Anchor placement;
+                if (_lastPlacementAnchor.HasValue)
+                {
+                    placement = _lastPlacementAnchor.Value;
+                }
+                else if (TryFindClearPlacement(docksAnchor, out placement))
+                {
+                    _lastPlacementAnchor = placement;
+                }
+                else
                 {
                     if (!_reportedNoClearSite)
                     {
@@ -223,6 +297,35 @@ namespace ScheduleIMegaExpansion.Runtime
             }
 
             return false;
+        }
+
+        private static bool TryLoadPlacementReport(string gameRoot)
+        {
+            try
+            {
+                string reportPath = Path.Combine(gameRoot, "UserData", "ScheduleIMegaExpansion", "Harborline", "last-generation.json");
+                if (!File.Exists(reportPath))
+                    return false;
+
+                using JsonDocument document = JsonDocument.Parse(File.ReadAllText(reportPath));
+                JsonElement root = document.RootElement;
+                if (!root.TryGetProperty("x", out JsonElement x)
+                    || !root.TryGetProperty("y", out JsonElement y)
+                    || !root.TryGetProperty("z", out JsonElement z))
+                    return false;
+
+                float yaw = root.TryGetProperty("rotationY", out JsonElement rotation)
+                    ? rotation.GetSingle()
+                    : 0f;
+                _lastPlacementAnchor = new Anchor(x.GetSingle(), y.GetSingle(), z.GetSingle(), yaw);
+                _selectedPlacement = "restored from last-generation.json";
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning("[Schedule I Mega Expansion] Failed to restore Harborline placement report: " + ex.Message);
+                return false;
+            }
         }
 
         private static bool TryFindClearPlacement(Anchor origin, out Anchor placement)
