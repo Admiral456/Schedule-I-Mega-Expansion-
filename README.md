@@ -7,8 +7,8 @@ Cílem je přirozeně rozšířit Hyland Point o nové obyvatelné a funkční o
 ## Principy
 
 1. **Nejdřív znovu použít hru.** Preferujeme existující prefaby, budovy, nábytek, světla, silniční prvky a herní interakce. Vlastní geometrii použijeme jen tam, kde ve hře vhodný prvek neexistuje.
-2. **NPC jako data.** NPC budou tvořena jako S1API.Entities.NPC přes původní herní NPC systém; vzhled generuje instance `Appearance.GenerateRandomAppearance()` následované `Appearance.Build()`. Jejich zákaznické/dealerské vlastnosti, rozvrhy a kontakty budou definované v balíčku.
-3. **Žádné vymyšlené souřadnice.** Pozice se musí zachytit přímo ve hře. 2D mapové souřadnice z webového pomocníka nejsou Unity World X/Y/Z.
+2. **NPC jako data.** Cílem je tvořit NPC jako S1API.Entities.NPC přes původní herní systém. Jejich vzhled, zákaznické/dealerské vlastnosti a rozvrhy jsou zatím návrhem; runtime třídy NPC v projektu dosud nejsou.
+3. **Žádné vymyšlené souřadnice.** Prototyp používá pozici existující Docks Warehouse a fyzikální kontroly Unity. Přesné hranice Docks a výsledné umístění zatím nejsou ověřené v cílové hře.
 4. **Host je autorita.** Síťové změny a stav světa musí respektovat síťové/ukládací mechanismy hry a S1API.
 5. **Po malých ověřitelných krocích.** Nejdřív funkční Harborline, až potom další provincie a rozšiřování mobilní sítě.
 
@@ -18,12 +18,12 @@ Harborline je pojmenovaná podčtvrť původního herního regionu **Docks**; ne
 
 NPC role a cílové počty jsou v `packs/Harborline/roster.json`: nově 42 fyzických NPC, z toho zhruba 18 současně aktivních, 30 zákaznických profilů a 2 dealeři. Harborline je rozdělený do pěti propojených podčástí. Detail rozšíření je v `world/harborline/expansion-plan.json`.
 
-## Generování NPC a multiplayer
+## Návrh NPC a multiplayeru – zatím neimplementováno
 
-- Každý zákazník má vlastní náhodné preference, ale generování je deterministické podle stabilního ID a uložené do save; po načtení ani připojení hráče se znovu nelosuje.
-- Vzhledy generuje nativní instance `Appearance.GenerateRandomAppearance()` a `Appearance.Build()`; přesné duplicity se mají kontrolovat na skutečných AvatarSettings.
-- Policie se nebude nahrazovat vlastním AI; Harborline se napojí na nativní policejní spawn/dispatch a navigaci.
-- Host je autorita pro spawn a stav NPC. Všichni hráči musí mít shodnou verzi modu a S1API.
+- Plán počítá s vlastními zákaznickými preferencemi a jejich uložením. V současném runtime však nejsou žádné Harborline NPC třídy ani ukládání těchto profilů.
+- Nativní vzhled má být vytvořen přes Appearance.GenerateRandomAppearance() a Appearance.Build(); tyto metody zatím nejsou volány žádnou Harborline NPC třídou.
+- Policie se nebude nahrazovat vlastním AI; napojení na nativní spawn/dispatch zatím není implementováno.
+- Host má být autoritou pro spawn a stav NPC. Multiplayerová implementace zatím není přítomná.
 - Detailní kontrakt a testovací brány: `docs/npc-generation-and-multiplayer.md`.
 
 ## Technologická vrstva
@@ -39,10 +39,10 @@ Pro mod manager je připraven manifest `manifest.json`. Balíček obsahuje samot
 
 ## Aktuální stav a limity
 
-- Větev nyní obsahuje runtime prototyp včetně read-only katalogu známých S1MAPI prefabů. Po načtení uložené hry se automaticky hledá vhodná plocha v okolí Docks Warehouse a vytvoří se fyzický přístavní areál. Nejde zatím o finální nativní budovy/obchody a nespawnuje NPC.
-- Umístění se odvozuje z nativní pozice Docks Warehouse a runtime fyzikálních kontrol; nepoužívají se souřadnice odhadnuté z obrázku mapy.
-- Nákup businessů, obchodní inventář, policie a Hyland Network se napojí na původní systémy až po ověření jejich API v cílové verzi hry.
-- GitHub Actions sestavuje IL2CPP mod a balí instalovatelný Thunderstore ZIP. Samotný běh ve hře a jeho výstup ještě nejsou ověřeny; diagnostický runtime nic nemění a vyčítá původní registry pro další implementaci.
+- Runtime obsahuje automatické generování pouze první geometrické prototypové části z Unity primitiv po načtení save. Přesné umístění, kolize a běh v cílové hře nejsou ověřeny. Nejde o nativní budovu, podnik ani obchod a žádné Harborline NPC se zatím nevytváří.
+- Umístění se odvozuje z nativní pozice Docks Warehouse a runtime fyzikálních kontrol. To ale samo o sobě nezaručuje, že kandidát leží uvnitř hranic Docks nebo že není nad vodou s neoznačeným colliderem.
+- Nativní Realtor/property registrace, mapové ikony, funkční interiéry, dveře, obchody, online objednávky, NPC, policie, ukládání a multiplayer nejsou v runtime implementované. Veřejné S1API PropertyManager a BusinessManager zatím pouze enumerují existující záznamy.
+- GitHub Actions sestavuje IL2CPP mod a balí Thunderstore ZIP. Statické testy a build neprokazují chování ve hře. Diagnostické exportéry pouze čtou registry, ale celý mod navíc vytváří session-local Unity geometrii.
 
 ## Struktura
 
@@ -52,10 +52,11 @@ Pro mod manager je připraven manifest `manifest.json`. Balíček obsahuje samot
 - `docs/npc-generation-and-multiplayer.md` – náhodné preference, nativní generování vzhledu, policie a multiplayer.
 - `docs/native-map-buildings-interiors.md` – herní mapa, nativní ikony/vlastnictví, dveře a funkční interiéry.
 - `world/harborline/native-integration.json` – nativní integrační pravidla a kontrolní brány.
-- `src/` – IL2CPP runtime mod s automatickým fyzickým prototypem a read-only průzkumem nativních registrů a prefabs.
+- `src/` – IL2CPP runtime prototyp, automatická geometrie a read-only průzkum nativních registrů a prefabů.
 - `world/harborline/anchors.json` – seznam lokalit a míst k zaměření.
 - `world/harborline/expansion-plan.json` – plán větší oblasti a pěti podčástí.
-- `world/harborline/prefabs.json` – katalog původních prefabů ověřených přímo ve hře.
+- `world/harborline/prefabs.json` – katalog kandidátních prefabů k ověření v cílové hře.
+- `world/harborline/implementation-status.json` a `docs/implementation-audit.md` – matice skutečného stavu každého požadavku.
 - `packs/Harborline/roster.json` – role a cílové počty NPC.
 - `packs/Harborline/customer-designs.json` – 30 návrhů zákaznických preferencí, které se před vydáním mapují na ověřená herní data.
 - `tools/validate_personnel_pack.py` zůstává pouze pomocným validátorem cizích Personnel packů; není součástí plánovaného runtime.
@@ -69,4 +70,4 @@ python -m unittest discover -s tests -v
 
 Runtime diagnostický mod se sestavuje jako samostatný .NET 6 projekt bez lokálních herních DLL. Příkaz `dotnet build src/ScheduleIMegaExpansion.csproj -c Release` vytvoří DLL; GitHub Actions navíc vytváří ZIP artefakt. Do hry se instaluje až po ověření s MelonLoader a S1API.
 
-Současný fyzický prototyp není finální Harborline: chybí nativní registrace budov a podniků, nativní dveře/interakce, NPC, mapové ikony, telefonní objednávky, policie, síťová synchronizace a uložení světa.
+Současný fyzický prototyp není finální Harborline. Kompletní audit: docs/implementation-audit.md. Strojově čitelný stav: world/harborline/implementation-status.json.
