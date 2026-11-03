@@ -94,9 +94,16 @@ namespace ScheduleIMegaExpansion.Runtime
 
                 ParentAndPlace(transform, parentTransform, localX, 0f, localZ);
 
+                bool terrainCleared = TryClearTerrain(gameObject, warn);
+                bool terrainFlattened = TryInvokeOptional(
+                    builder,
+                    "FlattenTerrain",
+                    Array.Empty<object?>());
                 bool interiorNavigationBuilt = TryBuildInteriorNavigation(builder, warn);
                 log("S1MAPI warehouse created: procedural floor, roof, walls and lighting; door=" +
                     (doorAdded ? "networked sliding door requested" : "not available") +
+                    "; terrain foliage cleared=" + (terrainCleared ? "yes" : "not available") +
+                    "; terrain flattened=" + (terrainFlattened ? "yes/requested" : "not available") +
                     "; interior A* navigation=" + (interiorNavigationBuilt ? "built" : "not confirmed") + ".");
                 log("The building is physical geometry only; native Property/Business/Realtor registration is a separate system.");
                 return true;
@@ -194,10 +201,62 @@ namespace ScheduleIMegaExpansion.Runtime
             return method.Invoke(target, BuildPositionalArguments(method.GetParameters(), values));
         }
 
-        private static void TryInvokeOptional(object target, string name, object?[] values)
+        private static bool TryInvokeOptional(object target, string name, object?[] values)
         {
-            try { InvokeRequired(target, name, values); }
-            catch (MissingMethodException) { }
+            try
+            {
+                InvokeRequired(target, name, values);
+                return true;
+            }
+            catch (MissingMethodException)
+            {
+                return false;
+            }
+        }
+
+        private static bool TryClearTerrain(object buildingRoot, Action<string> warn)
+        {
+            try
+            {
+                Type? clearerType = FindType("S1MAPI.Building.Structural.TerrainClearer");
+                Type? optionsType = FindType("S1MAPI.Building.Structural.ClearingOptions");
+                Type? vectorType = FindType("UnityEngine.Vector3")
+                    ?? FindType("Il2CppUnityEngine.Vector3");
+                if (clearerType == null || optionsType == null || vectorType == null)
+                    return false;
+
+                object options = Activator.CreateInstance(optionsType)
+                    ?? throw new InvalidOperationException("S1MAPI ClearingOptions could not be constructed.");
+                SetFloat(options, "Padding", 2.0f);
+                object roomSize = Activator.CreateInstance(vectorType,
+                    new object[] { 13.0f, 5.5f, 12.0f })
+                    ?? throw new InvalidOperationException("Could not construct warehouse dimensions.");
+
+                MethodInfo? clear = clearerType.GetMethods(PublicStatic)
+                    .FirstOrDefault(method =>
+                    {
+                        ParameterInfo[] p = method.GetParameters();
+                        return method.Name == "ClearAroundBuilding"
+                            && p.Length == 3
+                            && p[0].ParameterType.IsInstanceOfType(buildingRoot)
+                            && p[1].ParameterType.IsInstanceOfType(roomSize)
+                            && p[2].ParameterType.IsInstanceOfType(options);
+                    });
+                if (clear == null)
+                {
+                    warn("S1MAPI TerrainClearer.ClearAroundBuilding signature was not found; foliage clearing skipped.");
+                    return false;
+                }
+
+                clear.Invoke(null, new[] { buildingRoot, roomSize, options });
+                return true;
+            }
+            catch (Exception ex)
+            {
+                warn("S1MAPI terrain clearing could not run: " +
+                    ex.GetType().Name + ": " + ex.Message);
+                return false;
+            }
         }
 
         private static bool TryInvokeNamed(
