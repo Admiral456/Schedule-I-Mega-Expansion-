@@ -4,7 +4,9 @@ Tento projekt je stále rozpracované rozšíření. Unity primitiva nejsou nati
 
 ## Implementováno ve zdrojovém kódu
 
-### Nativní NPC – pilot 10 postav
+### Nativní NPC – pilot 11 postav
+
+- `HarborlineOnlineSupplier` je nativní `IsSupplier` NPC Portside Supply. `WithSupplierDefaults` napojuje 14 stejných storable item ID z `HarborlineShopCatalog` do nativního Supplier phone-shop katalogu; S1API vytváří vlastní stash/shop/delivery vehicle a základní herní delivery workflow. Supplier je skrytý během nečinnosti a používá nativní meeting flow. Společná jsou item ID a `BasePurchasePrice`; limitovaný fyzický sklad a synchronizované kusy mezi kanály zatím implementované nejsou. Veřejná `DeliveryRegistry` a `Delivery` API je pouze read-only.
 - **Mason Reed** a **Sierra Voss**: fyzické postavy s rolí PlayerDealer. Používají nativní poplatek za nábor, provizi, pravidla kvality, uložení počtu obchodů, zamčený vztah s možností přímého oslovení a nativní události náboru/smluv.
 - **Caleb Price**, **Nina Brooks**, **Rafael Cole**, **Olivia Hayes**, **Ethan Ward**, **Maya Bennett**, **Lucas Foster** a **Ava Collins**: fyzičtí zákazníci s individuálním rozpočtem, počtem objednávek týdně, preferovaným dnem a časem, standardy, přístupem, šancí zavolat policii, závislostí a drogovými afinitami.
 - Vzhled se vytváří herním generátorem přes `Appearance.GenerateRandomAppearance()` a aplikuje přes `Appearance.Build()`.
@@ -35,7 +37,7 @@ Ceny níže jsou ceny nakonfigurované modem, nikoliv vanilla ceny hry. `BasePur
 
 ## Co ještě není hotové
 
-- Zbývajících 32 fyzických NPC z cíle 42 a zbylých 22 profilů ze zamýšlených 30.
+- Zbývajících 31 fyzických NPC z cíle 42 a zbylých 22 profilů ze zamýšlených 30.
 - Denní směny dělníků, trasy řidičů, rybářské a turistické chování. Nativní scheduler je zapnutý, ale bez ověřených bodů a dveří nelze tvrdit, že NPC chodí po čtvrti.
 - Samostatný Harborline Supply jako nová fyzická provozovna. Aktuální funkční integrace doplňuje existující Hardware Store, protože S1API veřejně neposkytuje registraci nového Shop.
 - Nové koupitelné podniky a bydlení v Realtoru. Veřejný `PropertyManager` a `BusinessManager` mají čtecí API pro existující záznamy, ale zatím nebyl ověřen bezpečný přidávací hook v cílové verzi Schedule I. Nezabíráme ani nepřepisujeme cizí nemovitosti.
