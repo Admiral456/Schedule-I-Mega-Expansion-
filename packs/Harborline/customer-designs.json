@@ -1,605 +1,701 @@
 {
   "schemaVersion": 1,
-  "status": "design_only_not_loaded_by_runtime",
-  "currency": "in_game_cash",
-  "affinityScale": "0-100; larger values mean stronger preference",
-  "runtimeWarning": "These 22 are proposed additional customers. They must not be described as live NPCs until registered, spawned, saved and tested through S1API.",
+  "region": "Harborline",
+  "status": "design-only; preferences are design candidates and must be checked against the target game build",
+  "purpose": "Individual customer behaviour and preference design for the Harborline NPC roster.",
+  "sourceGameProductFamilies": [
+    "Weed",
+    "Meth",
+    "Shrooms",
+    "Cocaine"
+  ],
+  "effectNamesPolicy": "Names must be checked against the target game build before exporting to Personnel.",
+  "mapping": {
+    "personnelRole": "behavior.conversation = customer",
+    "personnelDataBlock": "customer",
+    "notes": "This design file is not the Personnel manifest format. Convert each profile into fields documented by the installed Personnel version."
+  },
   "profiles": [
     {
+      "id": "harborline_customer_01",
+      "archetype": "Pier fisherman",
+      "spendingTier": "low",
+      "ordersPerWeek": 1,
+      "preferredDay": "Monday",
+      "preferredTime": "06:30",
+      "likesProducts": [
+        "Weed"
+      ],
+      "dislikesProducts": [
+        "Cocaine"
+      ],
+      "preferredEffects": [
+        "Calming",
+        "Refreshing"
+      ],
+      "avoidEffects": [
+        "Explosive"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
+    },
+    {
+      "id": "harborline_customer_02",
+      "archetype": "Dock worker",
+      "spendingTier": "low",
+      "ordersPerWeek": 2,
+      "preferredDay": "Tuesday",
+      "preferredTime": "11:00",
+      "likesProducts": [
+        "Weed"
+      ],
+      "dislikesProducts": [
+        "Shrooms"
+      ],
+      "preferredEffects": [
+        "Euphoric",
+        "Munchies"
+      ],
+      "avoidEffects": [
+        "Focused"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
+    },
+    {
+      "id": "harborline_customer_03",
+      "archetype": "Crane operator",
+      "spendingTier": "medium",
+      "ordersPerWeek": 2,
+      "preferredDay": "Wednesday",
+      "preferredTime": "07:00",
+      "likesProducts": [
+        "Meth"
+      ],
+      "dislikesProducts": [
+        "Weed"
+      ],
+      "preferredEffects": [
+        "Energizing",
+        "Focused"
+      ],
+      "avoidEffects": [
+        "Sedating"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
+    },
+    {
+      "id": "harborline_customer_04",
+      "archetype": "Freight driver",
+      "spendingTier": "medium",
+      "ordersPerWeek": 1,
+      "preferredDay": "Thursday",
+      "preferredTime": "15:30",
+      "likesProducts": [
+        "Meth",
+        "Cocaine"
+      ],
+      "dislikesProducts": [
+        "Shrooms"
+      ],
+      "preferredEffects": [
+        "Sneaky",
+        "Slippery"
+      ],
+      "avoidEffects": [
+        "Calming"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
+    },
+    {
+      "id": "harborline_customer_05",
+      "archetype": "Market vendor",
+      "spendingTier": "low",
+      "ordersPerWeek": 3,
+      "preferredDay": "Friday",
+      "preferredTime": "13:00",
+      "likesProducts": [
+        "Weed",
+        "Shrooms"
+      ],
+      "dislikesProducts": [
+        "Cocaine"
+      ],
+      "preferredEffects": [
+        "Thought-Provoking",
+        "Munchies"
+      ],
+      "avoidEffects": [
+        "Lethal"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
+    },
+    {
+      "id": "harborline_customer_06",
+      "archetype": "Mechanic",
+      "spendingTier": "medium",
+      "ordersPerWeek": 3,
+      "preferredDay": "Saturday",
+      "preferredTime": "10:00",
+      "likesProducts": [
+        "Meth"
+      ],
+      "dislikesProducts": [
+        "Weed"
+      ],
+      "preferredEffects": [
+        "Explosive",
+        "Energizing"
+      ],
+      "avoidEffects": [
+        "Foggy"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
+    },
+    {
+      "id": "harborline_customer_07",
+      "archetype": "Tourist",
+      "spendingTier": "high",
+      "ordersPerWeek": 1,
+      "preferredDay": "Saturday",
+      "preferredTime": "20:00",
+      "likesProducts": [
+        "Cocaine",
+        "Shrooms"
+      ],
+      "dislikesProducts": [
+        "Meth"
+      ],
+      "preferredEffects": [
+        "Euphoric",
+        "Spicy"
+      ],
+      "avoidEffects": [
+        "Toxic"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
+    },
+    {
+      "id": "harborline_customer_08",
+      "archetype": "Yacht owner",
+      "spendingTier": "vip",
+      "ordersPerWeek": 2,
+      "preferredDay": "Sunday",
+      "preferredTime": "16:00",
+      "likesProducts": [
+        "Cocaine"
+      ],
+      "dislikesProducts": [
+        "Weed"
+      ],
+      "preferredEffects": [
+        "Tropic Thunder",
+        "Lethal"
+      ],
+      "avoidEffects": [
+        "Sedating"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
+    },
+    {
       "id": "harborline_customer_09",
-      "name": "Noah Whitaker",
-      "status": "planned_not_runtime_registered",
-      "profile": {
-        "budgetPerOrder": 520,
-        "ordersPerWeek": 2,
-        "preferredProduct": "weed",
-        "affinities": {
-          "weed": 88,
-          "meth": 24,
-          "cocaine": 10,
-          "shrooms": 8,
-          "pills": 6
-        },
-        "qualityStandard": "standard",
-        "policeCallChance": 0.05,
-        "addictionLevel": 0.42,
-        "schedule": {
-          "days": [
-            "Mon",
-            "Thu"
-          ],
-          "timeWindow": "17:00-21:00"
-        }
-      }
+      "archetype": "Dock supervisor",
+      "spendingTier": "high",
+      "ordersPerWeek": 2,
+      "preferredDay": "Monday",
+      "preferredTime": "18:00",
+      "likesProducts": [
+        "Meth",
+        "Cocaine"
+      ],
+      "dislikesProducts": [
+        "Shrooms"
+      ],
+      "preferredEffects": [
+        "Thought-Provoking",
+        "Focused"
+      ],
+      "avoidEffects": [
+        "Slippery"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_10",
-      "name": "Ivy Morgan",
-      "status": "planned_not_runtime_registered",
-      "profile": {
-        "budgetPerOrder": 760,
-        "ordersPerWeek": 3,
-        "preferredProduct": "shrooms",
-        "affinities": {
-          "weed": 22,
-          "meth": 24,
-          "cocaine": 10,
-          "shrooms": 88,
-          "pills": 6
-        },
-        "qualityStandard": "high",
-        "policeCallChance": 0.08,
-        "addictionLevel": 0.31,
-        "schedule": {
-          "days": [
-            "Tue",
-            "Fri",
-            "Sun"
-          ],
-          "timeWindow": "15:00-20:00"
-        }
-      }
+      "archetype": "Night-shift worker",
+      "spendingTier": "medium",
+      "ordersPerWeek": 4,
+      "preferredDay": "Tuesday",
+      "preferredTime": "22:00",
+      "likesProducts": [
+        "Weed",
+        "Meth"
+      ],
+      "dislikesProducts": [
+        "Cocaine"
+      ],
+      "preferredEffects": [
+        "Calming",
+        "Sneaky"
+      ],
+      "avoidEffects": [
+        "Energizing"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_11",
-      "name": "Dylan Carter",
-      "status": "planned_not_runtime_registered",
-      "profile": {
-        "budgetPerOrder": 430,
-        "ordersPerWeek": 1,
-        "preferredProduct": "meth",
-        "affinities": {
-          "weed": 22,
-          "meth": 88,
-          "cocaine": 10,
-          "shrooms": 20,
-          "pills": 6
-        },
-        "qualityStandard": "low",
-        "policeCallChance": 0.18,
-        "addictionLevel": 0.71,
-        "schedule": {
-          "days": [
-            "Wed"
-          ],
-          "timeWindow": "19:00-23:00"
-        }
-      }
+      "archetype": "Coastal angler",
+      "spendingTier": "low",
+      "ordersPerWeek": 2,
+      "preferredDay": "Wednesday",
+      "preferredTime": "05:30",
+      "likesProducts": [
+        "Weed"
+      ],
+      "dislikesProducts": [
+        "Meth"
+      ],
+      "preferredEffects": [
+        "Munchies",
+        "Refreshing"
+      ],
+      "avoidEffects": [
+        "Explosive"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_12",
-      "name": "Sofia Bennett",
-      "status": "planned_not_runtime_registered",
-      "profile": {
-        "budgetPerOrder": 980,
-        "ordersPerWeek": 2,
-        "preferredProduct": "cocaine",
-        "affinities": {
-          "weed": 22,
-          "meth": 12,
-          "cocaine": 88,
-          "shrooms": 8,
-          "pills": 18
-        },
-        "qualityStandard": "very_high",
-        "policeCallChance": 0.03,
-        "addictionLevel": 0.26,
-        "schedule": {
-          "days": [
-            "Fri",
-            "Sat"
-          ],
-          "timeWindow": "20:00-00:00"
-        }
-      }
+      "archetype": "Shop clerk",
+      "spendingTier": "medium",
+      "ordersPerWeek": 2,
+      "preferredDay": "Thursday",
+      "preferredTime": "09:30",
+      "likesProducts": [
+        "Shrooms",
+        "Weed"
+      ],
+      "dislikesProducts": [
+        "Cocaine"
+      ],
+      "preferredEffects": [
+        "Euphoric",
+        "Thought-Provoking"
+      ],
+      "avoidEffects": [
+        "Lethal"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_13",
-      "name": "Oliver Hayes",
-      "status": "planned_not_runtime_registered",
-      "profile": {
-        "budgetPerOrder": 340,
-        "ordersPerWeek": 2,
-        "preferredProduct": "weed",
-        "affinities": {
-          "weed": 88,
-          "meth": 24,
-          "cocaine": 10,
-          "shrooms": 8,
-          "pills": 6
-        },
-        "qualityStandard": "standard",
-        "policeCallChance": 0.07,
-        "addictionLevel": 0.52,
-        "schedule": {
-          "days": [
-            "Mon",
-            "Sat"
-          ],
-          "timeWindow": "12:00-16:00"
-        }
-      }
+      "archetype": "Nightlife regular",
+      "spendingTier": "high",
+      "ordersPerWeek": 3,
+      "preferredDay": "Friday",
+      "preferredTime": "23:00",
+      "likesProducts": [
+        "Cocaine",
+        "Meth"
+      ],
+      "dislikesProducts": [
+        "Weed"
+      ],
+      "preferredEffects": [
+        "Spicy",
+        "Euphoric"
+      ],
+      "avoidEffects": [
+        "Calming"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_14",
-      "name": "Chloe Ramirez",
-      "status": "planned_not_runtime_registered",
-      "profile": {
-        "budgetPerOrder": 680,
-        "ordersPerWeek": 3,
-        "preferredProduct": "meth",
-        "affinities": {
-          "weed": 22,
-          "meth": 88,
-          "cocaine": 22,
-          "shrooms": 8,
-          "pills": 6
-        },
-        "qualityStandard": "high",
-        "policeCallChance": 0.1,
-        "addictionLevel": 0.64,
-        "schedule": {
-          "days": [
-            "Tue",
-            "Thu",
-            "Sat"
-          ],
-          "timeWindow": "18:00-22:00"
-        }
-      }
+      "archetype": "Warehouse manager",
+      "spendingTier": "high",
+      "ordersPerWeek": 1,
+      "preferredDay": "Sunday",
+      "preferredTime": "12:00",
+      "likesProducts": [
+        "Meth",
+        "Shrooms"
+      ],
+      "dislikesProducts": [
+        "Weed"
+      ],
+      "preferredEffects": [
+        "Focused",
+        "Gingeritis",
+        "Explosive"
+      ],
+      "avoidEffects": [
+        "Foggy"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_15",
-      "name": "Mason Clarke",
-      "status": "planned_not_runtime_registered",
-      "profile": {
-        "budgetPerOrder": 1150,
-        "ordersPerWeek": 2,
-        "preferredProduct": "cocaine",
-        "affinities": {
-          "weed": 22,
-          "meth": 12,
-          "cocaine": 88,
-          "shrooms": 20,
-          "pills": 6
-        },
-        "qualityStandard": "very_high",
-        "policeCallChance": 0.02,
-        "addictionLevel": 0.33,
-        "schedule": {
-          "days": [
-            "Fri",
-            "Sat"
-          ],
-          "timeWindow": "21:00-01:00"
-        }
-      }
+      "archetype": "Port clerk",
+      "spendingTier": "low",
+      "ordersPerWeek": 1,
+      "preferredDay": "Monday",
+      "preferredTime": "06:00",
+      "likesProducts": [
+        "Weed",
+        "Meth"
+      ],
+      "dislikesProducts": [
+        "Shrooms"
+      ],
+      "preferredEffects": [
+        "Calming",
+        "Sedating"
+      ],
+      "avoidEffects": [
+        "Slippery"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_16",
-      "name": "Grace Turner",
-      "status": "planned_not_runtime_registered",
-      "profile": {
-        "budgetPerOrder": 390,
-        "ordersPerWeek": 1,
-        "preferredProduct": "shrooms",
-        "affinities": {
-          "weed": 22,
-          "meth": 12,
-          "cocaine": 10,
-          "shrooms": 88,
-          "pills": 18
-        },
-        "qualityStandard": "standard",
-        "policeCallChance": 0.06,
-        "addictionLevel": 0.21,
-        "schedule": {
-          "days": [
-            "Sun"
-          ],
-          "timeWindow": "13:00-17:00"
-        }
-      }
+      "archetype": "Night guard",
+      "spendingTier": "medium",
+      "ordersPerWeek": 2,
+      "preferredDay": "Tuesday",
+      "preferredTime": "09:30",
+      "likesProducts": [
+        "Meth",
+        "Weed"
+      ],
+      "dislikesProducts": [
+        "Cocaine"
+      ],
+      "preferredEffects": [
+        "Euphoric",
+        "Slippery"
+      ],
+      "avoidEffects": [
+        "Spicy"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_17",
-      "name": "Leo Patterson",
-      "status": "planned_not_runtime_registered",
-      "profile": {
-        "budgetPerOrder": 600,
-        "ordersPerWeek": 2,
-        "preferredProduct": "weed",
-        "affinities": {
-          "weed": 88,
-          "meth": 24,
-          "cocaine": 10,
-          "shrooms": 8,
-          "pills": 6
-        },
-        "qualityStandard": "low",
-        "policeCallChance": 0.12,
-        "addictionLevel": 0.58,
-        "schedule": {
-          "days": [
-            "Wed",
-            "Sun"
-          ],
-          "timeWindow": "16:00-20:00"
-        }
-      }
+      "archetype": "Warehouse loader",
+      "spendingTier": "high",
+      "ordersPerWeek": 3,
+      "preferredDay": "Wednesday",
+      "preferredTime": "12:30",
+      "likesProducts": [
+        "Shrooms",
+        "Cocaine"
+      ],
+      "dislikesProducts": [
+        "Weed"
+      ],
+      "preferredEffects": [
+        "Focused",
+        "Explosive"
+      ],
+      "avoidEffects": [
+        "Foggy"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_18",
-      "name": "Amelia Ross",
-      "status": "planned_not_runtime_registered",
-      "profile": {
-        "budgetPerOrder": 840,
-        "ordersPerWeek": 3,
-        "preferredProduct": "cocaine",
-        "affinities": {
-          "weed": 22,
-          "meth": 24,
-          "cocaine": 88,
-          "shrooms": 8,
-          "pills": 6
-        },
-        "qualityStandard": "high",
-        "policeCallChance": 0.04,
-        "addictionLevel": 0.39,
-        "schedule": {
-          "days": [
-            "Thu",
-            "Fri",
-            "Sat"
-          ],
-          "timeWindow": "19:00-23:00"
-        }
-      }
+      "archetype": "Taxi driver",
+      "spendingTier": "vip",
+      "ordersPerWeek": 4,
+      "preferredDay": "Thursday",
+      "preferredTime": "17:00",
+      "likesProducts": [
+        "Cocaine",
+        "Shrooms"
+      ],
+      "dislikesProducts": [
+        "Meth"
+      ],
+      "preferredEffects": [
+        "Sneaky",
+        "Lethal"
+      ],
+      "avoidEffects": [
+        "Energizing"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_19",
-      "name": "Jack Sullivan",
-      "status": "planned_not_runtime_registered",
-      "profile": {
-        "budgetPerOrder": 470,
-        "ordersPerWeek": 2,
-        "preferredProduct": "meth",
-        "affinities": {
-          "weed": 22,
-          "meth": 88,
-          "cocaine": 10,
-          "shrooms": 20,
-          "pills": 6
-        },
-        "qualityStandard": "standard",
-        "policeCallChance": 0.14,
-        "addictionLevel": 0.76,
-        "schedule": {
-          "days": [
-            "Tue",
-            "Sat"
-          ],
-          "timeWindow": "20:00-00:00"
-        }
-      }
+      "archetype": "Cafe regular",
+      "spendingTier": "low",
+      "ordersPerWeek": 1,
+      "preferredDay": "Friday",
+      "preferredTime": "20:30",
+      "likesProducts": [
+        "Weed",
+        "Meth"
+      ],
+      "dislikesProducts": [
+        "Shrooms"
+      ],
+      "preferredEffects": [
+        "Thought-Provoking",
+        "Foggy"
+      ],
+      "avoidEffects": [
+        "Euphoric"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_20",
-      "name": "Harper James",
-      "status": "planned_not_runtime_registered",
-      "profile": {
-        "budgetPerOrder": 720,
-        "ordersPerWeek": 2,
-        "preferredProduct": "shrooms",
-        "affinities": {
-          "weed": 22,
-          "meth": 12,
-          "cocaine": 10,
-          "shrooms": 88,
-          "pills": 18
-        },
-        "qualityStandard": "high",
-        "policeCallChance": 0.05,
-        "addictionLevel": 0.18,
-        "schedule": {
-          "days": [
-            "Mon",
-            "Fri"
-          ],
-          "timeWindow": "14:00-18:00"
-        }
-      }
+      "archetype": "Local resident",
+      "spendingTier": "medium",
+      "ordersPerWeek": 2,
+      "preferredDay": "Saturday",
+      "preferredTime": "23:00",
+      "likesProducts": [
+        "Meth",
+        "Weed"
+      ],
+      "dislikesProducts": [
+        "Cocaine"
+      ],
+      "preferredEffects": [
+        "Spicy",
+        "Gingeritis"
+      ],
+      "avoidEffects": [
+        "Sedating"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_21",
-      "name": "Henry Brooks",
-      "status": "planned_not_runtime_registered",
-      "profile": {
-        "budgetPerOrder": 560,
-        "ordersPerWeek": 3,
-        "preferredProduct": "weed",
-        "affinities": {
-          "weed": 88,
-          "meth": 24,
-          "cocaine": 10,
-          "shrooms": 8,
-          "pills": 6
-        },
-        "qualityStandard": "standard",
-        "policeCallChance": 0.09,
-        "addictionLevel": 0.47,
-        "schedule": {
-          "days": [
-            "Mon",
-            "Wed",
-            "Sat"
-          ],
-          "timeWindow": "17:00-21:00"
-        }
-      }
+      "archetype": "Boat mechanic",
+      "spendingTier": "high",
+      "ordersPerWeek": 3,
+      "preferredDay": "Sunday",
+      "preferredTime": "06:00",
+      "likesProducts": [
+        "Shrooms",
+        "Cocaine"
+      ],
+      "dislikesProducts": [
+        "Weed"
+      ],
+      "preferredEffects": [
+        "Toxic",
+        "Calming"
+      ],
+      "avoidEffects": [
+        "Thought-Provoking"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_22",
-      "name": "Ella Price",
-      "status": "planned_not_runtime_registered",
-      "profile": {
-        "budgetPerOrder": 1050,
-        "ordersPerWeek": 2,
-        "preferredProduct": "cocaine",
-        "affinities": {
-          "weed": 22,
-          "meth": 24,
-          "cocaine": 88,
-          "shrooms": 8,
-          "pills": 6
-        },
-        "qualityStandard": "very_high",
-        "policeCallChance": 0.02,
-        "addictionLevel": 0.28,
-        "schedule": {
-          "days": [
-            "Fri",
-            "Sun"
-          ],
-          "timeWindow": "18:00-22:00"
-        }
-      }
+      "archetype": "Tour guide",
+      "spendingTier": "vip",
+      "ordersPerWeek": 4,
+      "preferredDay": "Monday",
+      "preferredTime": "09:30",
+      "likesProducts": [
+        "Cocaine",
+        "Shrooms"
+      ],
+      "dislikesProducts": [
+        "Meth"
+      ],
+      "preferredEffects": [
+        "Tropic Thunder",
+        "Euphoric"
+      ],
+      "avoidEffects": [
+        "Lethal"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_23",
-      "name": "Liam Cooper",
-      "status": "planned_not_runtime_registered",
-      "profile": {
-        "budgetPerOrder": 310,
-        "ordersPerWeek": 1,
-        "preferredProduct": "weed",
-        "affinities": {
-          "weed": 88,
-          "meth": 12,
-          "cocaine": 10,
-          "shrooms": 20,
-          "pills": 6
-        },
-        "qualityStandard": "low",
-        "policeCallChance": 0.16,
-        "addictionLevel": 0.61,
-        "schedule": {
-          "days": [
-            "Thu"
-          ],
-          "timeWindow": "11:00-15:00"
-        }
-      }
+      "archetype": "Port clerk",
+      "spendingTier": "low",
+      "ordersPerWeek": 1,
+      "preferredDay": "Tuesday",
+      "preferredTime": "12:30",
+      "likesProducts": [
+        "Weed",
+        "Meth"
+      ],
+      "dislikesProducts": [
+        "Shrooms"
+      ],
+      "preferredEffects": [
+        "Energizing",
+        "Focused"
+      ],
+      "avoidEffects": [
+        "Tropic Thunder"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_24",
-      "name": "Zoe Mitchell",
-      "status": "planned_not_runtime_registered",
-      "profile": {
-        "budgetPerOrder": 650,
-        "ordersPerWeek": 2,
-        "preferredProduct": "meth",
-        "affinities": {
-          "weed": 22,
-          "meth": 88,
-          "cocaine": 10,
-          "shrooms": 8,
-          "pills": 18
-        },
-        "qualityStandard": "high",
-        "policeCallChance": 0.11,
-        "addictionLevel": 0.69,
-        "schedule": {
-          "days": [
-            "Tue",
-            "Fri"
-          ],
-          "timeWindow": "19:00-23:00"
-        }
-      }
+      "archetype": "Night guard",
+      "spendingTier": "medium",
+      "ordersPerWeek": 2,
+      "preferredDay": "Wednesday",
+      "preferredTime": "17:00",
+      "likesProducts": [
+        "Meth",
+        "Weed"
+      ],
+      "dislikesProducts": [
+        "Cocaine"
+      ],
+      "preferredEffects": [
+        "Refreshing",
+        "Sneaky"
+      ],
+      "avoidEffects": [
+        "Calming"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_25",
-      "name": "Sebastian Ward",
-      "status": "planned_not_runtime_registered",
-      "profile": {
-        "budgetPerOrder": 890,
-        "ordersPerWeek": 4,
-        "preferredProduct": "cocaine",
-        "affinities": {
-          "weed": 34,
-          "meth": 12,
-          "cocaine": 88,
-          "shrooms": 8,
-          "pills": 6
-        },
-        "qualityStandard": "high",
-        "policeCallChance": 0.03,
-        "addictionLevel": 0.43,
-        "schedule": {
-          "days": [
-            "Mon",
-            "Wed",
-            "Fri",
-            "Sat"
-          ],
-          "timeWindow": "18:00-22:00"
-        }
-      }
+      "archetype": "Warehouse loader",
+      "spendingTier": "high",
+      "ordersPerWeek": 3,
+      "preferredDay": "Thursday",
+      "preferredTime": "20:30",
+      "likesProducts": [
+        "Shrooms",
+        "Cocaine"
+      ],
+      "dislikesProducts": [
+        "Weed"
+      ],
+      "preferredEffects": [
+        "Munchies",
+        "Thought-Provoking"
+      ],
+      "avoidEffects": [],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_26",
-      "name": "Lily Foster",
-      "status": "planned_not_runtime_registered",
-      "profile": {
-        "budgetPerOrder": 440,
-        "ordersPerWeek": 1,
-        "preferredProduct": "shrooms",
-        "affinities": {
-          "weed": 22,
-          "meth": 24,
-          "cocaine": 10,
-          "shrooms": 88,
-          "pills": 6
-        },
-        "qualityStandard": "standard",
-        "policeCallChance": 0.07,
-        "addictionLevel": 0.24,
-        "schedule": {
-          "days": [
-            "Sun"
-          ],
-          "timeWindow": "14:00-18:00"
-        }
-      }
+      "archetype": "Taxi driver",
+      "spendingTier": "vip",
+      "ordersPerWeek": 4,
+      "preferredDay": "Friday",
+      "preferredTime": "23:00",
+      "likesProducts": [
+        "Cocaine",
+        "Shrooms"
+      ],
+      "dislikesProducts": [
+        "Meth"
+      ],
+      "preferredEffects": [
+        "Sedating",
+        "Spicy"
+      ],
+      "avoidEffects": [
+        "Sneaky"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_27",
-      "name": "Benjamin Cole",
-      "status": "planned_not_runtime_registered",
-      "profile": {
-        "budgetPerOrder": 580,
-        "ordersPerWeek": 2,
-        "preferredProduct": "weed",
-        "affinities": {
-          "weed": 88,
-          "meth": 12,
-          "cocaine": 10,
-          "shrooms": 20,
-          "pills": 6
-        },
-        "qualityStandard": "standard",
-        "policeCallChance": 0.08,
-        "addictionLevel": 0.55,
-        "schedule": {
-          "days": [
-            "Tue",
-            "Thu"
-          ],
-          "timeWindow": "16:00-20:00"
-        }
-      }
+      "archetype": "Cafe regular",
+      "spendingTier": "low",
+      "ordersPerWeek": 1,
+      "preferredDay": "Saturday",
+      "preferredTime": "06:00",
+      "likesProducts": [
+        "Weed",
+        "Meth"
+      ],
+      "dislikesProducts": [
+        "Shrooms"
+      ],
+      "preferredEffects": [
+        "Slippery",
+        "Toxic"
+      ],
+      "avoidEffects": [
+        "Explosive"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_28",
-      "name": "Aria Collins",
-      "status": "planned_not_runtime_registered",
-      "profile": {
-        "budgetPerOrder": 930,
-        "ordersPerWeek": 3,
-        "preferredProduct": "cocaine",
-        "affinities": {
-          "weed": 22,
-          "meth": 12,
-          "cocaine": 88,
-          "shrooms": 8,
-          "pills": 18
-        },
-        "qualityStandard": "very_high",
-        "policeCallChance": 0.02,
-        "addictionLevel": 0.29,
-        "schedule": {
-          "days": [
-            "Wed",
-            "Fri",
-            "Sat"
-          ],
-          "timeWindow": "20:00-00:00"
-        }
-      }
+      "archetype": "Local resident",
+      "spendingTier": "medium",
+      "ordersPerWeek": 2,
+      "preferredDay": "Sunday",
+      "preferredTime": "09:30",
+      "likesProducts": [
+        "Meth",
+        "Weed"
+      ],
+      "dislikesProducts": [
+        "Cocaine"
+      ],
+      "preferredEffects": [
+        "Explosive",
+        "Tropic Thunder"
+      ],
+      "avoidEffects": [
+        "Toxic"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_29",
-      "name": "Samuel Reed",
-      "status": "planned_not_runtime_registered",
-      "profile": {
-        "budgetPerOrder": 370,
-        "ordersPerWeek": 1,
-        "preferredProduct": "meth",
-        "affinities": {
-          "weed": 34,
-          "meth": 88,
-          "cocaine": 10,
-          "shrooms": 8,
-          "pills": 6
-        },
-        "qualityStandard": "low",
-        "policeCallChance": 0.2,
-        "addictionLevel": 0.79,
-        "schedule": {
-          "days": [
-            "Sat"
-          ],
-          "timeWindow": "21:00-01:00"
-        }
-      }
+      "archetype": "Boat mechanic",
+      "spendingTier": "high",
+      "ordersPerWeek": 3,
+      "preferredDay": "Monday",
+      "preferredTime": "12:30",
+      "likesProducts": [
+        "Shrooms",
+        "Cocaine"
+      ],
+      "dislikesProducts": [
+        "Weed"
+      ],
+      "preferredEffects": [
+        "Lethal",
+        "Energizing"
+      ],
+      "avoidEffects": [
+        "Gingeritis"
+      ],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     },
     {
       "id": "harborline_customer_30",
-      "name": "Mila Hayes",
-      "status": "planned_not_runtime_registered",
-      "profile": {
-        "budgetPerOrder": 700,
-        "ordersPerWeek": 2,
-        "preferredProduct": "shrooms",
-        "affinities": {
-          "weed": 22,
-          "meth": 24,
-          "cocaine": 10,
-          "shrooms": 88,
-          "pills": 6
-        },
-        "qualityStandard": "high",
-        "policeCallChance": 0.06,
-        "addictionLevel": 0.34,
-        "schedule": {
-          "days": [
-            "Mon",
-            "Thu"
-          ],
-          "timeWindow": "15:00-19:00"
-        }
-      }
+      "archetype": "Tour guide",
+      "spendingTier": "vip",
+      "ordersPerWeek": 4,
+      "preferredDay": "Tuesday",
+      "preferredTime": "17:00",
+      "likesProducts": [
+        "Cocaine",
+        "Shrooms"
+      ],
+      "dislikesProducts": [
+        "Meth"
+      ],
+      "preferredEffects": [
+        "Foggy",
+        "Refreshing"
+      ],
+      "avoidEffects": [],
+      "mappingStatus": "design-only; map to native S1API customer/product/effect data before release"
     }
   ]
 }
