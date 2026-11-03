@@ -7,7 +7,7 @@ Cílem je přirozeně rozšířit Hyland Point o nové obyvatelné a funkční o
 ## Principy
 
 1. **Nejdřív znovu použít hru.** Preferujeme existující prefaby, budovy, nábytek, světla, silniční prvky a herní interakce. Vlastní geometrii použijeme jen tam, kde ve hře vhodný prvek neexistuje.
-2. **NPC jako data.** Harborline už obsahuje první runtime vlnu jedenácti nativních S1API NPC: dva PlayerDealers a osm zákazníků. Dalších 31 postav z cílového rosteru je stále plánovaných; systém se rozšiřuje postupně po ověření ve hře.
+2. **NPC jako data.** Harborline už obsahuje první runtime vlnu jedenácti nativních S1API NPC: dva PlayerDealers, osm zákazníků a jeden nativní supplier Portside Supply. Dalších 31 postav z cílového rosteru je stále plánovaných; systém se rozšiřuje postupně po ověření ve hře.
 3. **Žádné vymyšlené souřadnice.** Prototyp používá pozici existující Docks Warehouse a fyzikální kontroly Unity. Přesné hranice Docks a výsledné umístění zatím nejsou ověřené v cílové hře.
 4. **Host je autorita.** Síťové změny a stav světa musí respektovat síťové/ukládací mechanismy hry a S1API.
 5. **Po malých ověřitelných krocích.** Nejdřív funkční Harborline, až potom další provincie a rozšiřování mobilní sítě.
@@ -21,11 +21,11 @@ NPC role a cílové počty jsou v `packs/Harborline/roster.json`: nově 42 fyzic
 ## První nativní herní obsah
 
 - `HarborlineNpcRoster.cs` registruje dva fyzické dealery (Mason Reed, Sierra Voss) přes `IsDealer` a `WithDealerDefaults`, včetně náborového poplatku, provize, kvality a nativních událostí náboru/smluv.
-- Portside Supply je samostatný nativní Supplier NPC. Jeho telefonní objednávkový katalog používá stejných 14 existujících item ID a jejich stejné ceny jako kamenný Hardware Store: S1API automaticky připraví supplier shop, persistentní sklad a delivery vehicle a zapojí objednávky do původního herního Delivery systému. Dodavatel používá nativní supplier meeting/phone flow a je skrytý, když je nečinný. Katalog a cenové definice jsou společné, ale zásoby nejsou synchronizované jako konečný sklad; veřejné delivery API dovoluje jen číst stav zásilek, nikoli vytvářet libovolné dodávky.
+- Portside Supply je samostatný nativní Supplier NPC, který je vložen do existujícího supplier/dead-drop/meeting-shop toku hry. Těchto 14 item ID se předává do nativního supplier katalogu, ale neznamená to nový samostatný fyzický obchod ani hotovou Hyland Network online objednávkovou aplikaci. Zásoby supplieru nejsou prokazatelně sdílené s Hardware Store. Vlastní online storefront a jednotná skladová evidence zůstávají nedokončené.
 
 Osm fyzických zákaznických NPC (Caleb Price, Nina Brooks, Rafael Cole, Olivia Hayes, Ethan Ward, Maya Bennett, Lucas Foster a Ava Collins) má individuální rozpočty, týdenní počet objednávek, den/čas, standardy, šanci zavolat policii, závislost a afinity k typům drog.
-- Vzhled se vytváří herním generátorem přes `Appearance.GenerateRandomAppearance()` a `Appearance.Build()`. Všech osm zákazníků má nativní akci `EnsureDealSignal()` pro čekání na nabídku. Dealeři používají automatické `DealerAttendDealBehaviour` v novější herní verzi; samostatná akce `HandleDeal()` je zastaralá. Scheduler se zapíná přes podporované `Schedule.Enable()`. Pěší trasy a návštěvy budov zatím čekají na zaměření navmeshe.
-- `HarborlineShopCatalog.cs` upravuje ceny 14 existujících vanilla předmětů přímo v nativním `StorableItemDefinition.BasePurchasePrice` a zajišťuje jejich listing v existujícím Hardware Store přes `Shop.AddItem`. Používá originální nákupní UI a doručení předmětů hry. Cena definice je sdílená napříč všemi obchody používajícími stejné item ID.
+- Vzhled se vytváří herním generátorem přes `Appearance.GenerateRandomAppearance()` a `Appearance.Build()`. Zákaznické čekání na obchodní handover se v aktuální hře nastavuje automaticky přes `IsCustomer`; `EnsureDealSignal()` je od hry 0.4.6 pouze zastaralý no-op, proto ho nepoužíváme. Scheduler se zapíná přes `Schedule.Enable()`. Pěší trasy a návštěvy budov zatím čekají na zaměření navmeshe.
+- `HarborlineShopCatalog.cs` upravuje ceny 14 existujících vanilla předmětů přímo v nativním `StorableItemDefinition.BasePurchasePrice` a zajišťuje jejich listing v existujícím Hardware Store přes `Shop.AddItem`. Používá originální nákupní UI. Cena definice je sdílená napříč všemi obchody používajícími stejné item ID; nejde o per-shop cenu.
 - Vlastní NPC typy jsou definované přes S1API a používají jeho nativní prefab, save/load a FishNet pipeline. Doplňkový fallback registrar je omezený na single-player, aby nevytvářel duplicitní NPC mimo ověřený serverový tok. Runtime ve hře zatím nebyl ověřen; denní chození po čtvrti zatím není nakonfigurované.
 
 ## Zatím blokované / další fáze
@@ -34,7 +34,7 @@ Osm fyzických zákaznických NPC (Caleb Price, Nina Brooks, Rafael Cole, Olivia
 - Nativní denní trasy a návštěvy budov – zatím nejsou zaměřené a otestované navmesh body a interiéry.
 - Vlastní fyzický Harborline obchod a online objednávky přes telefon se společným inventářem. Aktuální implementace rozšiřuje skutečný vanilla Hardware Store, nikoli novou provozovnu.
 - Nové koupitelné podniky a byty přes Realtor. Veřejné S1API PropertyManager/BusinessManager pouze čtou existující registrace; přidávací hook není zatím prokázán. Nepřepisujeme cizí nemovitosti ani nefalšujeme realitní nabídky.
-- Nativní mapové ikony, dveře/interiéry, policejní dispatch/hlídky, ukládání geometrie a multiplayer.
+- Nativní mapové ikony, funkční interiérové objekty a otestované dveřní interakce, policejní dispatch/hlídky, ukládání geometrie a multiplayer.
 - Detailní kontrakt a testovací brány: `docs/npc-generation-and-multiplayer.md`.
 
 ## Technologická vrstva
@@ -49,9 +49,9 @@ Pro mod manager je připraven manifest `manifest.json`. Balíček obsahuje samot
 
 ## Aktuální stav a limity
 
-- Runtime vytváří první geometrickou prototypovou část z Unity primitiv. Po načtení save nezávisle zkouší aktivovat nativní NPC a katalog Hardware Store; katalog již není blokován tím, zda se podařilo vytvořit fyzickou geometrii. Vše je zatím ověřené pouze zdrojovou kontrolou, nikoli během v cílové hře.
+- Runtime vytváří první fyzickou prototypovou část. Sklad Portside Supply se nově pokouší sestavit přes S1MAPI `BuildingBuilder` včetně podlahy, stěn, střechy, osvětlení a server-side posuvných dveří; při nekompatibilním API se použije původní Unity geometrický fallback. Základní volání budovy a vnitřní `NavigationBuilder` nejsou zatím ověřené v cílové hře. Po načtení save nezávisle zkouší aktivovat nativní NPC a katalog Hardware Store; katalog již není blokován tím, zda se podařilo vytvořit fyzickou geometrii. Vše je zatím ověřené pouze zdrojovou kontrolou, nikoli během v cílové hře.
 - Umístění se odvozuje z nativní pozice Docks Warehouse a runtime fyzikálních kontrol. To ale samo o sobě nezaručuje, že kandidát leží uvnitř hranic Docks nebo že není nad vodou s neoznačeným colliderem.
-- Nové Realtor/property registrace, mapové ikony, funkční interiéry, nové fyzické obchody v Harborline, online objednávky, policie, ukládání geometrie a multiplayer nejsou v runtime implementované. Veřejné S1API PropertyManager a BusinessManager zatím pouze enumerují existující záznamy. Vanilla Hardware Store má připravený katalog 14 existujících položek; jejich nativní definice dostanou nastavené ceny. Změna ceny je globální pro stejné item ID, ne pouze pro Hardware Store.
+- Vlastní Realtor/property registrace, mapové ikony, funkční interiérové předměty, nové fyzické obchody v Harborline, online objednávky, policie, ukládání geometrie a multiplayer nejsou dokončené. S1MAPI budova je jen procedurální struktura; automaticky z ní nedělá nativní `Building`, `Property`, `Business` nebo `Shop`. Veřejné S1API PropertyManager a BusinessManager zatím pouze enumerují existující záznamy. Vanilla Hardware Store má připravený katalog 14 existujících položek; jejich nativní definice dostanou nastavené ceny. Změna ceny je globální pro stejné item ID, ne pouze pro Hardware Store.
 - GitHub Actions sestavuje IL2CPP mod a balí Thunderstore ZIP. Statické testy a build neprokazují chování ve hře. Diagnostické exportéry pouze čtou registry, ale celý mod navíc vytváří session-local Unity geometrii.
 
 ## Struktura
@@ -61,6 +61,7 @@ Pro mod manager je připraven manifest `manifest.json`. Balíček obsahuje samot
 - `docs/harborline-survey-checklist.md` – přesný postup zaměření spawnu, tras, budov a checkpointů ve hře.
 - `docs/npc-generation-and-multiplayer.md` – náhodné preference, nativní generování vzhledu, policie a multiplayer.
 - `docs/native-map-buildings-interiors.md` – herní mapa, nativní ikony/vlastnictví, dveře a funkční interiéry.
+- `docs/daffys-hills-reference-study.md` – technická studie rozšíření mapy Daffy's Hills; pouze architektonická inspirace, bez převzetí kódu či assetů.
 - `world/harborline/native-integration.json` – nativní integrační pravidla a kontrolní brány.
 - `src/` – IL2CPP runtime prototyp, automatická geometrie a read-only průzkum nativních registrů, obchodů, položek a prefabů.
 - `world/harborline/anchors.json` – seznam lokalit a míst k zaměření.
