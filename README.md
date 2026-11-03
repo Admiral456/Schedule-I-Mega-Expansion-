@@ -45,13 +45,13 @@ Osm fyzických zákaznických NPC (Caleb Price, Nina Brooks, Rafael Cole, Olivia
 
 ## Instalace a závislosti
 
-Pro mod manager je připraven manifest `manifest.json`. Balíček obsahuje samotný DLL a automaticky vyžaduje MelonLoader 0.7.3, S1API Forked 3.2.2 a S1MAPI 2.0.1. Všechny tři jsou samostatné knihovny; DLL modu je neobsahuje. Diagnostický export nyní navíc vypisuje `native-shops.csv`, `native-shop-items.csv`, `native-items.csv` a `native-law-*.csv` pro ověření reálného katalogu, policejních checkpointů a existujících pěších/vozidlových hlídek konkrétní instalace.
+Pro mod manager je připraven manifest `manifest.json`. Balíček obsahuje samotný DLL a automaticky vyžaduje MelonLoader 0.7.3, S1API Forked 3.2.2 a S1MAPI 2.0.1. Všechny tři jsou samostatné knihovny; DLL modu je neobsahuje. Diagnostický export nyní navíc vypisuje `native-shops.csv`, `native-shop-items.csv`, `native-items.csv`, `native-law-*.csv`, `native-scene-prefabs.csv`, `native-terrain-surfaces.csv`, `native-terrain-layers.csv` a `native-terrain-height-samples.csv`. Exporty pomáhají ověřit skutečné herní prefab cesty, road-node graf, výškový profil terénu a policejní checkpointy konkrétní instalace.
 
 ## Aktuální stav a limity
 
 - Runtime vytváří první fyzickou prototypovou část. Sklad Portside Supply se nově pokouší sestavit přes S1MAPI `BuildingBuilder` včetně podlahy, stěn, střechy, osvětlení a server-side posuvných dveří; při nekompatibilním API se použije původní Unity geometrický fallback. Základní volání budovy a vnitřní `NavigationBuilder` nejsou zatím ověřené v cílové hře. Po načtení save nezávisle zkouší aktivovat nativní NPC a katalog Hardware Store; katalog již není blokován tím, zda se podařilo vytvořit fyzickou geometrii. Vše je zatím ověřené pouze zdrojovou kontrolou, nikoli během v cílové hře.
 - Umístění se odvozuje z nativní pozice Docks Warehouse a runtime fyzikálních kontrol. To ale samo o sobě nezaručuje, že kandidát leží uvnitř hranic Docks nebo že není nad vodou s neoznačeným colliderem.
-- Vlastní Realtor/property registrace, mapové ikony, funkční interiérové předměty, nové fyzické obchody v Harborline, online objednávky, policie, ukládání geometrie a multiplayer nejsou dokončené. S1MAPI budova je jen procedurální struktura; automaticky z ní nedělá nativní `Building`, `Property`, `Business` nebo `Shop`. Veřejné S1API PropertyManager a BusinessManager zatím pouze enumerují existující záznamy. Vanilla Hardware Store má připravený katalog 14 existujících položek; jejich nativní definice dostanou nastavené ceny. Změna ceny je globální pro stejné item ID, ne pouze pro Hardware Store.
+- Vlastní Realtor/property registrace, mapové ikony, funkční interiérové předměty, nové fyzické obchody v Harborline, online objednávky, policie, ukládání geometrie a multiplayer nejsou v runtime implementované. S1MAPI budova je jen procedurální struktura; automaticky z ní nedělá nativní `Building`, `Property`, `Business` nebo `Shop`. Veřejné S1API PropertyManager a BusinessManager zatím pouze enumerují existující záznamy. Vanilla Hardware Store má připravený katalog 14 existujících položek; jejich nativní definice dostanou nastavené ceny. Změna ceny je globální pro stejné item ID, ne pouze pro Hardware Store.
 - GitHub Actions sestavuje IL2CPP mod a balí Thunderstore ZIP. Statické testy a build neprokazují chování ve hře. Diagnostické exportéry pouze čtou registry, ale celý mod navíc vytváří session-local Unity geometrii.
 
 ## Struktura
@@ -63,10 +63,11 @@ Pro mod manager je připraven manifest `manifest.json`. Balíček obsahuje samot
 - `docs/native-map-buildings-interiors.md` – herní mapa, nativní ikony/vlastnictví, dveře a funkční interiéry.
 - `docs/daffys-hills-reference-study.md` – technická studie rozšíření mapy Daffy's Hills; pouze architektonická inspirace, bez převzetí kódu či assetů.
 - `world/harborline/native-integration.json` – nativní integrační pravidla a kontrolní brány.
-- `src/` – IL2CPP runtime prototyp, automatická geometrie a read-only průzkum nativních registrů, obchodů, položek a prefabů.
+- `src/` – IL2CPP runtime prototyp, automatická geometrie, bezpečné opětovné použití render meshů původní hry a read-only průzkum nativních registrů, terénu, road nodes a prefabů.
 - `world/harborline/anchors.json` – seznam lokalit a míst k zaměření.
 - `world/harborline/expansion-plan.json` – plán větší oblasti a pěti podčástí.
 - `world/harborline/prefabs.json` – katalog kandidátních prefabů k ověření v cílové hře.
+- `world/harborline/vanilla-prefab-reuse.json` – původní cesty k budovám, lampám, lavičkám, zastávkám a road-node grafu, které diagnostika ověřuje v načtené scéně.
 - `world/harborline/implementation-status.json` a `docs/implementation-audit.md` – matice skutečného stavu každého požadavku.
 - `packs/Harborline/roster.json` – role a cílové počty NPC.
 - `packs/Harborline/customer-designs.json` – 30 návrhů zákaznických preferencí, které se před vydáním mapují na ověřená herní data.
