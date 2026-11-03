@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "project": "Schedule I Mega Expansion / Harborline",
-  "reviewedCommit": "ab9a0f910e529ca9d067c490b286be2617898d54",
-  "reviewMethod": "Source review of native Harborline NPC/shop pilot against official S1API Forked 3.2.2 public API, successful latest GitHub Actions compile, Thunderstore package assembly and all 36 repository tests. No Schedule I game runtime or user save was available; in-game behavior remains unverified.",
+  "reviewedCommit": "pending CI",
+  "reviewMethod": "Source/API review and latest successful compile will be recorded after CI for the current branch head. No Schedule I game runtime or user save is available; in-game behavior remains unverified.",
   "statusLegend": {
     "implemented_code_unverified_runtime": "Code exists and builds, but target-game execution is not confirmed.",
     "design_only": "Requirements/data exist as a plan or configuration, not executable runtime behavior.",
@@ -126,11 +126,11 @@
       "requirement": "Use native NPC schedules and allow NPCs to enter buildings.",
       "status": "implemented_code_unverified_runtime",
       "evidence": [
-        "HarborlineNpcRoster.cs configures the two dealers with native WithSchedule(plan => plan.HandleDeal(900)).",
-        "All eight customer NPCs receive WithSchedule(plan => plan.EnsureDealSignal()), the S1API-documented action required for customer deal waiting.",
-        "HarborlineNpcLifecycle calls Schedule.Enable() and Schedule.InitializeActions() on creation."
+        "HarborlineNpcRoster.cs configures all eight customer NPCs with the native WithSchedule(plan => plan.EnsureDealSignal()) action required for customer deal waiting.",
+        "The target game version automatically handles dealer scheduling through DealerAttendDealBehaviour; the deprecated HandleDeal() action is not used.",
+        "HarborlineNpcLifecycle enables the supported native scheduler with Schedule.Enable()."
       ],
-      "remaining": "The initial deal-handling and customer waiting actions are configured, but full daily movement, building visits and role-specific shifts still require measured navmesh waypoints, verified native buildings and functional doors. Verify all actions in the target game."
+      "remaining": "Customer deal-waiting actions are configured, but full daily movement, building visits and role-specific worker shifts still require measured navmesh waypoints, verified native buildings and functional doors. The S1API 3.2.2 NPCSchedule wrapper does not expose InitializeActions(). Verify the supported actions in the target game."
     },
     {
       "id": "packaging",
@@ -157,9 +157,10 @@
       "requirement": "Native police checks, patrol and dispatch coverage across Harborline.",
       "status": "not_implemented",
       "evidence": [
-        "No runtime police dispatcher, patrol or checkpoint integration is present in src/."
+        "The new NativeLawSnapshotExporter reads LawController, LawManager, CheckpointManager.GetAllCheckpointInfo, CheckpointLocation and current foot/vehicle patrol route registries.",
+        "No Harborline-specific checkpoint has been enabled and no Harborline patrol route is created or started by the mod."
       ],
-      "remaining": "Discover and test the native Docks police coverage, dispatch and checkpoint hooks in the target game."
+      "remaining": "Use the new in-game native-law-*.csv exports to identify existing Docks checkpoint locations and patrol route APIs/data; only then add a supported Harborline checkpoint/patrol using measured positions and documented SetCheckpointEnabled/StartFootPatrol or StartVehiclePatrol calls."
     },
     {
       "id": "properties.realtor",
@@ -262,6 +263,17 @@
         "The S1API 3.2.2 source for ShopIntegration.CreateListing explicitly warns that customPrice is not applied and uses BasePurchasePrice instead."
       ],
       "remaining": "Run an in-game purchase and compare the visible price and charged amount. This is a shared item-definition price, not a per-store override; verify the effect on every vanilla shop that sells the same item ID."
+    },
+    {
+      "id": "diagnostics.law",
+      "requirement": "Survey native police intensity, checkpoint locations and existing foot/vehicle patrol routes.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "src/Diagnostics/NativeLawSnapshotExporter.cs uses S1API.Law reflection to export LawController/LawManager values and CheckpointManager.GetAllCheckpointInfo.",
+        "Exports native-law-checkpoint-locations.csv, native-law-checkpoints.csv, native-law-foot-patrol-routes.csv and native-law-vehicle-patrol-routes.csv.",
+        "The snapshot is read-only and does not enable a checkpoint or start a patrol."
+      ],
+      "remaining": "Run the exporter in the target Schedule I installation and inspect all six native-law-*.csv files; confirm actual loaded wrapper members and route coordinates before changing law coverage."
     }
   ],
   "overallVerdict": "The repository contains a buildable native gameplay pilot: two S1API PlayerDealer NPCs, eight S1API customer NPCs with individual customer preferences, and a native Hardware Store catalogue extension and configured native dealer/customer schedule actions using existing vanilla item definitions and the native purchase UI. Ten of the target 42 physical NPCs are now coded. The 30-profile target is not complete; 22 profiles and 32 NPCs remain. A new Harborline storefront, online orders, Realtor-purchasable businesses, map integration, functional interiors, police, persistence, multiplayer and in-game validation remain incomplete or blocked.",
