@@ -214,31 +214,52 @@ namespace ScheduleIMegaExpansion.Runtime
                 return false;
             }
 
-            string id = ReadString(root, "id");
-            if (!string.Equals(id, ExpansionId, StringComparison.Ordinal))
+            if (!string.Equals(ReadString(root, "id"), ExpansionId, StringComparison.Ordinal))
             {
                 reason = "id must be '" + ExpansionId + "'";
                 return false;
             }
 
+            string mode = ReadString(root, "mode", "source-scene-expansion");
+            bool sourceSceneMode = string.Equals(mode, "source-scene-expansion", StringComparison.OrdinalIgnoreCase);
+            bool editLayerMode = string.Equals(mode, "main-world-edit-layer", StringComparison.OrdinalIgnoreCase);
+            if (!sourceSceneMode && !editLayerMode)
+            {
+                reason = "mode must be 'source-scene-expansion' or 'main-world-edit-layer'";
+                return false;
+            }
+
             JsonElement source = Get(root, "source");
             string sceneName = ReadString(source, "sceneName");
-            if (string.IsNullOrWhiteSpace(sceneName))
+            if (sourceSceneMode && string.IsNullOrWhiteSpace(sceneName))
             {
                 reason = "source.sceneName is empty. Use native-scenes.csv to select a real source scene.";
                 return false;
             }
-
-            if (!TryReadVector3(Get(root, "offset"), out _, out _, out _))
+            if (editLayerMode && !string.IsNullOrWhiteSpace(sceneName))
             {
-                reason = "offset must be a measured [x,y,z] world position";
+                reason = "main-world-edit-layer must leave source.sceneName empty; it edits the main world in place and does not copy a terrain scene";
+                return false;
+            }
+
+            JsonElement offset = Get(root, "offset");
+            if (sourceSceneMode && !TryReadVector3(offset, out _, out _, out _))
+            {
+                reason = "source-scene-expansion needs a measured [x,y,z] world offset";
+                return false;
+            }
+            if (editLayerMode && offset.ValueKind != JsonValueKind.Null
+                && TryReadVector3(offset, out float ox, out float oy, out float oz)
+                && (Math.Abs(ox) > 0.001f || Math.Abs(oy) > 0.001f || Math.Abs(oz) > 0.001f))
+            {
+                reason = "main-world-edit-layer has no source frame and therefore requires offset null or [0,0,0]";
                 return false;
             }
 
             JsonElement regions = Get(root, "regions");
             if (regions.ValueKind != JsonValueKind.Array || regions.GetArrayLength() == 0)
             {
-                reason = "at least one region polygon is required";
+                reason = "at least one measured region polygon is required";
                 return false;
             }
             foreach (JsonElement region in regions.EnumerateArray())
@@ -246,24 +267,31 @@ namespace ScheduleIMegaExpansion.Runtime
                 JsonElement polygon = Get(region, "polygon");
                 if (polygon.ValueKind != JsonValueKind.Array || polygon.GetArrayLength() < 3)
                 {
-                    reason = "region '" + ReadString(region, "name") + "' needs at least three measured local [x,z] vertices";
+                    reason = "region '" + ReadString(region, "name") + "' needs at least three measured [x,z] vertices";
                     return false;
                 }
                 foreach (JsonElement vertex in polygon.EnumerateArray())
+                {
                     if (!TryReadVector2(vertex, out _, out _))
                     {
-                        reason = "region polygons must contain [x,z] pairs";
+                        reason = "region polygons must contain measured [x,z] pairs";
                         return false;
                     }
+                }
             }
 
             JsonElement connections = Get(root, "connections");
-            if (connections.ValueKind != JsonValueKind.Array || connections.GetArrayLength() == 0)
+            if (sourceSceneMode && (connections.ValueKind != JsonValueKind.Array || connections.GetArrayLength() == 0))
             {
-                reason = "at least one Docks-to-Harborline connection is required; no isolated map island will be registered";
+                reason = "source-scene-expansion needs at least one measured Docks-to-Harborline connection; no isolated map island will be registered";
                 return false;
             }
-            foreach (JsonElement connection in connections.EnumerateArray())
+            if (editLayerMode && connections.ValueKind == JsonValueKind.Array && connections.GetArrayLength() > 0)
+            {
+                reason = "main-world-edit-layer cannot create connections; switch to source-scene-expansion after a source scene exists";
+                return false;
+            }
+            foreach (JsonElement connection in Enumerate(connections))
             {
                 JsonElement route = Get(connection, "route");
                 if (route.ValueKind != JsonValueKind.Array || route.GetArrayLength() < 2)
@@ -284,7 +312,7 @@ namespace ScheduleIMegaExpansion.Runtime
                 }
                 if (!hasMain || !hasExpansion)
                 {
-                    reason = "each connection must join Main world points to Expansion-local points";
+                    reason = "each source-scene connection must join Main world points to Expansion-local points";
                     return false;
                 }
             }
@@ -295,16 +323,40 @@ namespace ScheduleIMegaExpansion.Runtime
                 reason = "at least one Realtor property template is required";
                 return false;
             }
+            var codes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (JsonElement property in properties.EnumerateArray())
             {
+                string code = ReadString(property, "code");
+                if (string.IsNullOrWhiteSpace(code) || !codes.Add(code))
+                {
+                    reason = "each Realtor property needs a non-empty unique code";
+                    return false;
+                }
                 if (string.IsNullOrWhiteSpace(ReadString(property, "template")))
                 {
-                    reason = "property '" + ReadString(property, "code") + "' needs a verified template propertyCode from native-properties.csv/native-businesses.csv";
+                    reason = "property '" + code + "' needs a verified template propertyCode from native-properties.csv/native-businesses.csv";
                     return false;
                 }
                 if (!TryReadVector3(Get(property, "root"), out _, out _, out _))
                 {
-                    reason = "property '" + ReadString(property, "code") + "' needs a measured expansion-local root position";
+                    reason = "property '" + code + "' needs a measured " +
+                        (editLayerMode ? "main-world" : "expansion-local") + " root position";
+                    return false;
+                }
+            }
+
+            foreach (JsonElement shop in Enumerate(Get(root, "shops")))
+            {
+                if (string.IsNullOrWhiteSpace(ReadString(shop, "id"))
+                    || string.IsNullOrWhiteSpace(ReadString(shop, "seller"))
+                    || string.IsNullOrWhiteSpace(ReadString(shop, "shopCode")))
+                {
+                    reason = "each configured shop needs a stable id, a real native shopCode from native-shops.csv, and a registered seller NPC id";
+                    return false;
+                }
+                if (!TryReadVector3(Get(shop, "counter"), out _, out _, out _))
+                {
+                    reason = "shop '" + ReadString(shop, "id") + "' needs a measured counter position";
                     return false;
                 }
             }
