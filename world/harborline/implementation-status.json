@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "snapshotDate": "2026-11-03",
+  "baseline": "ScheduleIMegaExpansion 0.3.1 Thunderstore package",
+  "verificationNote": "Statuses describe package documentation/source inspection. No in-game runtime session was available for this audit.",
+  "implementedButRuntimeUnverified": [
+    {
+      "id": "native_dealers",
+      "label": "Two native dealers (Mason Reed, Sierra Voss)",
+      "status": "implemented_unverified"
+    },
+    {
+      "id": "native_customers",
+      "label": "Eight native customer NPCs",
+      "status": "implemented_unverified"
+    },
+    {
+      "id": "supplier_npc",
+      "label": "Portside Supply native Supplier NPC",
+      "status": "implemented_unverified"
+    },
+    {
+      "id": "supplier_phone_catalog",
+      "label": "Supplier phone catalog with 14 existing item IDs and base Delivery flow",
+      "status": "implemented_unverified_with_api_limits"
+    },
+    {
+      "id": "hardware_store_catalog",
+      "label": "14 existing items listed in vanilla Hardware Store",
+      "status": "implemented_unverified_global_price_side_effect"
+    },
+    {
+      "id": "runtime_placement_probe",
+      "label": "Docks Warehouse anchor and physics-based placement candidate checks",
+      "status": "implemented_unverified"
+    }
+  ],
+  "plannedOrBlocked": [
+    {
+      "id": "harborline_complete_geometry",
+      "label": "Complete Harborline district geometry and roads",
+      "status": "planned"
+    },
+    {
+      "id": "navmesh_routes",
+      "label": "NPC walking routes and building visits",
+      "status": "blocked_by_survey"
+    },
+    {
+      "id": "extra_customer_profiles",
+      "label": "22 additional customer profiles",
+      "status": "design_data_added_not_runtime_wired"
+    },
+    {
+      "id": "physical_shop",
+      "label": "Independent Harborline physical shop",
+      "status": "not_implemented"
+    },
+    {
+      "id": "phone_shop_app",
+      "label": "Dedicated phone app and online orders for new shop",
+      "status": "not_implemented"
+    },
+    {
+      "id": "shared_stock",
+      "label": "One authoritative stock for physical and online storefront",
+      "status": "blocked_by_delivery_api_capability"
+    },
+    {
+      "id": "realtor_properties",
+      "label": "New purchasable properties/businesses",
+      "status": "blocked_property_registration_hook_unproven"
+    },
+    {
+      "id": "police_patrols",
+      "label": "Additional police patrols/checkpoints and dispatch",
+      "status": "not_implemented_native_law_survey_required"
+    },
+    {
+      "id": "map_pois",
+      "label": "Harborline map POIs",
+      "status": "not_implemented"
+    },
+    {
+      "id": "persistent_geometry",
+      "label": "Persist generated world geometry across reloads",
+      "status": "not_implemented"
+    },
+    {
+      "id": "multiplayer",
+      "label": "Host-authoritative multiplayer state and late join",
+      "status": "not_implemented_or_unverified"
+    }
+  ],
+  "externalIntegrations": [
+    {
+      "id": "daffys_hills",
+      "label": "Daffy's Hills 1.2 optional companion mod",
+      "status": "compatibility_test_required",
+      "bundled": false,
+      "requiredDependency": false
+    }
+  ]
+}
