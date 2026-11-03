@@ -3,14 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using MelonLoader;
 using S1API.Items;
+using S1API.Items.Storable;
 using S1API.Shops;
 
 namespace ScheduleIMegaExpansion.Runtime
 {
     /// <summary>
-    /// Adds real vanilla Schedule I item definitions to the existing native Hardware Store.
-    /// Shop.AddItem uses the game's actual shop listings, buy button, money transfer and item delivery.
-    /// It does not create a fake shop UI or placeholder item.
+    /// Extends the native Hardware Store with existing Schedule I item definitions.
+    /// The current S1API Shop.AddItem customPrice argument is not implemented by S1API:
+    /// ShopIntegration warns and ignores it. Therefore this catalog deliberately updates
+    /// the native StorableItemDefinition.BasePurchasePrice before attaching missing items.
+    ///
+    /// IMPORTANT: BasePurchasePrice belongs to the shared item definition, not a shop
+    /// listing. A reprice therefore applies anywhere the same item ID is sold in-game.
+    /// This is preferable to claiming a per-shop price override that the API does not honor.
     /// </summary>
     internal static class HarborlineShopCatalog
     {
@@ -63,8 +69,10 @@ namespace ScheduleIMegaExpansion.Runtime
                     return false;
                 }
 
-                int added = 0;
-                int alreadyThere = 0;
+                int pricesChanged = 0;
+                int alreadyCorrect = 0;
+                int addedToStore = 0;
+                int alreadySold = 0;
                 int unavailable = 0;
 
                 foreach (StockItem stock in ExpansionStock)
@@ -78,33 +86,61 @@ namespace ScheduleIMegaExpansion.Runtime
                         continue;
                     }
 
-                    if (hardwareStore.HasItem(item.ID))
+                    if (item is not StorableItemDefinition storable)
                     {
-                        alreadyThere++;
+                        unavailable++;
+                        if (LoggedMissingItems.Add(stock.Id))
+                            warn("Native item '" + stock.Id + "' is not a storable definition and cannot be priced as shop stock.");
                         continue;
                     }
 
-                    if (hardwareStore.AddItem(item, stock.Price))
+                    float previousPrice = storable.BasePurchasePrice;
+                    if (Math.Abs(previousPrice - stock.Price) > 0.01f)
                     {
-                        added++;
-                        log("Hardware Store stock added: " + item.Name + " (" + item.ID + ") $" +
-                            stock.Price.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture));
+                        // The game calculates native shop purchase cost from the item's shared
+                        // StorableItemDefinition. S1API's customPrice argument is currently ignored.
+                        storable.BasePurchasePrice = stock.Price;
+                        pricesChanged++;
+                        log("Native item repriced: " + item.Name + " (" + item.ID + ") $" +
+                            previousPrice.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) +
+                            " -> $" + stock.Price.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) +
+                            " (shared item definition; applies to every shop selling this ID).");
+                    }
+                    else
+                    {
+                        alreadyCorrect++;
+                    }
+
+                    if (hardwareStore.HasItem(item.ID))
+                    {
+                        alreadySold++;
+                        continue;
+                    }
+
+                    // Use the native item definition and native shop purchase/listing UI.
+                    // Do not pass customPrice: current S1API 3.2.2 does not apply that argument.
+                    if (hardwareStore.AddItem(item))
+                    {
+                        addedToStore++;
+                        log("Hardware Store native listing added: " + item.Name + " (" + item.ID + ").");
                     }
                     else
                     {
                         if (LoggedRejectedItems.Add(item.ID))
-                            warn("Native shop refused item '" + item.ID + "'. The entry was not replaced or duplicated.");
+                            warn("Native shop refused item '" + item.ID + "'. The price definition was updated, but no new listing was added.");
                     }
                 }
 
-                log("Native Hardware Store catalog checked: " + added + " added, " +
-                    alreadyThere + " already sold, " + unavailable + " not present in this game build.");
+                log("Native Hardware Store catalog checked: " + pricesChanged + " item prices changed, " +
+                    alreadyCorrect + " already had the target price, " + addedToStore +
+                    " listings added, " + alreadySold + " already listed, " + unavailable +
+                    " not present/usable in this game build.");
+                log("Pricing scope: native item-definition level. A price change affects every vanilla shop using that item ID; S1API 3.2.2 has no working per-listing custom price override.");
                 return true;
             }
             catch (Exception ex)
             {
-                warn("Native shop catalog integration failed without changing other stores: " +
-                    ex.GetType().Name + ": " + ex.Message);
+                warn("Native shop catalog integration failed: " + ex.GetType().Name + ": " + ex.Message);
                 return false;
             }
         }
@@ -123,7 +159,7 @@ namespace ScheduleIMegaExpansion.Runtime
                 _shopApplied = HarborlineShopCatalog.TryApply(log, warn);
 
             if (_npcApplied && _shopApplied)
-                log("Harborline native gameplay slice activated: 2 native dealers, 3 native customer NPCs and extended Hardware Store stock.");
+                log("Harborline native gameplay slice activated: 2 native dealers, 3 native customer NPCs and repriced native Hardware Store catalog.");
             return _npcApplied && _shopApplied;
         }
 
