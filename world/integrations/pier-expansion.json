@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "id": "pier_expansion",
+  "displayName": "Pier Expansion - Map Expansion",
+  "archiveLabelVersion": "1.2.1",
+  "authorPublishedVersion": "1.2.0",
+  "versionMismatch": "The user-supplied archive filename says 1.2.1, while the public Nexus page currently labels the release 1.2.0. The DLL did not expose a reliable assembly version in the limited metadata/string inspection, so the exact binary release identity remains unverified.",
+  "author": "DrDaffy",
+  "sourcePage": "https://www.nexusmods.com/schedule1/mods/2594",
+  "archiveInspection": {
+    "providedByUser": true,
+    "archiveFileName": "PierExpansion 2594 1.2.1 2026-09-24T15-23Z pH8W8y8nt.zip",
+    "archiveContainsOnlyOneDll": true,
+    "files": [
+      {
+        "path": "PierExpansion.dll",
+        "sizeBytes": 218624,
+        "sha256": "e4d8d17c4e00d5e9bd1da9eb1a818252d4a546b38299717828c06ce7be85dc34"
+      }
+    ],
+    "sourceCodeIncluded": false,
+    "separateAssetsIncluded": false,
+    "inspectionScope": "Archive listing, SHA-256, PE/.NET file identification and readable binary string metadata only. No source decompilation or code/assets reuse.",
+    "observedStartupMessage": "Pier Expansion by DrDaffy loaded: pier, bridge road, 8 buildings, 8 residents, 2 buyable properties."
+  },
+  "featuresByAuthorDescription": {
+    "bridgeRoadFrom": "Westville road bend",
+    "bridgeRoadTo": "Docks",
+    "pier": true,
+    "buildings": [
+      "Driftwood Shack",
+      "Gull's Rest",
+      "Tidewater House",
+      "Salt Cottage",
+      "Harbour House",
+      "Pier 9 Bait & Tackle",
+      "Harbourmaster's Office",
+      "Wharf Logistics"
+    ],
+    "residentCount": 8,
+    "residentsAreCustomers": true,
+    "purchasableProperties": 2,
+    "workingPropertyLights": true,
+    "deliveryBays": true,
+    "nativeNavMeshForPier": true
+  },
+  "authorTestedGameVersion": "0.4.6f13",
+  "requirementsByAuthor": {
+    "melonloader": "0.7.x (tested on 0.7.3)",
+    "s1api": "Forked by Bars 3.2.0 or newer, including S1APILoader"
+  },
+  "settingsObservedInBinaryText": [
+    "WarehousePrice",
+    "BoathousePrice",
+    "BlockOffsetX",
+    "BlockOffsetZ",
+    "EnableProperties",
+    "EnableNavMesh",
+    "EnableDecor",
+    "DevKeys"
+  ],
+  "compatibilityCaveats": [
+    "Author warns that mods adding buildings or NPCs in the same stretch of water may overlap.",
+    "The two purchasable properties are saved in the game save; removing this mod or disabling EnableProperties later can leave the save referencing missing properties.",
+    "Author's multiplayer notes require every player to install the mod; property creation is host-driven. Multiplayer is described as not yet tested in the page notes.",
+    "Public page reports tested game build 0.4.6f13; that is not proof of compatibility with a newer game build."
+  ],
+  "integrationPolicy": {
+    "optionalCompanion": true,
+    "bundled": false,
+    "requiredDependency": false,
+    "copyBinary": false,
+    "copyAssets": false,
+    "modifyExternalFiles": false,
+    "doNotOverlapArea": "Pier, bridge road, water stretch west of Docks and the Westville-side bridge approach",
+    "ourArea": "Harborline remains a separate planned district; final placement must be selected only after in-game spatial survey and exclusion-zone checks.",
+    "runtimePlacementGuardRequired": true,
+    "testRequired": [
+      "Pier Expansion alone on a backed-up test save",
+      "Mega Expansion alone on a fresh test save",
+      "Both mods installed together and loaded in both practical orders",
+      "Harborline generation and NPC placement do not enter the pier/bridge exclusion area",
+      "Buy both Pier Expansion properties, save, reload and verify",
+      "Remove/disable the companion only on a disposable test save",
+      "NPC navigation across native road and bridge",
+      "Host/client installation parity and property replication",
+      "Performance during a long session"
+    ]
+  },
+  "permissionNotice": "The author's Nexus permissions disallow reuploading the mod, require permission for modification and asset reuse, and disallow earning donation points when using its assets. Do not redistribute the DLL or reuse its files/assets without written permission."
+}
