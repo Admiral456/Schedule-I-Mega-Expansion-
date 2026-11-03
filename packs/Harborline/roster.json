@@ -1,43 +1,227 @@
 {
-  "schemaVersion": 1,
-  "status": "design_and_runtime_inventory; not all entries are active runtime entities",
-  "targets": {
-    "customerProfiles": 30,
-    "dealers": 2,
-    "physicalNpcTarget": 42,
-    "concurrentNpcBudgetTarget": 18
+  "schemaVersion": 2,
+  "packId": "harborline",
+  "region": "Harborline",
+  "status": "design-only; native S1API NPC implementation requires in-game survey and target-build verification",
+  "expansion": {
+    "scale": "large-district",
+    "subdistricts": [
+      "Port District",
+      "Freight & Industrial Quarter",
+      "Harbor Market & Commercial Street",
+      "Waterfront Promenade",
+      "Residential Backstreets"
+    ],
+    "designRule": "Harborline is a large physical subdistrict inside the native Docks region. Extend from the existing Docks world area and connect to the actual road/navigation graph.",
+    "environment": "Reuse vanilla buildings, props, road pieces, lighting, interiors and interaction prefabs wherever possible."
   },
-  "nativeRuntimeInventory": {
-    "customers": [
-      "Caleb Price",
-      "Nina Brooks",
-      "Rafael Cole",
-      "Olivia Hayes",
-      "Ethan Ward",
-      "Maya Bennett",
-      "Lucas Foster",
-      "Ava Collins"
+  "groups": [
+    {
+      "idPrefix": "harborline_dockworker",
+      "role": "port-worker",
+      "targetCount": 8,
+      "physical": true,
+      "primaryAnchor": "harbor_freight_warehouse",
+      "scheduleProfile": "staggered-day-and-night-shifts",
+      "gameSystems": [
+        "S1API/native NPC spawn",
+        "native NPC schedule",
+        "S1API NPC"
+      ]
+    },
+    {
+      "idPrefix": "harborline_driver",
+      "role": "cargo-driver",
+      "targetCount": 5,
+      "physical": true,
+      "primaryAnchor": "truck_parking",
+      "scheduleProfile": "rotating-shift",
+      "gameSystems": [
+        "S1API/native NPC spawn",
+        "native NPC schedule/route",
+        "vehicle route only after compatibility check"
+      ]
+    },
+    {
+      "idPrefix": "harborline_fisher",
+      "role": "fisher",
+      "targetCount": 4,
+      "physical": true,
+      "primaryAnchor": "pier_promenade",
+      "scheduleProfile": "early-morning-and-evening",
+      "gameSystems": [
+        "S1API/native NPC spawn",
+        "native NPC schedule"
+      ]
+    },
+    {
+      "idPrefix": "harborline_vendor",
+      "role": "market-vendor",
+      "targetCount": 5,
+      "physical": true,
+      "primaryAnchor": "harbor_market",
+      "scheduleProfile": "market-opening-hours",
+      "gameSystems": [
+        "S1API/native NPC spawn",
+        "native NPC schedule",
+        "customer profile where applicable"
+      ]
+    },
+    {
+      "idPrefix": "harborline_mechanic",
+      "role": "mechanic",
+      "targetCount": 4,
+      "physical": true,
+      "primaryAnchor": "harbor_auto_works",
+      "scheduleProfile": "workshop-shift",
+      "gameSystems": [
+        "S1API/native NPC spawn",
+        "native NPC schedule"
+      ]
+    },
+    {
+      "idPrefix": "harborline_tourist",
+      "role": "tourist",
+      "targetCount": 6,
+      "physical": true,
+      "primaryAnchor": "pier_promenade",
+      "scheduleProfile": "daytime-and-evening",
+      "gameSystems": [
+        "S1API/native NPC spawn",
+        "native NPC schedule/route",
+        "customer profile where applicable"
+      ]
+    },
+    {
+      "idPrefix": "harborline_security",
+      "role": "port-security",
+      "targetCount": 4,
+      "physical": true,
+      "primaryAnchor": "police_checkpoint",
+      "scheduleProfile": "rotating-security-shift",
+      "gameSystems": [
+        "S1API/native NPC spawn",
+        "native NPC schedule",
+        "existing police/crime systems only"
+      ]
+    },
+    {
+      "idPrefix": "harborline_resident",
+      "role": "local-resident",
+      "targetCount": 6,
+      "physical": true,
+      "primaryAnchor": "residential_backstreets",
+      "scheduleProfile": "home-work-evening-cycle",
+      "gameSystems": [
+        "S1API/native NPC spawn",
+        "native NPC schedule",
+        "S1API NPC"
+      ]
+    }
+  ],
+  "customerProfileRules": {
+    "targetCount": 30,
+    "uniquePerNpc": true,
+    "randomizePerNpc": true,
+    "randomizedFields": [
+      "drug affinities",
+      "product affinities",
+      "standards",
+      "budget tier",
+      "orders per week",
+      "preferred order day and time"
     ],
-    "dealers": [
-      "Mason Reed",
-      "Sierra Voss"
+    "persistence": "Generate once from a stable per-NPC seed and save the resolved values; never reroll on reload or client join.",
+    "validity": "Choose only product/effect identifiers verified in the target game build and native S1API customer schema. Avoid impossible or empty preference sets.",
+    "uniqueness": "Use weighted random selection with duplicate-profile detection; if a collision occurs, reroll only the conflicting profile.",
+    "mustDefineIndividually": [
+      "spending",
+      "orders per week",
+      "preferred day and time",
+      "standards",
+      "direct approach",
+      "first sample",
+      "mutual relation requirement",
+      "call-police chance",
+      "dependence",
+      "affinities",
+      "preferred properties"
     ],
-    "supplier": [
-      "Portside Supply"
+    "designSource": "packs/Harborline/customer-designs.json",
+    "notes": [
+      "Customer behaviour is configured on S1API NPCs through native customer/economy builder fields.",
+      "customer-designs.json remains the design source; map only to verified product/effect IDs and S1API customer fields.",
+      "Resolved randomized preferences must be generated once by the host and saved; do not reroll on reload or client join."
     ]
   },
-  "additionalCustomerProfiles": "customer-designs.json",
-  "serviceNpcRolesToDefine": [
-    "dock_supervisor",
-    "warehouse_clerk",
-    "forklift_operator",
-    "mechanic",
-    "market_vendor",
-    "office_receptionist",
-    "harbor_security",
-    "maintenance_worker",
-    "fisherman",
-    "bus_driver"
+  "appearanceRules": {
+    "system": "S1API NPC instance Appearance; call Appearance.GenerateRandomAppearance() then Appearance.Build()",
+    "useNativeRandomizer": true,
+    "usePersonnelFramework": false,
+    "useCustomAvatarGenerator": false,
+    "vanillaAvatarLayersOnly": true,
+    "persistence": "Generate one appearance on the authoritative host and let native NPC save/load and networking preserve it; never reroll on load or late join.",
+    "uniqueness": "Compare resolved avatar settings among Harborline NPCs and reroll exact collisions using the same native randomizer. Verify the comparison against the target S1API version.",
+    "fields": "The native randomizer selects supported face/body/hair/clothing/accessory settings from the installed game's avatar library.",
+    "multiplayer": "All clients load the same mod and S1API version; the host-created appearance is the state replicated to peers."
+  },
+  "dealerProfiles": [
+    {
+      "id": "harborline_port_dealer",
+      "anchor": "harbor_offices",
+      "role": "dealer"
+    },
+    {
+      "id": "harborline_market_dealer",
+      "anchor": "harbor_market",
+      "role": "dealer"
+    }
   ],
-  "runtimeMapping": "New profiles and service roles do not spawn until mapped to supported S1API registrations and verified in game."
+  "policeIntegration": {
+    "system": "existing-game-police-and-crime-response",
+    "customPoliceAi": false,
+    "spawnPolicy": "Allow the game's native police spawn/dispatch logic to select Harborline as a valid region after its region and road/navigation registration is verified.",
+    "checkpoints": [
+      "harborline_entry",
+      "freight_road",
+      "market_exit"
+    ],
+    "patrols": "Use existing police patrol/vehicle/response systems; do not create client-only police or duplicate dispatch logic."
+  },
+  "multiplayer": {
+    "authority": "server-host-authoritative",
+    "npcSpawn": "one authoritative registration/spawn per save and stable NPC id",
+    "state": "Persist customer preferences, appearance seed, schedule and relevant NPC state on host/save; clients consume replicated state.",
+    "lateJoin": "Late joiners receive the same NPC state without creating another copy.",
+    "dependencies": "All players must install the same mod version and S1API version; no Personnel framework or external NPC pack is required.",
+    "conflicts": "Use namespaced IDs, additive hooks, feature detection and optional integrations; never replace vanilla singleton systems or hard-depend on unrelated mods.",
+    "degradedMode": "If optional integration is absent, disable only that integration and log a clear warning."
+  },
+  "releaseRules": [
+    "Stable explicit NPC ids before first public save.",
+    "Never publish a physical NPC without measured spawn coordinates.",
+    "Start with 3-5 NPCs, then scale after spawn, schedule, persistence, multiplayer, police and performance tests.",
+    "Target population is a design goal, not a guarantee all NPCs are active simultaneously.",
+    "Native police population is additional to the custom NPC target and is governed by the game's own police system."
+  ],
+  "npcTarget": {
+    "physicalNpcCount": 42,
+    "targetSimultaneousActive": 18,
+    "uniqueCustomerProfiles": 30,
+    "newDealers": 2,
+    "contactOnlyOptional": 8,
+    "policeNpcPopulation": "native-game police spawns; not counted as custom roster NPCs"
+  },
+  "npcImplementation": {
+    "system": "S1API.Entities.NPC using the native Schedule I NPC prefab, save, schedule, avatar and networking pipeline",
+    "externalNpcPackFrameworkRequired": false,
+    "appearanceApi": "On the NPC instance: Appearance.GenerateRandomAppearance() followed by Appearance.Build()",
+    "appearanceAssets": "vanilla game avatar layers only unless later explicitly required",
+    "appearancePersistence": "Build the random appearance once when the authoritative host creates the NPC; preserve it through native NPC save/load and networking.",
+    "duplicatePolicy": "Compare resolved native avatar settings for Harborline; reroll exact duplicates through GenerateRandomAppearance(), not a custom appearance generator.",
+    "nativeRegion": "Docks",
+    "nativeRegionNote": "Use the existing S1API Region.Docks enum in native NPC prefab configuration; never cast a custom Harborline integer into the game enum."
+  },
+  "nativeRegion": "Docks",
+  "nativeRegionPolicy": "Harborline is a physical subdistrict of the existing Docks region, not a new Region enum value. Confirm the final world coordinates fall within Docks bounds before enabling region-aware systems."
 }
