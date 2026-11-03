@@ -14,8 +14,8 @@
     {
       "id": "docks_clothing_store",
       "path": "Map/Hyland Point/Region_Docks/Clothing store with interior",
-      "role": "visual reference for shopfront/building shell",
-      "currentlyUsed": false
+      "role": "Harbor Market visual shell only; no original scripts, colliders, stock, door, or property behavior copied",
+      "currentlyUsed": true
     },
     {
       "id": "suburbia_green_house",
@@ -93,7 +93,8 @@
       "id": "road_nodes",
       "path": "Map/Pathfinding/RoadNodes",
       "role": "native road-node hierarchy for road/nav survey",
-      "currentlyUsedForDiagnostics": true
+      "currentlyUsedForDiagnostics": true,
+      "diagnosticOutput": "native-road-nodes.csv"
     },
     {
       "id": "pathfinding_root",
@@ -125,6 +126,8 @@
     "HarborlineNativeVisualReuse copies MeshFilter.sharedMesh, MeshRenderer.sharedMaterials and basic Light settings into new local GameObjects.",
     "It does not copy MonoBehaviours, colliders, NPCEnterableBuilding, InteractableObject, DoorController, AvatarSeatSet or FishNet NetworkObjects.",
     "Streetlights, promenade benches and a bus-stop visual are used with geometry fallback when no source exists.",
-    "Road-node hierarchy and position output are exported by NativeScenePrefabExporter for the next verified road-navigation implementation."
+    "Road-node hierarchy and position output are exported by NativeScenePrefabExporter for the next verified road-navigation implementation.",
+    "Harbor Market now attempts to reuse the render-only shell of the vanilla Docks clothing store. It is visual-only and has no cloned storefront interactions, inventory or Property registration.",
+    "NativeRoadGraphExporter traverses every child under Map/Pathfinding/RoadNodes and exports world/local transforms and component types to native-road-nodes.csv. It does not alter the A* graph."
   ]
 }
