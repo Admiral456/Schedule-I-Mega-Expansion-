@@ -23,7 +23,8 @@ namespace ScheduleIMegaExpansion.Diagnostics
             "DoorController", "StaticDoor", "PivotDoor", "InteractableObject",
             "NPCMovement", "NPCSchedule", "NavMesh", "Navigation", "AstarPath",
             "Pathfinding", "RecastGraph", "PointGraph", "GraphNode", "Seeker",
-            "AIPath", "RoadNodes", "NodeLink", "Road", "Region", "Map"
+            "AIPath", "RoadNodes", "NodeLink", "Road", "Region", "Map",
+            "AvatarSeatSet", "SeatSet", "ParkingLot", "Vehicle", "TerrainData", "TerrainLayer"
         };
 
         private static readonly string[] MemberTokens =
