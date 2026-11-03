@@ -2,10 +2,11 @@
   "name": "ScheduleIMegaExpansion",
   "version_number": "0.3.1",
   "website_url": "https://github.com/Admiral456/Schedule-I-Mega-Expansion-",
-  "description": "Harborline with native S1API NPCs and repriced vanilla Hardware Store stock.",
+  "description": "Harborline: native NPCs, S1MAPI buildings and MapExpansions road, property and shop integration.",
   "dependencies": [
     "LavaGang-MelonLoader-0.7.3",
     "ifBars-S1API_Forked-3.2.2",
-    "ifBars-S1MAPI-2.0.1"
+    "ifBars-S1MAPI-2.0.1",
+    "DooDesch-MapExpansions-1.0.0"
   ]
 }
