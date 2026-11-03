@@ -7,7 +7,7 @@ Cílem je přirozeně rozšířit Hyland Point o nové obyvatelné a funkční o
 ## Principy
 
 1. **Nejdřív znovu použít hru.** Preferujeme existující prefaby, budovy, nábytek, světla, silniční prvky a herní interakce. Vlastní geometrii použijeme jen tam, kde ve hře vhodný prvek neexistuje.
-2. **NPC jako data.** Harborline už obsahuje první runtime vlnu deseti nativních S1API NPC: dva PlayerDealers a osm zákazníků. Dalších 32 postav z cílového rosteru je stále plánovaných; systém se rozšiřuje postupně po ověření ve hře.
+2. **NPC jako data.** Harborline už obsahuje první runtime vlnu jedenácti nativních S1API NPC: dva PlayerDealers a osm zákazníků. Dalších 31 postav z cílového rosteru je stále plánovaných; systém se rozšiřuje postupně po ověření ve hře.
 3. **Žádné vymyšlené souřadnice.** Prototyp používá pozici existující Docks Warehouse a fyzikální kontroly Unity. Přesné hranice Docks a výsledné umístění zatím nejsou ověřené v cílové hře.
 4. **Host je autorita.** Síťové změny a stav světa musí respektovat síťové/ukládací mechanismy hry a S1API.
 5. **Po malých ověřitelných krocích.** Nejdřív funkční Harborline, až potom další provincie a rozšiřování mobilní sítě.
@@ -21,14 +21,16 @@ NPC role a cílové počty jsou v `packs/Harborline/roster.json`: nově 42 fyzic
 ## První nativní herní obsah
 
 - `HarborlineNpcRoster.cs` registruje dva fyzické dealery (Mason Reed, Sierra Voss) přes `IsDealer` a `WithDealerDefaults`, včetně náborového poplatku, provize, kvality a nativních událostí náboru/smluv.
-- Osm fyzických zákaznických NPC (Caleb Price, Nina Brooks, Rafael Cole, Olivia Hayes, Ethan Ward, Maya Bennett, Lucas Foster a Ava Collins) má individuální rozpočty, týdenní počet objednávek, den/čas, standardy, šanci zavolat policii, závislost a afinity k typům drog.
+- Portside Supply je samostatný nativní Supplier NPC. Jeho telefonní objednávkový katalog používá stejných 14 existujících item ID a jejich stejné ceny jako kamenný Hardware Store: S1API automaticky připraví supplier shop, persistentní sklad a delivery vehicle a zapojí objednávky do původního herního Delivery systému. Dodavatel používá nativní supplier meeting/phone flow a je skrytý, když je nečinný. Katalog a cenové definice jsou společné, ale zásoby nejsou synchronizované jako konečný sklad; veřejné delivery API dovoluje jen číst stav zásilek, nikoli vytvářet libovolné dodávky.
+
+Osm fyzických zákaznických NPC (Caleb Price, Nina Brooks, Rafael Cole, Olivia Hayes, Ethan Ward, Maya Bennett, Lucas Foster a Ava Collins) má individuální rozpočty, týdenní počet objednávek, den/čas, standardy, šanci zavolat policii, závislost a afinity k typům drog.
 - Vzhled se vytváří herním generátorem přes `Appearance.GenerateRandomAppearance()` a `Appearance.Build()`. Všech osm zákazníků má nativní akci `EnsureDealSignal()` pro čekání na nabídku. Dealeři používají automatické `DealerAttendDealBehaviour` v novější herní verzi; samostatná akce `HandleDeal()` je zastaralá. Scheduler se zapíná přes podporované `Schedule.Enable()`. Pěší trasy a návštěvy budov zatím čekají na zaměření navmeshe.
 - `HarborlineShopCatalog.cs` upravuje ceny 14 existujících vanilla předmětů přímo v nativním `StorableItemDefinition.BasePurchasePrice` a zajišťuje jejich listing v existujícím Hardware Store přes `Shop.AddItem`. Používá originální nákupní UI a doručení předmětů hry. Cena definice je sdílená napříč všemi obchody používajícími stejné item ID.
 - Vlastní NPC typy jsou definované přes S1API a používají jeho nativní prefab, save/load a FishNet pipeline. Doplňkový fallback registrar je omezený na single-player, aby nevytvářel duplicitní NPC mimo ověřený serverový tok. Runtime ve hře zatím nebyl ověřen; denní chození po čtvrti zatím není nakonfigurované.
 
 ## Zatím blokované / další fáze
 
-- Zbývajících 32 NPC, rozšíření na 42 fyzických postav a dalších 22 zákaznických profilů do cílového počtu 30.
+- Zbývajících 31 NPC, rozšíření na 42 fyzických postav a dalších 22 zákaznických profilů do cílového počtu 30.
 - Nativní denní trasy a návštěvy budov – zatím nejsou zaměřené a otestované navmesh body a interiéry.
 - Vlastní fyzický Harborline obchod a online objednávky přes telefon se společným inventářem. Aktuální implementace rozšiřuje skutečný vanilla Hardware Store, nikoli novou provozovnu.
 - Nové koupitelné podniky a byty přes Realtor. Veřejné S1API PropertyManager/BusinessManager pouze čtou existující registrace; přidávací hook není zatím prokázán. Nepřepisujeme cizí nemovitosti ani nefalšujeme realitní nabídky.
