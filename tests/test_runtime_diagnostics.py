@@ -31,7 +31,7 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIsNotNone(target)
         self.assertEqual(target.text, "net6.0")
         self.assertIsNotNone(version)
-        self.assertEqual(version.text, self.manifest["version_number"])
+        self.assertEqual(version.text, self.manifest["version_number"])\n        self.assertEqual(version.text, "0.3.1")
 
     def test_runtime_uses_official_s1api_package_without_bundling_game_assemblies(self):
         self.assertEqual(self.project.findall(".//Reference"), [])
@@ -54,7 +54,7 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn("HarborlinePhysicalBuilder.ResetForNewSave();", self.core)
         self.assertIn("private void OnPreSceneChange()", self.core)
         self.assertIn("_saveLoaded = true", self.core)
-        self.assertIn("HarborlineGameplayBootstrap.TryActivate(", self.core)
+        self.assertIn("HarborlineGameplayBootstrap.TryActivate(", self.core)\n        self.assertIn("if (_saveLoaded && !_gameplayInitialized)", self.core)\n        self.assertNotIn("if (_saveLoaded && _harborlineGenerated && !_gameplayInitialized)", self.core)
         self.assertIn("_gameplayInitialized", self.core)
 
     def test_player_safety_gate_uses_real_s1api_player_registry(self):
@@ -180,9 +180,9 @@ class RuntimeDiagnosticTests(unittest.TestCase):
     def test_shop_stock_uses_native_shop_and_existing_item_registry(self):
         self.assertIn('ShopManager.GetShopByName("Hardware Store")', self.shop)
         self.assertIn("ItemManager.GetDefinition(stock.Id)", self.shop)
-        self.assertIn("hardwareStore.AddItem(item, stock.Price)", self.shop)
+        self.assertIn("storable.BasePurchasePrice = stock.Price", self.shop)\n        self.assertIn("hardwareStore.AddItem(item)", self.shop)\n        self.assertNotIn("hardwareStore.AddItem(item, stock.Price)", self.shop)\n        self.assertIn("shared item definition", self.shop)\n        self.assertIn("Price override", self.shop) if "Price override" in self.shop else self.assertIn("customPrice is currently", self.shop)
         self.assertIn("hardwareStore.HasItem(item.ID)", self.shop)
-        self.assertEqual(self.shop.count("new StockItem("), 14)
+        self.assertEqual(self.shop.count("new StockItem("), 14)\n        self.assertIn("using S1API.Items.Storable;", self.shop)
         for item_id in (
             "plasticpot", "moisturepreservingpot", "airpot",
             "suspensionrack", "halogengrowlight", "ledgrowlight",
