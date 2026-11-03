@@ -202,7 +202,7 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn("shared item definition", self.shop)
         self.assertIn("hardwareStore.HasItem(item.ID)", self.shop)
         self.assertEqual(self.shop.count("new StockItem("), 14)
-        self.assertIn("using S1API.Items.Storable;", self.shop)
+        self.assertIn("using NativeStorableItemDefinition = S1API.Items.Storable.StorableItemDefinition;", self.shop)
         for item_id in (
             "plasticpot", "moisturepreservingpot", "airpot",
             "suspensionrack", "halogengrowlight", "ledgrowlight",
