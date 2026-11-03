@@ -217,7 +217,7 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn("zbylých 22 profilů", self.src_readme)
         self.assertIn("11 fyzických S1API NPC", (ROOT / "docs" / "implementation-audit.md").read_text(encoding="utf-8"))
         self.assertIn("slot > 10", self.npcs)
-        self.assertIn("slot > 9", self.physical)
+        self.assertIn("slot > 10", self.physical)
         self.assertIn("5 => -21.0f", self.physical)
         self.assertIn("9 => 21.0f", self.physical)
         self.assertIn("10 => -19.0f", self.physical)
