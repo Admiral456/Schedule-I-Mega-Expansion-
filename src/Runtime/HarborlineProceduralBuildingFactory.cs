@@ -99,11 +99,13 @@ namespace ScheduleIMegaExpansion.Runtime
                     builder,
                     "FlattenTerrain",
                     Array.Empty<object?>());
+                bool interiorDecorBuilt = TryBuildNativeInteriorDecor(transform, warn);
                 bool interiorNavigationBuilt = TryBuildInteriorNavigation(builder, warn);
                 log("S1MAPI warehouse created: procedural floor, roof, walls and lighting; door=" +
                     (doorAdded ? "networked sliding door requested" : "not available") +
                     "; terrain foliage cleared=" + (terrainCleared ? "yes" : "not available") +
                     "; terrain flattened=" + (terrainFlattened ? "yes/requested" : "not available") +
+                    "; vanilla interior mesh decor=" + (interiorDecorBuilt ? "built" : "not available") +
                     "; interior A* navigation=" + (interiorNavigationBuilt ? "built" : "not confirmed") + ".");
                 log("The building is physical geometry only; native Property/Business/Realtor registration is a separate system.");
                 return true;
@@ -158,6 +160,111 @@ namespace ScheduleIMegaExpansion.Runtime
                 [method.GetParameters()[2].Name ?? "openingHours"] = "24/7"
             });
             method.Invoke(builder, args);
+            return true;
+        }
+
+        private static bool TryBuildNativeInteriorDecor(object buildingTransform, Action<string> warn)
+        {
+            try
+            {
+                Type? interiorType = FindType("S1MAPI.Building.Interior.InteriorBuilder");
+                Type? vectorType = FindType("UnityEngine.Vector3")
+                    ?? FindType("Il2CppUnityEngine.Vector3");
+                Type? quaternionType = FindType("UnityEngine.Quaternion")
+                    ?? FindType("Il2CppUnityEngine.Quaternion");
+                if (interiorType == null || vectorType == null || quaternionType == null)
+                    return false;
+
+                ConstructorInfo? constructor = interiorType.GetConstructors(AllInstance)
+                    .FirstOrDefault(candidate =>
+                    {
+                        ParameterInfo[] p = candidate.GetParameters();
+                        return p.Length == 1 &&
+                            p[0].ParameterType.IsAssignableFrom(buildingTransform.GetType());
+                    });
+                if (constructor == null)
+                {
+                    warn("S1MAPI InteriorBuilder(Transform) constructor was not found; native furniture decoration skipped.");
+                    return false;
+                }
+
+                object interior = constructor.Invoke(new[] { buildingTransform });
+                object identity = quaternionType.GetProperty("identity", PublicStatic)?.GetValue(null, null)
+                    ?? CreateYawQuaternion(quaternionType, 0f);
+                int added = 0;
+
+                added += TryAddInteriorObject(interior, "AddDesk", vectorType, quaternionType, 9.5f, 0f, 9.0f, identity) ? 1 : 0;
+                added += TryAddInteriorObject(interior, "AddChair", vectorType, quaternionType, 9.5f, 0f, 7.6f, identity) ? 1 : 0;
+                added += TryAddInteriorObject(interior, "AddCabinet", vectorType, quaternionType, 1.1f, 0f, 2.0f, identity) ? 1 : 0;
+                added += TryAddInteriorObject(interior, "AddLocker", vectorType, quaternionType, 1.1f, 0f, 8.2f, identity) ? 1 : 0;
+                added += TryAddInteriorObject(interior, "AddFridge", vectorType, quaternionType, 10.8f, 0f, 3.0f, identity) ? 1 : 0;
+                added += TryAddInteriorPlant(interior, vectorType, 10.8f, 0f, 9.5f) ? 1 : 0;
+
+                MethodInfo? build = interiorType.GetMethods(PublicInstance)
+                    .FirstOrDefault(method => method.Name == "Build" && method.GetParameters().Length == 0);
+                if (build == null)
+                    throw new MissingMethodException(interiorType.FullName, "Build()");
+                build.Invoke(interior, null);
+
+                if (added == 0)
+                {
+                    warn("S1MAPI InteriorBuilder was found, but none of the documented furniture methods matched this runtime API.");
+                    return false;
+                }
+
+                // InteriorBuilder objects are vanilla visual meshes, not a register,
+                // shop inventory, functional locker or networked gameplay object.
+                warn("Portside Supply interior received " + added +
+                    " vanilla mesh decorations. They are visual only; functional shop/storage interactions remain to be wired.");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                warn("S1MAPI InteriorBuilder decoration failed: " +
+                    ex.GetType().Name + ": " + ex.Message);
+                return false;
+            }
+        }
+
+        private static bool TryAddInteriorObject(
+            object interior,
+            string methodName,
+            Type vectorType,
+            Type quaternionType,
+            float x,
+            float y,
+            float z,
+            object rotation)
+        {
+            MethodInfo? method = interior.GetType().GetMethods(PublicInstance)
+                .FirstOrDefault(candidate =>
+                {
+                    ParameterInfo[] p = candidate.GetParameters();
+                    return candidate.Name == methodName && p.Length == 2
+                        && p[0].ParameterType == vectorType
+                        && p[1].ParameterType == quaternionType;
+                });
+            if (method == null)
+                return false;
+
+            object position = Activator.CreateInstance(vectorType, new object[] { x, y, z })
+                ?? throw new InvalidOperationException("Could not create local position for " + methodName);
+            method.Invoke(interior, new[] { position, rotation });
+            return true;
+        }
+
+        private static bool TryAddInteriorPlant(object interior, Type vectorType, float x, float y, float z)
+        {
+            MethodInfo? method = interior.GetType().GetMethods(PublicInstance)
+                .FirstOrDefault(candidate => candidate.Name == "AddPlant"
+                    && candidate.GetParameters().Length == 1
+                    && candidate.GetParameters()[0].ParameterType == vectorType);
+            if (method == null)
+                return false;
+
+            object position = Activator.CreateInstance(vectorType, new object[] { x, y, z })
+                ?? throw new InvalidOperationException("Could not create plant position.");
+            method.Invoke(interior, new[] { position });
             return true;
         }
 
