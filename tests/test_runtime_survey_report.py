@@ -31,7 +31,7 @@ class RuntimeSurveyReportTests(unittest.TestCase):
         self._write_csv(directory, "native-shop-items.csv",
             ["shopName", "itemId", "itemName", "category", "basePurchasePrice"],
             [["Hardware Store", "fertilizer", "Fertilizer", "Supply", "20"]])
-        self._write_csv(directory, "native-law-foot-patrol-routes",
+        self._write_csv(directory, "native-law-foot-patrol-routes.csv",
             ["index", "runtimeType", "footPatrolRouteName", "publicValues"], [])
         self._write_csv(directory, "native-law-vehicle-patrol-routes.csv",
             ["index", "runtimeType", "vehiclePatrolRouteName", "publicValues"], [["0", "Route", "Docks Patrol", "{}"]])
