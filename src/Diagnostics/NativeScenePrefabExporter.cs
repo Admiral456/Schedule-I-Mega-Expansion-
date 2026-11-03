@@ -35,6 +35,8 @@ namespace ScheduleIMegaExpansion.Diagnostics
             "Map/Hyland Point/Region_Uptown/Pier/Seats/OutdoorBench",
             "Map/Hyland Point/Bus stops/Bus Stop",
             "Map/Hyland Point/Region_Suburbia/StreetLight",
+            "Map/Pathfinding/RoadNodes",
+            "Map/Pathfinding",
             "Map/Hyland Point/Rocks",
             "Map/Hyland Point/Cliffs",
             "Map/Hyland Point/Region_Docks"
@@ -189,7 +191,7 @@ namespace ScheduleIMegaExpansion.Diagnostics
                 object current = pending.Dequeue();
                 string name = ReadText(current, "name");
                 if (!string.IsNullOrWhiteSpace(name))
-                    names.Add(name);
+                    names.Add(name + " @ " + ReadText(current, "position") + " (local " + ReadText(current, "localPosition") + ")");
 
                 int childCount = ReadInt(current, "childCount");
                 MethodInfo? getChild = current.GetType().GetMethods(PublicInstance)
