@@ -116,6 +116,7 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         ):
             self.assertIn(token, self.exporter)
         self.assertIn("NativeApiSurfaceScanner.Export(", self.exporter)
+        self.assertIn("WriteShopsAndItems(outputDirectory, summary, warn)", self.exporter)
         self.assertIn("NativePrefabCatalogExporter.Export(", self.exporter)
         self.assertIn("native-prefabs.csv", self.prefabs)
         self.assertIn("native-game-api-surface.txt", self.scanner)
@@ -124,6 +125,9 @@ class RuntimeDiagnosticTests(unittest.TestCase):
             "native-buildings.csv",
             "native-properties.csv",
             "native-businesses.csv",
+            "native-shops.csv",
+            "native-shop-items.csv",
+            "native-items.csv",
             "standalone-phone-map-pois.csv",
         ):
             self.assertIn(filename, self.exporter)
