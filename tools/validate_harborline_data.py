@@ -20,6 +20,9 @@ def validate() -> list[str]:
     roster = load("packs/Harborline/roster.json")
     designs = load("packs/Harborline/customer-designs.json")
     integration = load("world/integrations/daffys-hills.json")
+    pier_integration = load("world/integrations/pier-expansion.json")
+    ume_integration = load("world/integrations/ume-serena-flats.json")
+    map_guard = load("world/integrations/map-expansion-guard.json")
     native_integration = load("world/harborline/native-integration.json")
 
     # Harborline remains a named extension of the vanilla Docks region.
@@ -83,6 +86,50 @@ def validate() -> list[str]:
         errors.append("Daffy's Hills binaries/assets/source must not be copied or modified")
     if integration.get("version") != "1.2":
         errors.append("The documented Daffy's Hills reference version must remain 1.2")
+
+    # Optional external map expansions: never bundle, modify, or reuse third-party files/assets.
+    for name, record in (
+        ("Pier Expansion", pier_integration),
+        ("Unofficial Map Enhancer", ume_integration),
+    ):
+        policy = record.get("integrationPolicy", {})
+        if not record.get("sourcePage"):
+            errors.append(f"{name} profile must include its public source page")
+        if not policy.get("optionalCompanion") or policy.get("bundled") or policy.get("requiredDependency"):
+            errors.append(f"{name} must remain an optional, unbundled companion")
+        if policy.get("copyBinary") or policy.get("copyAssets") or policy.get("modifyExternalFiles"):
+            errors.append(f"{name} files/assets must not be copied or modified")
+        if not policy.get("runtimePlacementGuardRequired"):
+            errors.append(f"{name} must require the external-map placement guard")
+
+    pier_files = pier_integration.get("archiveInspection", {}).get("files", [])
+    if len(pier_files) != 1 or pier_files[0].get("path") != "PierExpansion.dll":
+        errors.append("Pier Expansion inspected archive must remain documented as one DLL only")
+    if pier_files and pier_files[0].get("sha256") != "e4d8d17c4e00d5e9bd1da9eb1a818252d4a546b38299717828c06ce7be85dc34":
+        errors.append("Pier Expansion archive SHA-256 does not match the inspected user archive")
+    if pier_integration.get("archiveLabelVersion") != "1.2.1" or pier_integration.get("authorPublishedVersion") != "1.2.0":
+        errors.append("Pier Expansion archive-label/public-page version discrepancy must remain explicit")
+
+    ume_install = ume_integration.get("installationFactsByAuthorDescription", {})
+    if len(ume_install.get("replacesOriginalGameAssetFiles", [])) != 5:
+        errors.append("UME profile must document all five original game asset replacement files")
+    if ume_install.get("gameAssetReplacementVersion") != "0.4.5f2":
+        errors.append("UME replacement asset version must remain pinned to the author's 0.4.5f2 description")
+    if ume_integration.get("archiveInspection", {}).get("providedByUser") is not False:
+        errors.append("UME archive inspection must remain explicitly unverified until the archive is supplied")
+
+    # Keep the runtime detector synchronized with the machine-readable guard manifest.
+    detected_mod_files = map_guard.get("detectedModFiles", [])
+    if not detected_mod_files or len(detected_mod_files) != len(set(detected_mod_files)):
+        errors.append("External map guard DLL names must be present and unique")
+    builder_source = (ROOT / "src/Runtime/HarborlinePhysicalBuilder.cs").read_text(encoding="utf-8")
+    for file_name in detected_mod_files:
+        if f'"{file_name}"' not in builder_source:
+            errors.append(f"Runtime placement guard does not detect {file_name}")
+    guard_behavior = map_guard.get("behavior", {})
+    if not guard_behavior.get("pauseAutomaticHarborlineGeometry") or not guard_behavior.get("pauseHarborlineNpcPositionResolution"):
+        errors.append("External map guard must pause both Harborline geometry and NPC position assignment")
+
     if native_integration.get("regionIntegration", {}).get("harborlineParentNativeRegion") != "Docks":
         errors.append("Native integration contract must map Harborline to Docks")
 
