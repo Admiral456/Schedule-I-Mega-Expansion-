@@ -78,7 +78,7 @@ namespace ScheduleIMegaExpansion.Runtime
         public static bool TryGetPlannedNpcSpawnPosition(int slot, out float x, out float y, out float z)
         {
             x = y = z = 0f;
-            if (slot < 0 || slot > 9)
+            if (slot < 0 || slot > 10)
                 return false;
 
             try
