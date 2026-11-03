@@ -19,7 +19,7 @@ namespace ScheduleIMegaExpansion.Runtime
         public static bool TryGet(int slot, out float x, out float y, out float z)
         {
             x = y = z = 0f;
-            if (slot < 0 || slot > 4)
+            if (slot < 0 || slot > 9)
                 return false;
 
             return HarborlinePhysicalBuilder.TryGetPlannedNpcSpawnPosition(
@@ -334,6 +334,96 @@ namespace ScheduleIMegaExpansion.Runtime
         }
     }
 
+    public sealed class HarborlineCustomerOlivia : NPC
+    {
+        public override bool IsPhysical => true;
+        public override bool IsCustomer => true;
+        public HarborlineCustomerOlivia() : base() { }
+        protected override void ConfigurePrefab(NPCPrefabBuilder builder)
+        {
+            HarborlineNpcSpawnPoints.Configure(builder, "harborline_customer_olivia", "Olivia", "Hayes", 5);
+            builder.WithCustomerDefaults(customer => customer
+                .WithSpending(260f, 560f).WithOrdersPerWeek(1, 3)
+                .WithPreferredOrderDay("Tuesday").WithOrderTime(900)
+                .WithStandards(CustomerStandard.Moderate).AllowDirectApproach(true)
+                .WithCallPoliceChance(0.03f).WithDependence(0.12f, 0.28f)
+                .WithAffinities(new[] { (DrugType.Marijuana, 0.55f), (DrugType.Cocaine, 0.15f), (DrugType.Methamphetamine, -0.20f) }));
+        }
+        protected override void OnCreated() { base.OnCreated(); HarborlineNpcLifecycle.InitializePhysicalNpc(this); }
+    }
+
+    public sealed class HarborlineCustomerEthan : NPC
+    {
+        public override bool IsPhysical => true;
+        public override bool IsCustomer => true;
+        public HarborlineCustomerEthan() : base() { }
+        protected override void ConfigurePrefab(NPCPrefabBuilder builder)
+        {
+            HarborlineNpcSpawnPoints.Configure(builder, "harborline_customer_ethan", "Ethan", "Ward", 6);
+            builder.WithCustomerDefaults(customer => customer
+                .WithSpending(600f, 1100f).WithOrdersPerWeek(2, 4)
+                .WithPreferredOrderDay("Thursday").WithOrderTime(1740)
+                .WithStandards(CustomerStandard.High).AllowDirectApproach(true)
+                .WithCallPoliceChance(0.05f).WithDependence(0.18f, 0.32f)
+                .WithAffinities(new[] { (DrugType.Cocaine, 0.65f), (DrugType.Shrooms, 0.25f), (DrugType.Marijuana, -0.25f) }));
+        }
+        protected override void OnCreated() { base.OnCreated(); HarborlineNpcLifecycle.InitializePhysicalNpc(this); }
+    }
+
+    public sealed class HarborlineCustomerMaya : NPC
+    {
+        public override bool IsPhysical => true;
+        public override bool IsCustomer => true;
+        public HarborlineCustomerMaya() : base() { }
+        protected override void ConfigurePrefab(NPCPrefabBuilder builder)
+        {
+            HarborlineNpcSpawnPoints.Configure(builder, "harborline_customer_maya", "Maya", "Bennett", 7);
+            builder.WithCustomerDefaults(customer => customer
+                .WithSpending(120f, 300f).WithOrdersPerWeek(1, 2)
+                .WithPreferredOrderDay("Saturday").WithOrderTime(1130)
+                .WithStandards(CustomerStandard.Low).AllowDirectApproach(true)
+                .WithCallPoliceChance(0.01f).WithDependence(0.08f, 0.18f)
+                .WithAffinities(new[] { (DrugType.Marijuana, 0.80f), (DrugType.Methamphetamine, -0.45f) }));
+        }
+        protected override void OnCreated() { base.OnCreated(); HarborlineNpcLifecycle.InitializePhysicalNpc(this); }
+    }
+
+    public sealed class HarborlineCustomerLucas : NPC
+    {
+        public override bool IsPhysical => true;
+        public override bool IsCustomer => true;
+        public HarborlineCustomerLucas() : base() { }
+        protected override void ConfigurePrefab(NPCPrefabBuilder builder)
+        {
+            HarborlineNpcSpawnPoints.Configure(builder, "harborline_customer_lucas", "Lucas", "Foster", 8);
+            builder.WithCustomerDefaults(customer => customer
+                .WithSpending(900f, 1750f).WithOrdersPerWeek(1, 2)
+                .WithPreferredOrderDay("Sunday").WithOrderTime(2010)
+                .WithStandards(CustomerStandard.VeryHigh).AllowDirectApproach(true)
+                .WithCallPoliceChance(0.08f).WithDependence(0.05f, 0.16f)
+                .WithAffinities(new[] { (DrugType.Cocaine, 0.75f), (DrugType.Shrooms, 0.45f), (DrugType.Methamphetamine, -0.35f) }));
+        }
+        protected override void OnCreated() { base.OnCreated(); HarborlineNpcLifecycle.InitializePhysicalNpc(this); }
+    }
+
+    public sealed class HarborlineCustomerAva : NPC
+    {
+        public override bool IsPhysical => true;
+        public override bool IsCustomer => true;
+        public HarborlineCustomerAva() : base() { }
+        protected override void ConfigurePrefab(NPCPrefabBuilder builder)
+        {
+            HarborlineNpcSpawnPoints.Configure(builder, "harborline_customer_ava", "Ava", "Collins", 9);
+            builder.WithCustomerDefaults(customer => customer
+                .WithSpending(350f, 720f).WithOrdersPerWeek(2, 3)
+                .WithPreferredOrderDay("Friday").WithOrderTime(1515)
+                .WithStandards(CustomerStandard.High).AllowDirectApproach(true)
+                .WithCallPoliceChance(0.035f).WithDependence(0.14f, 0.26f)
+                .WithAffinities(new[] { (DrugType.Methamphetamine, 0.55f), (DrugType.Marijuana, 0.25f), (DrugType.Cocaine, -0.20f) }));
+        }
+        protected override void OnCreated() { base.OnCreated(); HarborlineNpcLifecycle.InitializePhysicalNpc(this); }
+    }
+
     internal static class HarborlineNpcLifecycle
     {
         public static void InitializePhysicalNpc(NPC npc)
@@ -375,7 +465,12 @@ namespace ScheduleIMegaExpansion.Runtime
             "harborline_dealer_sierra",
             "harborline_customer_caleb",
             "harborline_customer_nina",
-            "harborline_customer_rafael"
+            "harborline_customer_rafael",
+            "harborline_customer_olivia",
+            "harborline_customer_ethan",
+            "harborline_customer_maya",
+            "harborline_customer_lucas",
+            "harborline_customer_ava"
         };
 
         public static bool EnsureInitialWave(Action<string> log, Action<string> warn)
@@ -421,6 +516,11 @@ namespace ScheduleIMegaExpansion.Runtime
                 CreateIfMissing("harborline_customer_caleb", () => new HarborlineCustomerCaleb(), 2, ref created, ref alreadyPresent);
                 CreateIfMissing("harborline_customer_nina", () => new HarborlineCustomerNina(), 3, ref created, ref alreadyPresent);
                 CreateIfMissing("harborline_customer_rafael", () => new HarborlineCustomerRafael(), 4, ref created, ref alreadyPresent);
+                CreateIfMissing("harborline_customer_olivia", () => new HarborlineCustomerOlivia(), 5, ref created, ref alreadyPresent);
+                CreateIfMissing("harborline_customer_ethan", () => new HarborlineCustomerEthan(), 6, ref created, ref alreadyPresent);
+                CreateIfMissing("harborline_customer_maya", () => new HarborlineCustomerMaya(), 7, ref created, ref alreadyPresent);
+                CreateIfMissing("harborline_customer_lucas", () => new HarborlineCustomerLucas(), 8, ref created, ref alreadyPresent);
+                CreateIfMissing("harborline_customer_ava", () => new HarborlineCustomerAva(), 9, ref created, ref alreadyPresent);
             }
             catch (Exception ex)
             {
