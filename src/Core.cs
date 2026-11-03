@@ -5,7 +5,7 @@ using MelonLoader;
 using ScheduleIMegaExpansion.Diagnostics;
 using ScheduleIMegaExpansion.Runtime;
 
-[assembly: MelonInfo(typeof(ScheduleIMegaExpansion.MegaExpansionMod), "Schedule I Mega Expansion", "0.3.0", "Admiral456")]
+[assembly: MelonInfo(typeof(ScheduleIMegaExpansion.MegaExpansionMod), "Schedule I Mega Expansion", "0.3.1", "Admiral456")]
 [assembly: MelonGame("TVGS", "Schedule I")]
 
 namespace ScheduleIMegaExpansion
@@ -55,7 +55,7 @@ namespace ScheduleIMegaExpansion
                 }
             }
 
-            if (_saveLoaded && _harborlineGenerated && !_gameplayInitialized)
+            if (_saveLoaded && !_gameplayInitialized)
             {
                 _gameplayPollFrames++;
                 if (_gameplayPollFrames >= 60)
