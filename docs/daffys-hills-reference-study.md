@@ -40,6 +40,26 @@ Veřejný changelog Polyfill uvádí, že DaffysHills potřeboval po změně hry
 
 **Rozhodnutí pro Harborline:** používat současné veřejné S1API/S1MAPI API, reflexi omezit na zjišťování dostupných podpisů a pro neznámou verzi mít bezpečný fallback. Testy sestavení nenahrazují test ve hře.
 
+## Další technické indicie z DLL string table
+
+Při druhém průchodu celým string table se objevily další konkrétní stopy (stále nejde o dekompilovaný zdrojový kód):
+
+- **Původní objekty mapy:** cesty jako `Map/Hyland Point/Region_Docks/Clothing store with interior`, `Region_Suburbia/Green House`, původní domy v Suburbia/Westville, `Region_Downtown/Boutique Store`, gas station, `Region_Suburbia/StreetLight`, `Region_Uptown/Pier/Seats/OutdoorBench` a `Map/Hyland Point/Bus stops/Bus Stop`. Z toho vznikl vlastní katalog `world/harborline/vanilla-prefab-reuse.json`.
+- **Silniční síť:** string table zmiňuje `Map/Pathfinding/RoadNodes`, AstarPath, RecastGraph, PointGraph, Seeker, road points on navmesh, valid links a testy úplných tras z města přes nový úsek až ke vchodovým dveřím. Daffy tedy nekontroloval jen to, jestli silnice vizuálně existuje; ověřoval dosažitelnost.
+- **Terén:** DLL obsahuje kroky pro výškový profil, vzorkování terénu, heightmapu, alphamap vrstvy, stromy a kolize. Nová diagnostika proto exportuje rozměry Terrain, vrstvy materiálů a mřížku 5×5 výškových vzorků pro každý aktivní Terrain.
+- **NPC a rezidence:** texty ukazují domovní rutiny, návštěvy, odchody domů a kontroly cest k domovním dveřím. Vlastní plánování NPC má být navázané na existující Building/door registry a ověřenou navigaci, ne jen na přidání souřadnic do seznamu.
+- **Realtor:** string table obsahuje čtyři jména hooků `ShouldChoiceBeShown`, `ModifyChoiceText`, `CheckChoice`, `ChoiceCallback` a další pojmenované wrappery `AgentShow`, `AgentText`, `AgentCheck`, `AgentPick`. Objevují se také `AddComponent<Property>`, `SetOwned`, `SetOwned_Server`, `BuyingCabin` a název seznamu `Properties`. To je vodítko k tomu, kde autor napojil koupi nemovitosti a vlastnictví. Bez přesných typů, signatur a serializačních polí cílové hry to ale není bezpečný návod k opakování.
+- **Testy:** DLL obsahuje výstupy vlastního drive-line self-testu, testů cest od města ke dveřím a kontroly colliderů/terénních kroků. Je to dobrý standard pro náš budoucí road self-test.
+
+## Nové použití těchto poznatků v Harborline
+
+- `NativeScenePrefabExporter` hledá vybrané vanilla hierarchy paths v živé scéně; včetně původního Docks clothing store, domů, lamp, laviček, zastávky a `Map/Pathfinding/RoadNodes`. Exportuje názvy, souřadnice, měřítko a typy komponent.
+- `HarborlineNativeVisualReuse` kopíruje jen `MeshFilter.sharedMesh`, `MeshRenderer.sharedMaterials` a základní nastavení Light komponent do nových lokálních GameObjectů. Neklonuje žádné síťové prefab objekty, interakční skripty ani collidery. Streetlight, promenade bench a bus stop visual mají vlastní geometry fallback, když konkrétní cesta ve scéně není.
+- `NativeTerrainSurveyExporter` exportuje `native-terrain-surfaces.csv`, `native-terrain-layers.csv` a `native-terrain-height-samples.csv`. Získáme tak skutečné výšky a materiálové vrstvy, než začneme kreslit novou silnici nebo upravovat terén.
+- `HarborlineIntegrationApiScanner` nyní sleduje také A* graph typy, road nodes, NPC movement, seat sets a transport/parking typy. Cílem je ověřit, jak bezpečně připojit novou trasu k již existujícímu grafu.
+
+Tyto nové exportéry jsou read-only. Vlastní silniční síť, terénní úpravy, rezidenční routiny a Realtor transakce ještě nejsou hotové; nejdřív potřebujeme ověřené výstupy z cílové hry.
+
 ## Co je již převedeno do vlastního projektu
 
 - Přidán HarborlineProceduralBuildingFactory, který přes reflexi hledá S1MAPI BuildingBuilder a BuildingConfig a sestavuje sklad; pokud API není dostupné nebo volání selže, vrací řízení původnímu geometrickému fallbacku.
