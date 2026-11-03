@@ -14,15 +14,16 @@
   ],
   "featuresFromAuthorDescription": {
     "roadLengthMeters": 720,
-    "houses": 32,
-    "customerNpcs": 43,
-    "dealer": 1,
+    "houseCountClaim": 32,
+    "newCustomerCount": 43,
+    "additionalDealer": "DrDaffy",
     "knockableDoors": true,
     "residentSchedules": true,
     "neighborVisits": true,
     "vehicles": true,
     "monument": true,
-    "billboard": true
+    "billboard": true,
+    "newPurchasableBuildingInVersion12": true
   },
   "testedGameVersionByAuthor": "0.4.6f13",
   "requirementsByAuthor": {
@@ -46,7 +47,24 @@
       "NPC/navmesh load",
       "performance",
       "multiplayer"
-    ]
+    ],
+    "ourUse": "Use as optional external content in the eastern high-ground residential district; Harborline remains in the original Docks region and will not duplicate Daffy's content."
   },
-  "permissionNotice": "Author's Nexus page forbids modification of the mod and reuse of its assets without permission; do not redistribute this DLL or assets."
+  "permissionNotice": "Author's Nexus page forbids modification of the mod and reuse of its assets without permission; do not redistribute this DLL or assets.",
+  "countClaims": {
+    "title": {
+      "houses": 30,
+      "npcs": 44,
+      "source": "Nexus mod page title"
+    },
+    "description": {
+      "houses": 32,
+      "newCustomers": 43,
+      "roadLengthMeters": 720,
+      "additionalDealer": "DrDaffy",
+      "source": "Nexus mod page feature description"
+    },
+    "discrepancy": "The page title and feature-description house counts differ (30 vs 32). It also advertises 44 NPCs in the title while the feature list specifies 43 new customers plus a dealer. Do not treat these counts as runtime-verified from the DLL."
+  },
+  "patchNotesCaveat": "Version 1.1 patch notes mentioned police presence/world events as in progress; do not assume this feature is complete in 1.2 without an in-game check."
 }
