@@ -195,8 +195,6 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn("Appearance.GenerateRandomAppearance()", self.npcs)
         self.assertIn("Appearance.Build()", self.npcs)
         self.assertIn("Schedule.Enable()", self.npcs)
-        self.assertIn("Schedule.InitializeActions()", self.npcs)
-        self.assertEqual(self.npcs.count("builder.WithSchedule(plan => plan.HandleDeal(900));"), 2)
         self.assertEqual(self.npcs.count("builder.WithSchedule(plan => plan.EnsureDealSignal());"), 8)
         self.assertEqual(self.npcs.count("plan.EnsureDealSignal()"), 8)
         self.assertIn("NPC.CustomNpcsReady", self.npcs)
@@ -212,8 +210,8 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn("slot > 9", self.npcs)
         self.assertIn("slot > 9", self.physical)
         self.assertIn("5 => -21.0f", self.physical)
-        self.assertNotIn("EnsureDealSignal()", self.npcs)
         self.assertNotIn("InitializeActions()", self.npcs)
+        self.assertNotIn("HandleDeal(900)", self.npcs)
 
     def test_shop_stock_uses_native_shared_item_prices_and_purchase_ui(self):
         self.assertIn('ShopManager.GetShopByName("Hardware Store")', self.shop)
