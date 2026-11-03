@@ -64,6 +64,16 @@ namespace ScheduleIMegaExpansion.Diagnostics
 
             try
             {
+                int navigationRows = NativeNavigationSurveyExporter.Export(outputDirectory, summary, warn);
+                summary.Add("NativeNavigationSurveyRows=" + navigationRows.ToString(CultureInfo.InvariantCulture));
+            }
+            catch (Exception ex)
+            {
+                AddError("NativeNavigationSurvey", ex, summary, warn);
+            }
+
+            try
+            {
                 int inspected = NativeApiSurfaceScanner.Export(outputDirectory, warn);
                 summary.Add("NativeApiSurfaceMembers=" + inspected.ToString(CultureInfo.InvariantCulture));
             }
