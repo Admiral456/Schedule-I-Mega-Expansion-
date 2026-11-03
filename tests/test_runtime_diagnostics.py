@@ -166,10 +166,13 @@ class RuntimeDiagnosticTests(unittest.TestCase):
             "harborline_customer_caleb",
             "harborline_customer_nina",
             "harborline_customer_rafael",
+            "harborline_customer_olivia", "harborline_customer_ethan",
+            "harborline_customer_maya", "harborline_customer_lucas",
+            "harborline_customer_ava",
         ):
             self.assertIn(npc_id, self.npcs)
         self.assertEqual(self.npcs.count("public override bool IsDealer => true;"), 2)
-        self.assertEqual(self.npcs.count("public override bool IsCustomer => true;"), 3)
+        self.assertEqual(self.npcs.count("public override bool IsCustomer => true;"), 8)
         self.assertIn("WithDealerDefaults(", self.npcs)
         self.assertIn("WithCustomerDefaults(", self.npcs)
         self.assertIn("WithAffinities(", self.npcs)
@@ -181,6 +184,10 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn("NPC.CustomNpcsReady", self.npcs)
         self.assertIn("IsConfirmedSinglePlayerSession()", self.npcs)
         self.assertIn("NPC.Get(id)", self.npcs)
+        self.assertEqual(self.npcs.count("new HarborlineCustomer"), 5)
+        self.assertIn("slot > 9", self.npcs)
+        self.assertIn("slot > 9", self.physical)
+        self.assertIn("5 => -21.0f", self.physical)
         self.assertNotIn("EnsureDealSignal()", self.npcs)
         self.assertNotIn("InitializeActions()", self.npcs)
 
