@@ -51,3 +51,5 @@ Ceny níže jsou ceny nakonfigurované modem, nikoliv vanilla ceny hry. `BasePur
 - Kompilace a statické testy neprokazují, že NPC, spawn body a změna nabídky skutečně fungují ve hře. Je potřeba otestovat instalaci v cílové verzi Schedule I.
 
 Diagnostické soubory se ukládají do `UserData/ScheduleIMegaExpansion/Diagnostics/<timestamp>/`. Vedle regionů, budov, nemovitostí a podniků nyní vznikají také `native-shops.csv`, `native-shop-items.csv` a `native-items.csv`; obsahují skutečné názvy obchodů, jejich položky a základní ceny z item registry. Fyzická poloha Harborline se zapisuje do `UserData/ScheduleIMegaExpansion/Harborline/last-generation.json`.
+
+The read-only diagnostics can also be summarized with `python tools/analyze_runtime_survey.py <diagnostics-folder-or-zip> --markdown report.md`.
