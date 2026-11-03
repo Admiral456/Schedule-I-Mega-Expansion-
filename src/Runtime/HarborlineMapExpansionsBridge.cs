@@ -373,15 +373,26 @@ namespace ScheduleIMegaExpansion.Runtime
             Set(definition, "QuarterTurns", ReadInt(json, "quarterTurns"));
             Set(definition, "MinimumWorldHeight", ReadFloat(json, "minimumWorldHeight", -5f));
             Set(definition, "SeparateViews", ReadBool(json, "separateViews", false));
-            Set(definition, "Offset", Vector3(Get(json, "offset")));
+            JsonElement offset = Get(json, "offset");
+            Set(definition, "Offset",
+                TryReadVector3(offset, out float ox, out float oy, out float oz)
+                    ? MakeVector3(ox, oy, oz)
+                    : MakeVector3(0f, 0f, 0f));
 
             JsonElement sourceJson = Get(json, "source");
-            object source = New("WorldSource");
-            Set(source, "SceneName", ReadString(sourceJson, "sceneName"));
-            Set(source, "RootName", ReadString(sourceJson, "rootName", "Map"));
-            Set(source, "RoadNodesName", ReadString(sourceJson, "roadNodesName", "RoadNodes"));
-            AddStrings(source, "TestedGameVersions", Get(sourceJson, "testedGameVersions"));
-            Set(definition, "Source", source);
+            string sceneName = ReadString(sourceJson, "sceneName");
+            if (!string.IsNullOrWhiteSpace(sceneName))
+            {
+                object source = New("WorldSource");
+                Set(source, "SceneName", sceneName);
+                Set(source, "RootName", ReadString(sourceJson, "rootName", "Map"));
+                Set(source, "RoadNodesName", ReadString(sourceJson, "roadNodesName", "RoadNodes"));
+                AddStrings(source, "TestedGameVersions", Get(sourceJson, "testedGameVersions"));
+                Set(definition, "Source", source);
+            }
+            // With Source=null, MapExpansions treats the definition as an edit layer
+            // in the main world. It has no separate terrain/connection but can still
+            // copy native properties, shop interiors/doors and world objects.
 
             AddRegions(definition, Get(json, "regions"));
             AddConnections(definition, Get(json, "connections"));
@@ -565,8 +576,15 @@ namespace ScheduleIMegaExpansion.Runtime
         private static void AddMapSheet(object definition, JsonElement map)
         {
             string pngPath = ReadString(map, "pngPath");
-            if (string.IsNullOrWhiteSpace(pngPath) || !File.Exists(pngPath))
+            if (string.IsNullOrWhiteSpace(pngPath))
                 return;
+            if (!Path.IsPathRooted(pngPath) && !string.IsNullOrWhiteSpace(_configPath))
+                pngPath = Path.Combine(Path.GetDirectoryName(_configPath)!, pngPath);
+            if (!File.Exists(pngPath))
+            {
+                MelonLogger.Warning("[Schedule I Mega Expansion] MapExpansions map PNG was not found: " + pngPath);
+                return;
+            }
 
             object sheet = New("MapSheetDefinition");
             Set(sheet, "Picture", EnumValue("MapPictureSource", "Png"));
