@@ -1,0 +1,605 @@
+{
+  "schemaVersion": 1,
+  "status": "design_only_not_loaded_by_runtime",
+  "currency": "in_game_cash",
+  "affinityScale": "0-100; larger values mean stronger preference",
+  "runtimeWarning": "These 22 are proposed additional customers. They must not be described as live NPCs until registered, spawned, saved and tested through S1API.",
+  "profiles": [
+    {
+      "id": "harborline_customer_09",
+      "name": "Noah Whitaker",
+      "status": "planned_not_runtime_registered",
+      "profile": {
+        "budgetPerOrder": 520,
+        "ordersPerWeek": 2,
+        "preferredProduct": "weed",
+        "affinities": {
+          "weed": 88,
+          "meth": 24,
+          "cocaine": 10,
+          "shrooms": 8,
+          "pills": 6
+        },
+        "qualityStandard": "standard",
+        "policeCallChance": 0.05,
+        "addictionLevel": 0.42,
+        "schedule": {
+          "days": [
+            "Mon",
+            "Thu"
+          ],
+          "timeWindow": "17:00-21:00"
+        }
+      }
+    },
+    {
+      "id": "harborline_customer_10",
+      "name": "Ivy Morgan",
+      "status": "planned_not_runtime_registered",
+      "profile": {
+        "budgetPerOrder": 760,
+        "ordersPerWeek": 3,
+        "preferredProduct": "shrooms",
+        "affinities": {
+          "weed": 22,
+          "meth": 24,
+          "cocaine": 10,
+          "shrooms": 88,
+          "pills": 6
+        },
+        "qualityStandard": "high",
+        "policeCallChance": 0.08,
+        "addictionLevel": 0.31,
+        "schedule": {
+          "days": [
+            "Tue",
+            "Fri",
+            "Sun"
+          ],
+          "timeWindow": "15:00-20:00"
+        }
+      }
+    },
+    {
+      "id": "harborline_customer_11",
+      "name": "Dylan Carter",
+      "status": "planned_not_runtime_registered",
+      "profile": {
+        "budgetPerOrder": 430,
+        "ordersPerWeek": 1,
+        "preferredProduct": "meth",
+        "affinities": {
+          "weed": 22,
+          "meth": 88,
+          "cocaine": 10,
+          "shrooms": 20,
+          "pills": 6
+        },
+        "qualityStandard": "low",
+        "policeCallChance": 0.18,
+        "addictionLevel": 0.71,
+        "schedule": {
+          "days": [
+            "Wed"
+          ],
+          "timeWindow": "19:00-23:00"
+        }
+      }
+    },
+    {
+      "id": "harborline_customer_12",
+      "name": "Sofia Bennett",
+      "status": "planned_not_runtime_registered",
+      "profile": {
+        "budgetPerOrder": 980,
+        "ordersPerWeek": 2,
+        "preferredProduct": "cocaine",
+        "affinities": {
+          "weed": 22,
+          "meth": 12,
+          "cocaine": 88,
+          "shrooms": 8,
+          "pills": 18
+        },
+        "qualityStandard": "very_high",
+        "policeCallChance": 0.03,
+        "addictionLevel": 0.26,
+        "schedule": {
+          "days": [
+            "Fri",
+            "Sat"
+          ],
+          "timeWindow": "20:00-00:00"
+        }
+      }
+    },
+    {
+      "id": "harborline_customer_13",
+      "name": "Oliver Hayes",
+      "status": "planned_not_runtime_registered",
+      "profile": {
+        "budgetPerOrder": 340,
+        "ordersPerWeek": 2,
+        "preferredProduct": "weed",
+        "affinities": {
+          "weed": 88,
+          "meth": 24,
+          "cocaine": 10,
+          "shrooms": 8,
+          "pills": 6
+        },
+        "qualityStandard": "standard",
+        "policeCallChance": 0.07,
+        "addictionLevel": 0.52,
+        "schedule": {
+          "days": [
+            "Mon",
+            "Sat"
+          ],
+          "timeWindow": "12:00-16:00"
+        }
+      }
+    },
+    {
+      "id": "harborline_customer_14",
+      "name": "Chloe Ramirez",
+      "status": "planned_not_runtime_registered",
+      "profile": {
+        "budgetPerOrder": 680,
+        "ordersPerWeek": 3,
+        "preferredProduct": "meth",
+        "affinities": {
+          "weed": 22,
+          "meth": 88,
+          "cocaine": 22,
+          "shrooms": 8,
+          "pills": 6
+        },
+        "qualityStandard": "high",
+        "policeCallChance": 0.1,
+        "addictionLevel": 0.64,
+        "schedule": {
+          "days": [
+            "Tue",
+            "Thu",
+            "Sat"
+          ],
+          "timeWindow": "18:00-22:00"
+        }
+      }
+    },
+    {
+      "id": "harborline_customer_15",
+      "name": "Mason Clarke",
+      "status": "planned_not_runtime_registered",
+      "profile": {
+        "budgetPerOrder": 1150,
+        "ordersPerWeek": 2,
+        "preferredProduct": "cocaine",
+        "affinities": {
+          "weed": 22,
+          "meth": 12,
+          "cocaine": 88,
+          "shrooms": 20,
+          "pills": 6
+        },
+        "qualityStandard": "very_high",
+        "policeCallChance": 0.02,
+        "addictionLevel": 0.33,
+        "schedule": {
+          "days": [
+            "Fri",
+            "Sat"
+          ],
+          "timeWindow": "21:00-01:00"
+        }
+      }
+    },
+    {
+      "id": "harborline_customer_16",
+      "name": "Grace Turner",
+      "status": "planned_not_runtime_registered",
+      "profile": {
+        "budgetPerOrder": 390,
+        "ordersPerWeek": 1,
+        "preferredProduct": "shrooms",
+        "affinities": {
+          "weed": 22,
+          "meth": 12,
+          "cocaine": 10,
+          "shrooms": 88,
+          "pills": 18
+        },
+        "qualityStandard": "standard",
+        "policeCallChance": 0.06,
+        "addictionLevel": 0.21,
+        "schedule": {
+          "days": [
+            "Sun"
+          ],
+          "timeWindow": "13:00-17:00"
+        }
+      }
+    },
+    {
+      "id": "harborline_customer_17",
+      "name": "Leo Patterson",
+      "status": "planned_not_runtime_registered",
+      "profile": {
+        "budgetPerOrder": 600,
+        "ordersPerWeek": 2,
+        "preferredProduct": "weed",
+        "affinities": {
+          "weed": 88,
+          "meth": 24,
+          "cocaine": 10,
+          "shrooms": 8,
+          "pills": 6
+        },
+        "qualityStandard": "low",
+        "policeCallChance": 0.12,
+        "addictionLevel": 0.58,
+        "schedule": {
+          "days": [
+            "Wed",
+            "Sun"
+          ],
+          "timeWindow": "16:00-20:00"
+        }
+      }
+    },
+    {
+      "id": "harborline_customer_18",
+      "name": "Amelia Ross",
+      "status": "planned_not_runtime_registered",
+      "profile": {
+        "budgetPerOrder": 840,
+        "ordersPerWeek": 3,
+        "preferredProduct": "cocaine",
+        "affinities": {
+          "weed": 22,
+          "meth": 24,
+          "cocaine": 88,
+          "shrooms": 8,
+          "pills": 6
+        },
+        "qualityStandard": "high",
+        "policeCallChance": 0.04,
+        "addictionLevel": 0.39,
+        "schedule": {
+          "days": [
+            "Thu",
+            "Fri",
+            "Sat"
+          ],
+          "timeWindow": "19:00-23:00"
+        }
+      }
+    },
+    {
+      "id": "harborline_customer_19",
+      "name": "Jack Sullivan",
+      "status": "planned_not_runtime_registered",
+      "profile": {
+        "budgetPerOrder": 470,
+        "ordersPerWeek": 2,
+        "preferredProduct": "meth",
+        "affinities": {
+          "weed": 22,
+          "meth": 88,
+          "cocaine": 10,
+          "shrooms": 20,
+          "pills": 6
+        },
+        "qualityStandard": "standard",
+        "policeCallChance": 0.14,
+        "addictionLevel": 0.76,
+        "schedule": {
+          "days": [
+            "Tue",
+            "Sat"
+          ],
+          "timeWindow": "20:00-00:00"
+        }
+      }
+    },
+    {
+      "id": "harborline_customer_20",
+      "name": "Harper James",
+      "status": "planned_not_runtime_registered",
+      "profile": {
+        "budgetPerOrder": 720,
+        "ordersPerWeek": 2,
+        "preferredProduct": "shrooms",
+        "affinities": {
+          "weed": 22,
+          "meth": 12,
+          "cocaine": 10,
+          "shrooms": 88,
+          "pills": 18
+        },
+        "qualityStandard": "high",
+        "policeCallChance": 0.05,
+        "addictionLevel": 0.18,
+        "schedule": {
+          "days": [
+            "Mon",
+            "Fri"
+          ],
+          "timeWindow": "14:00-18:00"
+        }
+      }
+    },
+    {
+      "id": "harborline_customer_21",
+      "name": "Henry Brooks",
+      "status": "planned_not_runtime_registered",
+      "profile": {
+        "budgetPerOrder": 560,
+        "ordersPerWeek": 3,
+        "preferredProduct": "weed",
+        "affinities": {
+          "weed": 88,
+          "meth": 24,
+          "cocaine": 10,
+          "shrooms": 8,
+          "pills": 6
+        },
+        "qualityStandard": "standard",
+        "policeCallChance": 0.09,
+        "addictionLevel": 0.47,
+        "schedule": {
+          "days": [
+            "Mon",
+            "Wed",
+            "Sat"
+          ],
+          "timeWindow": "17:00-21:00"
+        }
+      }
+    },
+    {
+      "id": "harborline_customer_22",
+      "name": "Ella Price",
+      "status": "planned_not_runtime_registered",
+      "profile": {
+        "budgetPerOrder": 1050,
+        "ordersPerWeek": 2,
+        "preferredProduct": "cocaine",
+        "affinities": {
+          "weed": 22,
+          "meth": 24,
+          "cocaine": 88,
+          "shrooms": 8,
+          "pills": 6
+        },
+        "qualityStandard": "very_high",
+        "policeCallChance": 0.02,
+        "addictionLevel": 0.28,
+        "schedule": {
+          "days": [
+            "Fri",
+            "Sun"
+          ],
+          "timeWindow": "18:00-22:00"
+        }
+      }
+    },
+    {
+      "id": "harborline_customer_23",
+      "name": "Liam Cooper",
+      "status": "planned_not_runtime_registered",
+      "profile": {
+        "budgetPerOrder": 310,
+        "ordersPerWeek": 1,
+        "preferredProduct": "weed",
+        "affinities": {
+          "weed": 88,
+          "meth": 12,
+          "cocaine": 10,
+          "shrooms": 20,
+          "pills": 6
+        },
+        "qualityStandard": "low",
+        "policeCallChance": 0.16,
+        "addictionLevel": 0.61,
+        "schedule": {
+          "days": [
+            "Thu"
+          ],
+          "timeWindow": "11:00-15:00"
+        }
+      }
+    },
+    {
+      "id": "harborline_customer_24",
+      "name": "Zoe Mitchell",
+      "status": "planned_not_runtime_registered",
+      "profile": {
+        "budgetPerOrder": 650,
+        "ordersPerWeek": 2,
+        "preferredProduct": "meth",
+        "affinities": {
+          "weed": 22,
+          "meth": 88,
+          "cocaine": 10,
+          "shrooms": 8,
+          "pills": 18
+        },
+        "qualityStandard": "high",
+        "policeCallChance": 0.11,
+        "addictionLevel": 0.69,
+        "schedule": {
+          "days": [
+            "Tue",
+            "Fri"
+          ],
+          "timeWindow": "19:00-23:00"
+        }
+      }
+    },
+    {
+      "id": "harborline_customer_25",
+      "name": "Sebastian Ward",
+      "status": "planned_not_runtime_registered",
+      "profile": {
+        "budgetPerOrder": 890,
+        "ordersPerWeek": 4,
+        "preferredProduct": "cocaine",
+        "affinities": {
+          "weed": 34,
+          "meth": 12,
+          "cocaine": 88,
+          "shrooms": 8,
+          "pills": 6
+        },
+        "qualityStandard": "high",
+        "policeCallChance": 0.03,
+        "addictionLevel": 0.43,
+        "schedule": {
+          "days": [
+            "Mon",
+            "Wed",
+            "Fri",
+            "Sat"
+          ],
+          "timeWindow": "18:00-22:00"
+        }
+      }
+    },
+    {
+      "id": "harborline_customer_26",
+      "name": "Lily Foster",
+      "status": "planned_not_runtime_registered",
+      "profile": {
+        "budgetPerOrder": 440,
+        "ordersPerWeek": 1,
+        "preferredProduct": "shrooms",
+        "affinities": {
+          "weed": 22,
+          "meth": 24,
+          "cocaine": 10,
+          "shrooms": 88,
+          "pills": 6
+        },
+        "qualityStandard": "standard",
+        "policeCallChance": 0.07,
+        "addictionLevel": 0.24,
+        "schedule": {
+          "days": [
+            "Sun"
+          ],
+          "timeWindow": "14:00-18:00"
+        }
+      }
+    },
+    {
+      "id": "harborline_customer_27",
+      "name": "Benjamin Cole",
+      "status": "planned_not_runtime_registered",
+      "profile": {
+        "budgetPerOrder": 580,
+        "ordersPerWeek": 2,
+        "preferredProduct": "weed",
+        "affinities": {
+          "weed": 88,
+          "meth": 12,
+          "cocaine": 10,
+          "shrooms": 20,
+          "pills": 6
+        },
+        "qualityStandard": "standard",
+        "policeCallChance": 0.08,
+        "addictionLevel": 0.55,
+        "schedule": {
+          "days": [
+            "Tue",
+            "Thu"
+          ],
+          "timeWindow": "16:00-20:00"
+        }
+      }
+    },
+    {
+      "id": "harborline_customer_28",
+      "name": "Aria Collins",
+      "status": "planned_not_runtime_registered",
+      "profile": {
+        "budgetPerOrder": 930,
+        "ordersPerWeek": 3,
+        "preferredProduct": "cocaine",
+        "affinities": {
+          "weed": 22,
+          "meth": 12,
+          "cocaine": 88,
+          "shrooms": 8,
+          "pills": 18
+        },
+        "qualityStandard": "very_high",
+        "policeCallChance": 0.02,
+        "addictionLevel": 0.29,
+        "schedule": {
+          "days": [
+            "Wed",
+            "Fri",
+            "Sat"
+          ],
+          "timeWindow": "20:00-00:00"
+        }
+      }
+    },
+    {
+      "id": "harborline_customer_29",
+      "name": "Samuel Reed",
+      "status": "planned_not_runtime_registered",
+      "profile": {
+        "budgetPerOrder": 370,
+        "ordersPerWeek": 1,
+        "preferredProduct": "meth",
+        "affinities": {
+          "weed": 34,
+          "meth": 88,
+          "cocaine": 10,
+          "shrooms": 8,
+          "pills": 6
+        },
+        "qualityStandard": "low",
+        "policeCallChance": 0.2,
+        "addictionLevel": 0.79,
+        "schedule": {
+          "days": [
+            "Sat"
+          ],
+          "timeWindow": "21:00-01:00"
+        }
+      }
+    },
+    {
+      "id": "harborline_customer_30",
+      "name": "Mila Hayes",
+      "status": "planned_not_runtime_registered",
+      "profile": {
+        "budgetPerOrder": 700,
+        "ordersPerWeek": 2,
+        "preferredProduct": "shrooms",
+        "affinities": {
+          "weed": 22,
+          "meth": 24,
+          "cocaine": 10,
+          "shrooms": 88,
+          "pills": 6
+        },
+        "qualityStandard": "high",
+        "policeCallChance": 0.06,
+        "addictionLevel": 0.34,
+        "schedule": {
+          "days": [
+            "Mon",
+            "Thu"
+          ],
+          "timeWindow": "15:00-19:00"
+        }
+      }
+    }
+  ]
+}
