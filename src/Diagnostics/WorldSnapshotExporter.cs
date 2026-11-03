@@ -72,6 +72,17 @@ namespace ScheduleIMegaExpansion.Diagnostics
                 AddError("NativeApiSurface", ex, summary, warn);
             }
 
+            try
+            {
+                int inspected = HarborlineIntegrationApiScanner.Export(outputDirectory);
+                summary.Add("HarborlineIntegrationApiMembers=" + inspected.ToString(CultureInfo.InvariantCulture));
+                summary.Add("HarborlineIntegrationApiMode=metadata-only; no game actions invoked");
+            }
+            catch (Exception ex)
+            {
+                AddError("HarborlineIntegrationApi", ex, summary, warn);
+            }
+
             string summaryPath = Path.Combine(outputDirectory, "summary.txt");
             File.WriteAllLines(summaryPath, summary);
             log("Native world snapshot complete.");
