@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MelonLoader;
 using S1API.Items;
-using S1API.Items.Storable;
+using NativeStorableItemDefinition = S1API.Items.Storable.StorableItemDefinition;
 using S1API.Shops;
 
 namespace ScheduleIMegaExpansion.Runtime
@@ -86,7 +86,7 @@ namespace ScheduleIMegaExpansion.Runtime
                         continue;
                     }
 
-                    if (item is not StorableItemDefinition storable)
+                    if (item is not NativeStorableItemDefinition storable)
                     {
                         unavailable++;
                         if (LoggedMissingItems.Add(stock.Id))
