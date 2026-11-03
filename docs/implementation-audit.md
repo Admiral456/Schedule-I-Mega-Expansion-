@@ -1,6 +1,6 @@
 # Harborline – audit implementace
 
-**Kontrolovaný stav:** větev `feat/harborline-foundation`, commit `ab9a0f910e529ca9d067c490b286be2617898d54`, vývojová verze 0.3.1.
+**Kontrolovaný stav:** větev `feat/harborline-foundation`, commit `4de4c3d0417dd2c6200c160065f24067d1ac3198`, vývojová verze 0.3.1.
 **Metoda:** kontrola C# implementace, S1API Forked 3.2.2 public source/API, konfiguračních dat a automatických testů. Audit nebyl proveden uvnitř Schedule I hry.
 
 ## Co se nově skutečně implementuje přes nativní API
@@ -11,8 +11,8 @@
 | Dealeři | `WithDealerDefaults` | PlayerDealer, poplatek, provize, pravidla kvality, počitadlo smluv a nativní dealer události | Čeká na nábor a obchodní test |
 | Zákazníci | `WithCustomerDefaults` | Osm individuálních rozpočtů, frekvencí/časů objednávek, standardů, affinities, policejních šancí a dependence | Čeká na test objednávek |
 | Vzhled | `Appearance.GenerateRandomAppearance()` + `Build()` | Náhodný vzhled vytvořený herním generátorem při OnCreated | Čeká na render/save-load test |
-| Portside Supply | `HarborlineOnlineSupplier` | Nativní Supplier NPC s limity objednávek $25–$8,000 a 14 existujícími item ID pro telefonní/delivery workflow hry; vlastní katalog a sklad dodavatele nejsou sdílenou skladovou zásobou Hardware Store | Čeká na ověření odemčení, telefonní nabídky a doručení ve hře |
-| NPC scheduler | `WithSchedule`, `Schedule.Enable()` | Všech osm zákazníků dostává `EnsureDealSignal()`; dealeři používají automatické `DealerAttendDealBehaviour` v cílové herní verzi. `HandleDeal()` je zastaralé a `NPCSchedule.InitializeActions()` v S1API 3.2.2 není dostupné. | Základní zákaznické čekání je nakonfigurované; pěší trasy a návštěvy budov čekají na ověřené navmesh body a nativní budovy |
+| Portside Supply | `HarborlineDeadDropSupplier` | Nativní Supplier NPC s limity objednávek $25–$8,000 a 14 existujícími item ID pro dead-drop/meeting-shop flow; není to samostatný storefront ani synchronizovaný sklad Hardware Store | Čeká na ověření odemčení, telefonní nabídky a doručení ve hře |
+| NPC scheduler | `WithSchedule`, `Schedule.Enable()` | Zákaznické čekání na handover je automatické pro `IsCustomer=true`; zastaralé `EnsureDealSignal()` jsme odstranili. Dealeři používají automatické `DealerAttendDealBehaviour` v cílové herní verzi. `HandleDeal()` je zastaralé a `NPCSchedule.InitializeActions()` v S1API 3.2.2 není dostupné. | Základní zákaznické handover chování poskytuje hra; pěší trasy a návštěvy budov čekají na ověřené navmesh body a nativní budovy |
 | Sortiment | `HarborlineShopCatalog.cs` | 14 existujících vanilla item definitions přidá do nativního Hardware Store | Čeká na kontrolu shop UI a nákupu |
 | Ceny | `StorableItemDefinition.BasePurchasePrice` | Nastaví cenu na existující nativní definici předmětu; `Shop.AddItem` používá tuto cenu | Čeká na herní nákupní test; cena je sdílená napříč obchody používajícími stejné ID |
 | Fyzická čtvrť | `HarborlinePhysicalBuilder.cs` | Geometrický prototyp Unity primitiv | Umístění dosud neověřeno ve hře |
@@ -37,7 +37,7 @@ Oba mají nativní dealer defaults, omezení kvality, vlastní completed-deals p
 
 Všech osm profilů navíc nastavuje individuální policejní šanci, dependence a drogové afinity v `WithCustomerDefaults`.
 
-Hodnoty jsou uložené v nativním CustomerDataBuilder. Policejní šance a dependence se nastavují individuálně. Každý zákazník má navíc nativní `EnsureDealSignal()` a po vytvoření se inicializují jeho schedule akce. Kompletní 30členný zákaznický roster zatím dokončený není.
+Hodnoty jsou uložené v nativním CustomerDataBuilder. Policejní šance a dependence se nastavují individuálně. Zákaznické handover chování se aktivuje automaticky přes `IsCustomer`; `EnsureDealSignal()` je v aktuálním API no-op a v kódu se nepoužívá. Kompletní 30členný zákaznický roster zatím dokončený není.
 
 ### Sortiment a cenová vrstva nativního Hardware Store
 
@@ -60,6 +60,10 @@ Hodnoty jsou uložené v nativním CustomerDataBuilder. Policejní šance a depe
 
 Kód používá `ItemManager.GetDefinition` a upravuje `StorableItemDefinition.BasePurchasePrice`, tedy skutečný zdroj ceny, ze kterého nativní obchod počítá nákup. Poté ověří existenci položky v Hardware Store a případně zavolá `Shop.AddItem(item)`. Neznámé item IDs přeskočí. **Pozor:** tato cena patří sdílené definici předmětu, takže ji použijí všechny nativní obchody prodávající stejné item ID. S1API 3.2.2 parametr `Shop.AddItem(item, customPrice)` ve zdrojovém kódu ignoruje; mod na něj již nespoléhá.
 
+### Procedurální budova a focused API scan
+
+`HarborlineProceduralBuildingFactory.cs` se pokouší vytvořit sklad přes S1MAPI `BuildingBuilder` a `BuildingConfig`, posuvné dveře přes `AddSlidingDoors` a vnitřní pathfinding přes `NavigationBuilder`. V případě chyby se zachová stávající geometrický fallback. Vytvořená budova není automaticky registrovanou nativní Property/Business nebo novým Shop. `HarborlineIntegrationApiScanner.cs` rozšiřuje read-only diagnostiku o přesné podpisy metod/událostí pro Realtor, Property, Business, dveře, NPC movement, Navigation, road a map API.
+
 ### Nová diagnostika obchodů a položek
 
 `WorldSnapshotExporter` nyní čte přes `ShopManager.GetAllShops()` a `ItemManager.GetAllItemDefinitions()` tři soubory: `native-shops.csv`, `native-shop-items.csv` a `native-items.csv`. Samostatný `NativeLawSnapshotExporter` přidává šest read-only souborů: `native-law-controller.csv`, `native-law-manager.csv`, `native-law-checkpoint-locations.csv`, `native-law-checkpoints.csv`, `native-law-foot-patrol-routes.csv` a `native-law-vehicle-patrol-routes.csv`. Jde pouze o čtení nativních registrů; export nespouští hlídky, nepovoluje checkpointy a nemění herní stav.
@@ -68,14 +72,14 @@ Kód používá `ItemManager.GetDefinition` a upravuje `StorableItemDefinition.B
 
 | Oblast | Stav | Co chybí |
 |---|---|---|
-| Cílových 42 NPC | Částečně | Implementováno 10; zbývá 32 |
+| Cílových 42 NPC | Částečně | Implementováno 11; zbývá 31 |
 | 30 zákaznických profilů | Částečně | Implementováno 8; zbývá 22 |
 | Denní režimy NPC | Částečně implementováno | Zákaznické `EnsureDealSignal` je nakonfigurované a dealeři používají automatické herní dealer chování; chybí ověřené navmesh trasy, body a native building visits |
 | Harborline Supply – fyzická provozovna | Nedokončeno | Nativní supplier kontakt Portside Supply je připraven pro telefonní/delivery workflow; fyzická budova, pokladna a nový nativní Shop nejsou registrované |
-| Online objednávky | Částečně implementováno | Nativní Supplier NPC nabízí 14 item ID přes herní supplier/delivery workflow; vlastní online katalog a sklad dodavatele nejsou synchronizované se zásobami Hardware Store |
+| Online objednávky | Částečně implementováno | Nativní Supplier NPC předává 14 item ID do dead-drop/meeting-shop toku; vlastní online katalog a sklad dodavatele nejsou synchronizované se zásobami Hardware Store |
 | Koupitelné podniky / Realtor | Blokováno neověřeným API | `PropertyManager` a `BusinessManager` zpřístupňují existující záznamy; ověřený aditivní registrační hook pro novou Property/Business není znám |
 | Nové mapové ikony | Nedokončeno | Chybí ověřený map registry/projekce a vlastnické změny |
-| Funkční budovy/interiéry/dveře | Nedokončeno | Současný shell není nativní building a není průchozí interiér |
+| Procedurální sklad/interiér/dveře | Kód implementován, runtime neověřen | S1MAPI BuildingBuilder je zapojen do skladu; AddSlidingDoors a vnitřní NavigationBuilder jsou pouze pokusy o vytvoření. Není to registrace nativní Property/Business a vstup ani NPC navigace nejsou ve hře otestovány |
 | Policie | Nedokončeno | Není připojený nativní dispatch/patrol/checkpoint flow |
 | Save geometrie | Nedokončeno | Fyzická geometrie je zatím session-local |
 | Multiplayer | Zablokováno | NPC a geometrie jsou v této pilotní fázi omezené na single-player; host/client/late join nebyl testován |
