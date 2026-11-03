@@ -22,7 +22,7 @@ NPC role a cílové počty jsou v `packs/Harborline/roster.json`: nově 42 fyzic
 
 - `HarborlineNpcRoster.cs` registruje dva fyzické dealery (Mason Reed, Sierra Voss) přes `IsDealer` a `WithDealerDefaults`, včetně náborového poplatku, provize, kvality a nativních událostí náboru/smluv.
 - Osm fyzických zákaznických NPC (Caleb Price, Nina Brooks, Rafael Cole, Olivia Hayes, Ethan Ward, Maya Bennett, Lucas Foster a Ava Collins) má individuální rozpočty, týdenní počet objednávek, den/čas, standardy, šanci zavolat policii, závislost a afinity k typům drog.
-- Vzhled se vytváří herním generátorem přes `Appearance.GenerateRandomAppearance()` a `Appearance.Build()`; scheduler se zapíná přes `Schedule.Enable()`.
+- Vzhled se vytváří herním generátorem přes `Appearance.GenerateRandomAppearance()` a `Appearance.Build()`. Oba dealeři mají nativní akci `HandleDeal(900)`, všech osm zákazníků `EnsureDealSignal()`; scheduler se zapíná a inicializuje přes `Schedule.Enable()` + `Schedule.InitializeActions()`. Pěší trasy a návštěvy budov zatím čekají na zaměření navmeshe.
 - `HarborlineShopCatalog.cs` upravuje ceny 14 existujících vanilla předmětů přímo v nativním `StorableItemDefinition.BasePurchasePrice` a zajišťuje jejich listing v existujícím Hardware Store přes `Shop.AddItem`. Používá originální nákupní UI a doručení předmětů hry. Cena definice je sdílená napříč všemi obchody používajícími stejné item ID.
 - Vlastní NPC typy jsou definované přes S1API a používají jeho nativní prefab, save/load a FishNet pipeline. Doplňkový fallback registrar je omezený na single-player, aby nevytvářel duplicitní NPC mimo ověřený serverový tok. Runtime ve hře zatím nebyl ověřen; denní chození po čtvrti zatím není nakonfigurované.
 
