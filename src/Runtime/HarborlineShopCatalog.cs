@@ -159,7 +159,7 @@ namespace ScheduleIMegaExpansion.Runtime
                 _shopApplied = HarborlineShopCatalog.TryApply(log, warn);
 
             if (_npcApplied && _shopApplied)
-                log("Harborline native gameplay slice activated: 2 native dealers, 3 native customer NPCs and repriced native Hardware Store catalog.");
+                log("Harborline native gameplay slice activated: 2 native dealers, 8 native customer NPCs and repriced native Hardware Store catalog.");
             return _npcApplied && _shopApplied;
         }
 
