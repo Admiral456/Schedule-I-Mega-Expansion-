@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "id": "unofficial_map_enhancer_serena_flats",
+  "displayName": "Unofficial Map Enhancer - Serena Flats",
+  "version": "1.0.0",
+  "author": "Virtunerd",
+  "sourcePage": "https://www.nexusmods.com/schedule1/mods/2258",
+  "archiveInspection": {
+    "providedByUser": false,
+    "status": "not-inspected-user-cannot-upload-from-current-device",
+    "note": "The user can download this archive only on their PC. This record is based on the public author description and permission page, not on a local archive inspection."
+  },
+  "featuresByAuthorDescription": {
+    "addsPrologueDesertTown": "Serena Flats",
+    "connectsVia": "drivable bridge/ramp/tunnel",
+    "includesPurchasableDesertHouse": true,
+    "includesPersistentRv": true,
+    "includesSerenaCustomers": true,
+    "includesNpcSchedules": true,
+    "includesAtmAndVendingMachines": true,
+    "includesPoliceStationAndOfficers": true,
+    "includesModifiedHardwareStore": true,
+    "includesMotelDecoration": true
+  },
+  "authorTestedGameVersion": "0.4.5f2",
+  "requirementsByAuthor": {
+    "melonloader": "0.7.3",
+    "s1api": "No S1API dependency listed"
+  },
+  "installationFactsByAuthorDescription": {
+    "requiresBothDlls": [
+      "UnofficialMapEnhancer.dll",
+      "UME.HylandBridge.dll"
+    ],
+    "replacesOriginalGameAssetFiles": [
+      "Schedule I_Data/level2",
+      "Schedule I_Data/level2.resS",
+      "Schedule I_Data/sharedassets0.assets",
+      "Schedule I_Data/sharedassets1.assets",
+      "Schedule I_Data/sharedassets2.assets"
+    ],
+    "backupOriginalFilesFirst": true,
+    "gameAssetReplacementVersion": "0.4.5f2",
+    "writesToGameSave": false,
+    "sidecarFolder": "UserData/UME"
+  },
+  "compatibilityCaveats": [
+    "The five replacement files are tied to Schedule I 0.4.5f2 and game updates can overwrite or invalidate their visual fixes.",
+    "Both UME and Hyland Bridge DLLs must be installed together.",
+    "This mod modifies/replaces original game data files; it is not a simple Mods-folder-only installation.",
+    "Do not test on the only copy of a game installation or save. Back up the original assets first."
+  ],
+  "integrationPolicy": {
+    "optionalCompanion": true,
+    "bundled": false,
+    "requiredDependency": false,
+    "copyBinary": false,
+    "copyAssets": false,
+    "modifyExternalFiles": false,
+    "doNotOverlapArea": "Serena Flats desert/town area, its northwest water placement, tunnel, bridge/ramp and connected approaches",
+    "ourArea": "Harborline remains in the native Docks region; placement is paused until the installed map configuration is surveyed.",
+    "runtimePlacementGuardRequired": true,
+    "testRequired": [
+      "Back up original game asset files and the save",
+      "Confirm exact game build and restore compatible original assets if needed",
+      "Verify both UME DLLs are installed together",
+      "Check Serena Flats and its bridge in game before surveying Harborline",
+      "Confirm Harborline geometry and NPCs remain outside the Serena Flats/bridge exclusion area",
+      "Run on a disposable save before any combined release"
+    ]
+  },
+  "permissionNotice": "The author's Nexus permissions disallow reuploading the file, require permission for modification and asset reuse, and prohibit reuse of these assets in paid files. Do not redistribute the mod or reuse its assets without written permission."
+}
