@@ -12,6 +12,25 @@ This document is mandatory for new Harborline buildings, doors, interiors and en
 S1MAPI BuildingBuilder can create floors, walls, openings, lighting and structure. It does not by itself create a native Property, Shop, Business, map category or functional interior. Use it only when a suitable game building cannot be reused, then register the result through verified native building/property/business hooks.
 Use NavigationBuilder/doorway data where supported and test the resulting navigation. Every NPC schedule must reference a real registered building, not only a GameObject name.
 
+## 2A. Safe visual mesh reuse from the loaded vanilla scene
+
+Daffy's Hills demonstrates a useful pattern: locate an existing scene source by its hierarchy path and reuse its authored visual shape, rather than building every lamp, seat, shopfront or house from cubes.
+
+Harborline follows that idea with strict visual-only cloning:
+- Copy only `MeshFilter.sharedMesh`, `MeshRenderer.sharedMaterials` and selected visual renderer/light settings.
+- Create new local GameObjects and preserve source child transforms.
+- Never copy `MonoBehaviour`, `Collider`, `NetworkObject`, `DoorController`, `InteractableObject`, `NPCEnterableBuilding` or `AvatarSeatSet`.
+- A visual clone cannot be used as a seat, bus stop, door, register, storage, shop, home or purchasable property.
+- If the named source path is missing in the current game scene, keep the local geometry fallback and log the missing source. Do not search for a similarly named object and silently assume it has the same components.
+
+Current visual source candidates used by Harborline:
+- Suburbia `StreetLight` for promenade lamps.
+- Uptown pier `OutdoorBench` for bench appearance only.
+- `Bus stops/Bus Stop` for the shelter appearance only.
+- Docks `Clothing store with interior` for Harbor Market's storefront shell appearance only.
+
+These assets are still checked against the actual loaded scene. The user-provided Daffy's Hills DLL supplied the hierarchy path clues, not code or assets.
+
 ## 3. Interactive networked objects
 If a prefab has NetworkObject, always instantiate it through the server-side network path:
 - Use the verified PrefabRef.InstantiateNetworked() or appropriate S1MAPI builder path.
