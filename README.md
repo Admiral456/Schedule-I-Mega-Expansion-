@@ -24,14 +24,15 @@ NPC role a cílové počty jsou v `packs/Harborline/roster.json`: nově 42 fyzic
 - Portside Supply je samostatný nativní Supplier NPC. Jeho telefonní objednávkový katalog používá stejných 14 existujících item ID a jejich stejné ceny jako kamenný Hardware Store: S1API automaticky připraví supplier shop, persistentní sklad a delivery vehicle a zapojí objednávky do původního herního Delivery systému. Dodavatel používá nativní supplier meeting/phone flow a je skrytý, když je nečinný. Katalog a cenové definice jsou společné, ale zásoby nejsou synchronizované jako konečný sklad; veřejné delivery API dovoluje jen číst stav zásilek, nikoli vytvářet libovolné dodávky.
 
 Osm fyzických zákaznických NPC (Caleb Price, Nina Brooks, Rafael Cole, Olivia Hayes, Ethan Ward, Maya Bennett, Lucas Foster a Ava Collins) má individuální rozpočty, týdenní počet objednávek, den/čas, standardy, šanci zavolat policii, závislost a afinity k typům drog.
-- Vzhled se vytváří herním generátorem přes `Appearance.GenerateRandomAppearance()` a `Appearance.Build()`. Všech osm zákazníků má nativní akci `EnsureDealSignal()` pro čekání na nabídku. Dealeři používají automatické `DealerAttendDealBehaviour` v novější herní verzi; samostatná akce `HandleDeal()` je zastaralá. Scheduler se zapíná přes podporované `Schedule.Enable()`. Pěší trasy a návštěvy budov zatím čekají na zaměření navmeshe.
+- Vzhled se vytváří herním generátorem přes `Appearance.GenerateRandomAppearance()` a `Appearance.Build()`. Zákaznické čekání na nabídku zajišťuje nativní `IsCustomer` chování hry; staré `EnsureDealSignal()` je od Schedule I 0.4.6 zastaralé a v kódu ho nepoužíváme. Dealeři používají `DealerAttendDealBehaviour` a nativní HomeEvent. Scheduler se zapíná přes `Schedule.Enable()`.
+- Maya Bennett má první skutečný nativní rozvrh přes `WithSchedule(... SitAtSeatSet ...)`: v 14:30 jde na původní lavičku v Docks (`Region_Docks/WaterFront/OutdoorBench (1)`) a zůstane tam 30 herních minut. Navigaci a samotné sezení zajišťuje hra. Další denní trasy doplníme podle skutečných navmesh a seat-set dat, ne podle vymyšlených souřadnic.
 - `HarborlineShopCatalog.cs` upravuje ceny 14 existujících vanilla předmětů přímo v nativním `StorableItemDefinition.BasePurchasePrice` a zajišťuje jejich listing v existujícím Hardware Store přes `Shop.AddItem`. Používá originální nákupní UI a doručení předmětů hry. Cena definice je sdílená napříč všemi obchody používajícími stejné item ID.
 - Vlastní NPC typy jsou definované přes S1API a používají jeho nativní prefab, save/load a FishNet pipeline. Doplňkový fallback registrar je omezený na single-player, aby nevytvářel duplicitní NPC mimo ověřený serverový tok. Runtime ve hře zatím nebyl ověřen; denní chození po čtvrti zatím není nakonfigurované.
 
 ## Zatím blokované / další fáze
 
 - Zbývajících 31 NPC, rozšíření na 42 fyzických postav a dalších 22 zákaznických profilů do cílového počtu 30.
-- Nativní denní trasy a návštěvy budov – zatím nejsou zaměřené a otestované navmesh body a interiéry.
+- Další nativní denní trasy a návštěvy Harborline budov – pilotní lavička pro Mayu je definovaná přes herní scheduler; další body čekají na výstup `native-seat-sets.csv` a `harborline-spawn-navigation.csv`.
 - Vlastní fyzický Harborline obchod a online objednávky přes telefon se společným inventářem. Aktuální implementace rozšiřuje skutečný vanilla Hardware Store, nikoli novou provozovnu.
 - Nové koupitelné podniky a byty přes Realtor. Veřejné S1API PropertyManager/BusinessManager pouze čtou existující registrace; přidávací hook není zatím prokázán. Nepřepisujeme cizí nemovitosti ani nefalšujeme realitní nabídky.
 - Nativní mapové ikony, dveře/interiéry, policejní dispatch/hlídky, ukládání geometrie a multiplayer.
@@ -41,11 +42,11 @@ Osm fyzických zákaznických NPC (Caleb Price, Nina Brooks, Rafael Cole, Olivia
 
 - **MelonLoader + S1API Forked** – nativní NPC, zákaznická/dealerská ekonomika, vzhled, rozvrhy, předměty a obchody.
 - **S1MAPI** – budovy a interiéry pouze pro prvky, které nelze vhodně znovu použít z původní hry.
-- Projekt používá oficiální compile-time balíček `S1API.Forked` 3.2.2 z NuGetu. Hra načítá vlastní IL2CPP runtime sestavení S1API z deklarované Thunderstore závislosti; S1API DLL se do našeho ZIPu nepřibaluje. Viz [S1API Custom NPCs](https://ifbars.github.io/S1API/docs/custom-npcs.html), [NPCAppearance](https://ifbars.github.io/S1API/api/S1API.Entities.NPCAppearance.html) a [S1MAPI](https://ifbars.github.io/S1MAPI/).
+- Projekt používá oficiální compile-time balíček `S1API.Forked` 3.2.3 z NuGetu. Hra načítá vlastní IL2CPP runtime sestavení S1API z deklarované Thunderstore závislosti; S1API DLL se do našeho ZIPu nepřibaluje. Viz [S1API Custom NPCs](https://ifbars.github.io/S1API/docs/custom-npcs.html), [NPCAppearance](https://ifbars.github.io/S1API/api/S1API.Entities.NPCAppearance.html) a [S1MAPI](https://ifbars.github.io/S1MAPI/).
 
 ## Instalace a závislosti
 
-Pro mod manager je připraven manifest `manifest.json`. Balíček obsahuje samotný DLL a automaticky vyžaduje MelonLoader 0.7.3, S1API Forked 3.2.2 a S1MAPI 2.0.1. Všechny tři jsou samostatné knihovny; DLL modu je neobsahuje. Diagnostický export nyní navíc vypisuje `native-shops.csv`, `native-shop-items.csv`, `native-items.csv` a `native-law-*.csv` pro ověření reálného katalogu, policejních checkpointů a existujících pěších/vozidlových hlídek konkrétní instalace.
+Pro mod manager je připraven manifest `manifest.json`. Balíček obsahuje samotný DLL a automaticky vyžaduje MelonLoader 0.7.3, S1API Forked 3.2.3 a S1MAPI 2.0.1. Všechny tři jsou samostatné knihovny; DLL modu je neobsahuje. Diagnostický export nyní navíc vypisuje `native-shops.csv`, `native-shop-items.csv`, `native-items.csv` a `native-law-*.csv` pro ověření reálného katalogu, policejních checkpointů a existujících pěších/vozidlových hlídek konkrétní instalace.
 
 ## Aktuální stav a limity
 
@@ -59,6 +60,7 @@ Pro mod manager je připraven manifest `manifest.json`. Balíček obsahuje samot
 - `docs/architecture.md` – technická architektura a pořadí implementace.
 - `docs/prefab-reuse-rules.md` – pravidla pro opakované použití vanilla prefabů a multiplayer.
 - `docs/harborline-survey-checklist.md` – přesný postup zaměření spawnu, tras, budov a checkpointů ve hře.
+- `docs/NATIVE-NPC-NAVIGATION.md` – použití herního NavMesh, nativních rozvrhů, seat setů a ověřování dostupných tras.
 - `docs/npc-generation-and-multiplayer.md` – náhodné preference, nativní generování vzhledu, policie a multiplayer.
 - `docs/native-map-buildings-interiors.md` – herní mapa, nativní ikony/vlastnictví, dveře a funkční interiéry.
 - `world/harborline/native-integration.json` – nativní integrační pravidla a kontrolní brány.
