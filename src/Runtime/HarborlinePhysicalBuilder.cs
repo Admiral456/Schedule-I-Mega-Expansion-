@@ -220,6 +220,7 @@ namespace ScheduleIMegaExpansion.Runtime
                 Add("Dock loading apron", -6.3f, 0.09f, -9.2f, 13.4f, 0.14f, 8.2f, 0.42f, 0.43f, 0.41f);
 
                 BuildWarehouse();
+                BuildHarborMarketVisual();
                 BuildContainers();
                 BuildCrane();
                 BuildStreetFurniture();
@@ -676,6 +677,37 @@ namespace ScheduleIMegaExpansion.Runtime
             Add("Warehouse front window right", x + 4.55f, 3.65f, z + 6.02f, 1.4f, 1.0f, 0.08f, 0.28f, 0.62f, 0.72f);
         }
 
+        private static void BuildHarborMarketVisual()
+        {
+            // Daffy's Hills locates and reuses existing vanilla commercial/residential
+            // scene meshes. Use the original Docks clothing-store render geometry as
+            // a visual reference for Harbor Market; do not clone its shop scripts,
+            // colliders, inventory, property or NetworkObjects.
+            bool reused = TryReuseVanillaVisual(
+                "Map/Hyland Point/Region_Docks/Clothing store with interior",
+                "Harborline native Harbor Market visual shell",
+                -15.0f,
+                0f,
+                -8.5f,
+                180f);
+
+            if (reused)
+            {
+                MelonLogger.Msg("[Schedule I Mega Expansion] Harbor Market uses the vanilla Docks clothing-store render shell only; no shop interactions or inventory were cloned.");
+                return;
+            }
+
+            // Visual-only fallback when the source hierarchy path is absent in this
+            // Schedule I build. The structure is intentionally not registered as a shop.
+            Add("Harbor Market visual floor", -15.0f, 0.12f, -8.5f, 10.0f, 0.24f, 8.5f, 0.42f, 0.43f, 0.40f);
+            Add("Harbor Market rear wall", -15.0f, 2.2f, -12.65f, 10.0f, 4.0f, 0.22f, 0.32f, 0.35f, 0.34f);
+            Add("Harbor Market left wall", -19.9f, 2.2f, -8.5f, 0.22f, 4.0f, 8.2f, 0.30f, 0.33f, 0.32f);
+            Add("Harbor Market right wall", -10.1f, 2.2f, -8.5f, 0.22f, 4.0f, 8.2f, 0.30f, 0.33f, 0.32f);
+            Add("Harbor Market canopy", -15.0f, 4.2f, -8.5f, 10.4f, 0.3f, 9.0f, 0.68f, 0.27f, 0.16f);
+            Add("Harbor Market sign", -15.0f, 3.65f, -4.1f, 4.2f, 0.75f, 0.18f, 0.88f, 0.74f, 0.48f);
+            Add("Harbor Market visual counter", -15.0f, 0.78f, -5.7f, 5.6f, 1.35f, 0.85f, 0.42f, 0.26f, 0.14f);
+        }
+
         private static void BuildContainers()
         {
             BuildContainer(8.2f, 1.25f, -6.8f, 7.0f, 2.5f, 2.8f, 0.63f, 0.22f, 0.15f, "Rust red");
@@ -767,8 +799,6 @@ namespace ScheduleIMegaExpansion.Runtime
 
             Add("Dock safety barrier", 2.9f, 0.75f, 11.7f, 0.16f, 1.5f, 5.5f, 0.82f, 0.52f, 0.12f);
             Add("Dock notice board", -1.2f, 1.75f, 11.2f, 1.9f, 2.3f, 0.18f, 0.16f, 0.24f, 0.27f);
-            Add("Market crate stack lower", -12.5f, 0.7f, -9.4f, 1.5f, 1.2f, 1.4f, 0.46f, 0.28f, 0.13f);
-            Add("Market crate stack upper", -12.5f, 1.85f, -9.4f, 1.3f, 1.1f, 1.2f, 0.54f, 0.34f, 0.16f);
         }
 
         private static bool TryReuseVanillaVisual(
