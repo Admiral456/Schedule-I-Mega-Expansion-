@@ -7,6 +7,7 @@ using ScheduleIMegaExpansion.Runtime;
 
 [assembly: MelonInfo(typeof(ScheduleIMegaExpansion.MegaExpansionMod), "Schedule I Mega Expansion", "0.3.1", "Admiral456")]
 [assembly: MelonGame("TVGS", "Schedule I")]
+[assembly: MelonAdditionalDependencies("MapExpansions")]
 
 namespace ScheduleIMegaExpansion
 {
@@ -36,6 +37,7 @@ namespace ScheduleIMegaExpansion
         public override void OnInitializeMelon()
         {
             MelonLogger.Msg("[Schedule I Mega Expansion] Harborline runtime initialized; awaiting native save load.");
+            HarborlineMapExpansionsBridge.RegisterBeforeMainMenu();
             TrySubscribeToS1ApiLifecycle();
         }
 
@@ -43,6 +45,13 @@ namespace ScheduleIMegaExpansion
         {
             if (_saveLoaded && !_harborlineGenerated)
             {
+                if (HarborlineMapExpansionsBridge.IsRegistered)
+                {
+                    _harborlineGenerated = true;
+                    MelonLogger.Msg("[Schedule I Mega Expansion] Local preview generation disabled; DooDesch MapExpansions owns the configured Harborline world build.");
+                }
+                else
+                {
                 _generationPollFrames++;
                 if (_generationPollFrames >= 120)
                 {
@@ -52,6 +61,7 @@ namespace ScheduleIMegaExpansion
                         gameRoot,
                         message => MelonLogger.Msg("[Schedule I Mega Expansion] " + message),
                         message => MelonLogger.Warning("[Schedule I Mega Expansion] " + message));
+                }
                 }
             }
 
