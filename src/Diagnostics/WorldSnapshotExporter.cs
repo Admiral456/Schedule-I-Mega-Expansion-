@@ -45,6 +45,15 @@ namespace ScheduleIMegaExpansion.Diagnostics
             WriteStandaloneMapPois(outputDirectory, summary, warn);
             try
             {
+                int lawRows = NativeLawSnapshotExporter.Export(outputDirectory, summary, warn);
+                summary.Add("NativeLawSnapshotRows=" + lawRows.ToString(CultureInfo.InvariantCulture));
+            }
+            catch (Exception ex)
+            {
+                AddError("NativeLawSnapshot", ex, summary, warn);
+            }
+            try
+            {
                 int prefabsFound = NativePrefabCatalogExporter.Export(outputDirectory, summary, warn);
                 summary.Add("NativePrefabReferencesFound=" + prefabsFound.ToString(CultureInfo.InvariantCulture));
             }
