@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>ScheduleIMegaExpansion</AssemblyName>
+    <RootNamespace>ScheduleIMegaExpansion</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <Version>0.3.1</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LavaGang.MelonLoader" Version="0.7.3" PrivateAssets="all" NoWarn="NU1701" />
+    <PackageReference Include="S1API.Forked" Version="3.2.2" />
+    <EmbeddedResource Include="../world/harborline/map-expansions-template.json">
+      <LogicalName>ScheduleIMegaExpansion.map-expansions-template.json</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <!-- S1API is a runtime dependency supplied by the mod manager; the API package is compile-time only. -->
+</Project>

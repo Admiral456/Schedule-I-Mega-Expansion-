@@ -1,0 +1,51 @@
+name: Build Harborline runtime mod
+# Build against the official S1API compile-time package; runtime S1API comes from manifest dependency.
+
+on:
+  push:
+    branches: ["main", "feat/**"]
+    paths:
+      - "src/**"
+      - ".github/workflows/build-runtime.yml"
+      - "manifest.json"
+      - "README.md"
+      - "LICENSE"
+  pull_request:
+    paths:
+      - "src/**"
+      - ".github/workflows/build-runtime.yml"
+  workflow_dispatch:
+
+jobs:
+  build-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up .NET 6
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "6.0.x"
+      - name: Restore
+        run: dotnet restore src/ScheduleIMegaExpansion.csproj
+      - name: Build
+        run: dotnet build src/ScheduleIMegaExpansion.csproj --configuration Release --no-restore
+      - name: Assemble Thunderstore package
+        run: |
+          mkdir -p package/Mods
+          cp src/bin/Release/net6.0/ScheduleIMegaExpansion.dll package/Mods/
+          cp manifest.json package/
+          cp README.md package/
+          cp LICENSE package/
+          (cd package && zip -r ../ScheduleIMegaExpansion-0.3.1.zip .)
+          unzip -Z1 ScheduleIMegaExpansion-0.3.1.zip > package-contents.txt
+          grep -Fxq "Mods/ScheduleIMegaExpansion.dll" package-contents.txt
+          grep -Fxq "manifest.json" package-contents.txt
+          grep -Fxq "README.md" package-contents.txt
+          grep -Fxq "LICENSE" package-contents.txt
+      - name: Upload installable mod package
+        uses: actions/upload-artifact@v4
+        with:
+          name: ScheduleIMegaExpansion-0.3.1
+          path: ScheduleIMegaExpansion-0.3.1.zip
+          if-no-files-found: error

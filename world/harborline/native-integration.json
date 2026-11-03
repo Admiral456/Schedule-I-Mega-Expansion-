@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "region": "Harborline",
+  "status": "design-contract for native gameplay systems; first physical geometry runtime exists, but native district integration is not implemented",
+  "npc": {
+    "system": "S1API.Entities.NPC",
+    "appearance": "On the NPC instance: Appearance.GenerateRandomAppearance() followed by Appearance.Build()",
+    "externalNpcPackFrameworkRequired": false,
+    "useCustomAppearanceGenerator": false,
+    "useVanillaAvatarLayers": true,
+    "saveAndNetwork": "native Schedule I/S1API NPC lifecycle",
+    "appearanceRegeneration": "never on load or client join",
+    "appearanceMethodKind": "instance method on the NPC's NPCAppearance object; not a static type method"
+  },
+  "worldMap": {
+    "extendPlayableWorld": true,
+    "normalInGameMapVisible": true,
+    "connectTo": "Docks",
+    "requiresTerrainRoadsCollisionNavigation": true,
+    "requiresNativeRegionRegistration": false,
+    "requiresExistingMapCanvasExtension": true,
+    "standaloneMapOrPOIsAreInsufficient": true,
+    "mapBounds": null,
+    "worldToMapTransform": null,
+    "regionId": "Docks",
+    "status": "not-verified; target-build runtime inspection required",
+    "existingNativeRegion": "Docks",
+    "regionRequirement": "Harborline is a named subdistrict. Extend/check map, navigation and dispatch coverage inside Docks; do not register a fabricated new enum value."
+  },
+  "mapIcons": {
+    "source": "native building/property map classification",
+    "customSpriteOverride": false,
+    "ownershipIconSource": "native property ownership state",
+    "ownedMarker": "house/home marker as used by the corresponding vanilla property type",
+    "poiUsage": "S1API.Map.MapPOI only for public landmarks without a native building/property"
+  },
+  "propertyRegistration": {
+    "apiSurface": "S1API exposes Building lookup and property wrappers/PropertyManager for existing properties",
+    "customPropertyHookVerified": false,
+    "realEstateFlow": "must register through the native property/realtor registry before marking any site purchasable",
+    "ownedMapState": "must be read from the native property ownership state",
+    "status": "public S1API managers provide read-only enumeration; new property registration remains unverified and must be discovered via target game build/runtime investigation",
+    "evidence": "PropertyManager.GetAllProperties/GetOwnedProperties/FindPropertyByName and BusinessManager.GetAllBusinesses/GetOwnedBusinesses/FindBusinessByName only enumerate existing static game collections in the inspected source."
+  },
+  "buildings": {
+    "nativePrefabFirst": true,
+    "buildingBuilderRole": "geometry fallback only; not sufficient to register a game Building, Property, Shop or Business",
+    "allMustHaveFunctionalInteriors": true,
+    "requirements": [
+      "correct native building classification",
+      "working entrance",
+      "colliders",
+      "traversable navigation",
+      "native gameplay interactions",
+      "save/load",
+      "multiplayer replication"
+    ]
+  },
+  "doors": {
+    "system": "native interactive door prefab/controller",
+    "networkObjectRequired": true,
+    "spawnAuthority": "host/server",
+    "hostClientTestsRequired": true,
+    "knownS1MAPILimit": "BuildingBuilder.AddSlidingDoors currently documents host-only proximity automation; client manual handle interaction is supported via ServerRpc. Test every door in co-op and prefer verified vanilla door prefabs for production."
+  },
+  "interiors": {
+    "decoration": "S1MAPI InteriorBuilder for static decoration only",
+    "interactiveObjects": "original game prefabs/components with NetworkObject and native interactions",
+    "npcNavigation": "verified doorway/nav link and native StayInBuilding schedule",
+    "functionalExamples": [
+      "checkout/register",
+      "stocked shelf/shop inventory",
+      "networked storage",
+      "vendor/workbench interaction",
+      "office access/interaction points"
+    ]
+  },
+  "validation": [
+    "new area visible on normal map",
+    "world geometry and map projection align",
+    "correct native category icon per building",
+    "owned property icon follows purchase state",
+    "all doors usable by host and client",
+    "NPCs traverse and enter interiors",
+    "key interior objects perform native interactions",
+    "save/load and late join create no duplicates"
+  ],
+  "regionIntegration": {
+    "npcRegionApi": "NPCPrefabBuilder.WithRegion(Region region) sets the native NPC region from the game Region enum.",
+    "availableNativeRegionValues": [
+      "Northtown",
+      "Westville",
+      "Downtown",
+      "Docks",
+      "Suburbia",
+      "Uptown"
+    ],
+    "nativeRegionEnumVerified": true,
+    "harborlineDisplayDistrict": "Harborline",
+    "harborlineParentNativeRegion": "Docks",
+    "harborlineIsSubdistrict": true,
+    "customRegionEnumRequired": false,
+    "requirement": "Assign new Harborline NPC prefabs using the existing Region.Docks enum. Never pass an arbitrary Harborline string or cast an unsupported enum value. Verify that captured world positions lie within the Docks map/dispatch/navigation bounds.",
+    "affects": [
+      "NPC WithRegion assignment",
+      "police dispatch and patrol eligibility",
+      "region-aware gameplay systems",
+      "map labels and region bounds"
+    ],
+    "status": "native enum is confirmed; Docks spatial bounds and dispatch/nav coverage still require in-game verification"
+  },
+  "runtimeDiagnostics": {
+    "project": "src/ScheduleIMegaExpansion.csproj",
+    "mode": "read-only registry/API survey plus session-local Unity geometry generation",
+    "exports": [
+      "native Region enum values",
+      "registered enterable buildings",
+      "native properties and ownership state",
+      "native businesses and ownership state",
+      "standalone phone-map POIs when available",
+      "metadata-only API surface from Assembly-CSharp/S1API/S1MAPI/FishNet",
+      "read-only S1MAPI PrefabRef candidate and component/network survey"
+    ],
+    "output": "UserData/ScheduleIMegaExpansion/Diagnostics/<timestamp>",
+    "mutatesGameState": true,
+    "compileTarget": "IL2CPP net6.0",
+    "status": "CI build and static tests can verify source/package integrity; game runtime execution and actual placement are unverified",
+    "outputFiles": [
+      "summary.txt",
+      "native-regions.csv",
+      "native-buildings.csv",
+      "native-properties.csv",
+      "native-businesses.csv",
+      "standalone-phone-map-pois.csv",
+      "native-game-api-surface.txt",
+      "native-prefabs.csv"
+    ],
+    "compileRequiresGameAssemblies": false,
+    "buildWorkflow": ".github/workflows/build-runtime.yml",
+    "readOnlySurvey": true
+  },
+  "runtimeGeometry": {
+    "status": "implemented-code-unverified-runtime",
+    "description": "Session-local Unity primitive geometry after save-load, with Docks Warehouse anchor, occupancy/ground checks and fail-closed single-player gate.",
+    "nativeBuildingRegistration": false,
+    "nativePropertyRegistration": false,
+    "nativeMapRegistration": false,
+    "savePersistence": false,
+    "multiplayer": false
+  }
+}

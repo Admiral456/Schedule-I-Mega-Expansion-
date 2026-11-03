@@ -1,0 +1,443 @@
+{
+  "schemaVersion": 1,
+  "region": "Harborline",
+  "status": "survey-required",
+  "coordinateSystem": "Unity world coordinates captured in Schedule I at runtime",
+  "rules": [
+    "Never use 2D map pixels as Unity world coordinates.",
+    "Capture each anchor in game and preserve the in-game/S1API runtime capture.",
+    "Do not enable runtime spawning for entries whose position is null."
+  ],
+  "connections": [
+    {
+      "id": "docks_connection",
+      "name": "Napojení na Docks",
+      "purpose": "Vstupní silnice a pěší propojení s původním přístavním distriktem",
+      "position": null,
+      "rotationY": null,
+      "surveyStatus": "not-surveyed"
+    },
+    {
+      "id": "harborline_entry",
+      "name": "Vstupní bod Harborline",
+      "purpose": "Hranice nové oblasti a první navigační uzel",
+      "position": null,
+      "rotationY": null,
+      "surveyStatus": "not-surveyed"
+    }
+  ],
+  "sites": [
+    {
+      "id": "portside_supply",
+      "name": "Portside Supply",
+      "role": "shop",
+      "reuseStrategy": "reuse-vanilla-shop-prefab-first",
+      "position": null,
+      "rotationY": null,
+      "sourcePrefab": null,
+      "interiorAnchor": null,
+      "surveyStatus": "not-surveyed",
+      "purchasableThroughExistingRealtor": true,
+      "propertyListingGroup": "Harborline",
+      "commerce": {
+        "channels": [
+          "in-person",
+          "hyland-network-mobile"
+        ],
+        "inventorySource": "shared-native-shop-catalog",
+        "notes": "Mobile orders must reserve/decrement the same inventory as in-person purchases."
+      },
+      "mapClassification": {
+        "semanticRole": "shop",
+        "nativeIconSource": "native-game-building-property-map-classification",
+        "expectedNativeIconRole": "native-shop-icon",
+        "ownedIconRole": "native-owned-property-icon",
+        "customSpriteOverride": false,
+        "verification": "map in-game and compare with vanilla equivalent"
+      },
+      "entrance": {
+        "required": true,
+        "doorSystem": "native-interactive-door-controller",
+        "networked": true,
+        "doorPrefab": null,
+        "verified": false
+      },
+      "interior": {
+        "required": true,
+        "requiredFunctionalContent": [
+          "shop-counter",
+          "stocked-shelves",
+          "checkout-register",
+          "native-shop-inventory",
+          "customer-navigation"
+        ],
+        "staticDecorationAloneIsInsufficient": true,
+        "registeredAsNativeBuilding": false,
+        "verification": "enter, interact, NPC pathing, host/client, save/load"
+      }
+    },
+    {
+      "id": "harbor_freight_warehouse",
+      "name": "Harbor Freight Warehouse",
+      "role": "warehouse-business",
+      "reuseStrategy": "reuse-vanilla-industrial-building-first",
+      "position": null,
+      "rotationY": null,
+      "sourcePrefab": null,
+      "interiorAnchor": null,
+      "surveyStatus": "not-surveyed",
+      "purchasableThroughExistingRealtor": true,
+      "propertyListingGroup": "Harborline",
+      "mapClassification": {
+        "semanticRole": "warehouse",
+        "nativeIconSource": "native-game-building-property-map-classification",
+        "expectedNativeIconRole": "native-industrial-or-warehouse-icon",
+        "ownedIconRole": "native-owned-property-icon",
+        "customSpriteOverride": false,
+        "verification": "map in-game and compare with vanilla equivalent"
+      },
+      "entrance": {
+        "required": true,
+        "doorSystem": "native-interactive-door-controller",
+        "networked": true,
+        "doorPrefab": null,
+        "verified": false
+      },
+      "interior": {
+        "required": true,
+        "requiredFunctionalContent": [
+          "loading-access",
+          "networked-storage",
+          "cargo-interaction-points",
+          "staff-navigation"
+        ],
+        "staticDecorationAloneIsInsufficient": true,
+        "registeredAsNativeBuilding": false,
+        "verification": "enter, interact, NPC pathing, host/client, save/load"
+      }
+    },
+    {
+      "id": "harbor_market",
+      "name": "Harbor Market",
+      "role": "market",
+      "reuseStrategy": "reuse-vanilla-stalls-and-props-first",
+      "position": null,
+      "rotationY": null,
+      "sourcePrefab": null,
+      "interiorAnchor": null,
+      "surveyStatus": "not-surveyed",
+      "purchasableThroughExistingRealtor": true,
+      "propertyListingGroup": "Harborline",
+      "commerce": {
+        "channels": [
+          "in-person",
+          "hyland-network-mobile"
+        ],
+        "inventorySource": "shared-native-market-catalog"
+      },
+      "mapClassification": {
+        "semanticRole": "market",
+        "nativeIconSource": "native-game-building-property-map-classification",
+        "expectedNativeIconRole": "native-market-or-shop-icon",
+        "ownedIconRole": "native-owned-property-icon",
+        "customSpriteOverride": false,
+        "verification": "map in-game and compare with vanilla equivalent"
+      },
+      "entrance": {
+        "required": true,
+        "doorSystem": "native-interactive-door-controller",
+        "networked": true,
+        "doorPrefab": null,
+        "verified": false
+      },
+      "interior": {
+        "required": true,
+        "requiredFunctionalContent": [
+          "market-stalls",
+          "vendor-counters",
+          "shared-market-stock",
+          "customer-navigation"
+        ],
+        "staticDecorationAloneIsInsufficient": true,
+        "registeredAsNativeBuilding": false,
+        "verification": "enter, interact, NPC pathing, host/client, save/load"
+      }
+    },
+    {
+      "id": "harbor_auto_works",
+      "name": "Harbor Auto Works",
+      "role": "vehicle-service-business",
+      "reuseStrategy": "reuse-vanilla-garage-and-workshop-assets-first",
+      "position": null,
+      "rotationY": null,
+      "sourcePrefab": null,
+      "interiorAnchor": null,
+      "surveyStatus": "not-surveyed",
+      "purchasableThroughExistingRealtor": true,
+      "propertyListingGroup": "Harborline",
+      "mapClassification": {
+        "semanticRole": "vehicle-service",
+        "nativeIconSource": "native-game-building-property-map-classification",
+        "expectedNativeIconRole": "native-service-or-business-icon",
+        "ownedIconRole": "native-owned-property-icon",
+        "customSpriteOverride": false,
+        "verification": "map in-game and compare with vanilla equivalent"
+      },
+      "entrance": {
+        "required": true,
+        "doorSystem": "native-interactive-door-controller",
+        "networked": true,
+        "doorPrefab": null,
+        "verified": false
+      },
+      "interior": {
+        "required": true,
+        "requiredFunctionalContent": [
+          "workshop-interior",
+          "verified-native-vehicle-service-interactions",
+          "tool-and-storage-points"
+        ],
+        "staticDecorationAloneIsInsufficient": true,
+        "registeredAsNativeBuilding": false,
+        "verification": "enter, interact, NPC pathing, host/client, save/load"
+      }
+    },
+    {
+      "id": "harbor_offices",
+      "name": "Harbor Offices",
+      "role": "business-office",
+      "reuseStrategy": "reuse-vanilla-office-assets-first",
+      "position": null,
+      "rotationY": null,
+      "sourcePrefab": null,
+      "interiorAnchor": null,
+      "surveyStatus": "not-surveyed",
+      "purchasableThroughExistingRealtor": true,
+      "propertyListingGroup": "Harborline",
+      "mapClassification": {
+        "semanticRole": "business-office",
+        "nativeIconSource": "native-game-building-property-map-classification",
+        "expectedNativeIconRole": "native-business-icon",
+        "ownedIconRole": "native-owned-property-icon",
+        "customSpriteOverride": false,
+        "verification": "map in-game and compare with vanilla equivalent"
+      },
+      "entrance": {
+        "required": true,
+        "doorSystem": "native-interactive-door-controller",
+        "networked": true,
+        "doorPrefab": null,
+        "verified": false
+      },
+      "interior": {
+        "required": true,
+        "requiredFunctionalContent": [
+          "office-desks",
+          "usable-interaction-points",
+          "npc-schedule-entry"
+        ],
+        "staticDecorationAloneIsInsufficient": true,
+        "registeredAsNativeBuilding": false,
+        "verification": "enter, interact, NPC pathing, host/client, save/load"
+      }
+    },
+    {
+      "id": "harbor_power_plant",
+      "name": "Harbor Power Plant",
+      "role": "industrial-site",
+      "reuseStrategy": "reuse-vanilla-industrial-assets-first",
+      "position": null,
+      "rotationY": null,
+      "sourcePrefab": null,
+      "interiorAnchor": null,
+      "surveyStatus": "not-surveyed",
+      "purchasableThroughExistingRealtor": true,
+      "propertyListingGroup": "Harborline",
+      "mapClassification": {
+        "semanticRole": "industrial-utility",
+        "nativeIconSource": "native-game-building-property-map-classification",
+        "expectedNativeIconRole": "native-industrial-icon",
+        "ownedIconRole": "native-owned-property-icon",
+        "customSpriteOverride": false,
+        "verification": "map in-game and compare with vanilla equivalent"
+      },
+      "entrance": {
+        "required": true,
+        "doorSystem": "native-interactive-door-controller",
+        "networked": true,
+        "doorPrefab": null,
+        "verified": false
+      },
+      "interior": {
+        "required": true,
+        "requiredFunctionalContent": [
+          "maintenance-access",
+          "only-verified-native-utility-interactions"
+        ],
+        "staticDecorationAloneIsInsufficient": true,
+        "registeredAsNativeBuilding": false,
+        "verification": "enter, interact, NPC pathing, host/client, save/load"
+      }
+    },
+    {
+      "id": "pier_promenade",
+      "name": "Pier Promenade",
+      "role": "public-space",
+      "reuseStrategy": "reuse-vanilla-promenade-props-first",
+      "position": null,
+      "rotationY": null,
+      "sourcePrefab": null,
+      "interiorAnchor": null,
+      "surveyStatus": "not-surveyed",
+      "mapClassification": {
+        "semanticRole": "public-landmark",
+        "nativeIconSource": "native-game-building-property-map-classification",
+        "expectedNativeIconRole": "native-public-poi-icon",
+        "ownedIconRole": null,
+        "customSpriteOverride": false,
+        "verification": "map in-game and compare with vanilla equivalent"
+      },
+      "entrance": {
+        "required": true,
+        "doorSystem": "native-interactive-door-controller",
+        "networked": true,
+        "doorPrefab": null,
+        "verified": false
+      },
+      "interior": {
+        "required": true,
+        "requiredFunctionalContent": [
+          "benches-and-public-furnishings",
+          "walking-paths"
+        ],
+        "staticDecorationAloneIsInsufficient": true,
+        "registeredAsNativeBuilding": false,
+        "verification": "enter, interact, NPC pathing, host/client, save/load"
+      }
+    },
+    {
+      "id": "police_checkpoint",
+      "name": "Harbor Police Checkpoint",
+      "role": "police-checkpoint",
+      "reuseStrategy": "reuse-vanilla-police-and-roadside-assets-first",
+      "position": null,
+      "rotationY": null,
+      "sourcePrefab": null,
+      "interiorAnchor": null,
+      "surveyStatus": "not-surveyed",
+      "mapClassification": {
+        "semanticRole": "law-enforcement",
+        "nativeIconSource": "native-game-building-property-map-classification",
+        "expectedNativeIconRole": "native-police-checkpoint-icon",
+        "ownedIconRole": null,
+        "customSpriteOverride": false,
+        "verification": "map in-game and compare with vanilla equivalent"
+      },
+      "entrance": {
+        "required": true,
+        "doorSystem": "native-interactive-door-controller",
+        "networked": true,
+        "doorPrefab": null,
+        "verified": false
+      },
+      "interior": {
+        "required": true,
+        "requiredFunctionalContent": [
+          "checkpoint-access",
+          "native-police-interaction-points"
+        ],
+        "staticDecorationAloneIsInsufficient": true,
+        "registeredAsNativeBuilding": false,
+        "verification": "enter, interact, NPC pathing, host/client, save/load"
+      }
+    }
+  ],
+  "environmentAnchors": [
+    {
+      "id": "container_yard",
+      "purpose": "Kontejnery a nákladní plocha",
+      "position": null,
+      "surveyStatus": "not-surveyed"
+    },
+    {
+      "id": "quay_cranes",
+      "purpose": "Jeřáby, mola a lodní rampa",
+      "position": null,
+      "surveyStatus": "not-surveyed"
+    },
+    {
+      "id": "promenade_path",
+      "purpose": "Trasa chodců a rybářů",
+      "position": null,
+      "surveyStatus": "not-surveyed"
+    },
+    {
+      "id": "truck_parking",
+      "purpose": "Parkování a otočka nákladních vozidel",
+      "position": null,
+      "surveyStatus": "not-surveyed"
+    },
+    {
+      "id": "market_square",
+      "purpose": "Veřejný prostor tržnice",
+      "position": null,
+      "surveyStatus": "not-surveyed"
+    }
+  ],
+  "policeInfrastructure": {
+    "system": "existing-game-police-and-crime-response",
+    "doNotCreateSeparatePoliceAi": true,
+    "checkpoints": [
+      {
+        "id": "checkpoint_harbor_entry",
+        "purpose": "Control vehicles entering from Docks",
+        "position": null,
+        "surveyStatus": "not-surveyed"
+      },
+      {
+        "id": "checkpoint_freight_road",
+        "purpose": "Random freight and cargo inspections",
+        "position": null,
+        "surveyStatus": "not-surveyed"
+      },
+      {
+        "id": "checkpoint_market_exit",
+        "purpose": "Patrol/spot checks near the market and promenade",
+        "position": null,
+        "surveyStatus": "not-surveyed"
+      }
+    ],
+    "patrolRoute": {
+      "id": "harborline_police_patrol",
+      "waypoints": [],
+      "surveyStatus": "not-surveyed"
+    }
+  },
+  "businessIntegration": {
+    "listingSystem": "existing-Realtor",
+    "customRealtorUi": false,
+    "purchasableSiteIds": [
+      "portside_supply",
+      "harbor_freight_warehouse",
+      "harbor_market",
+      "harbor_auto_works",
+      "harbor_offices",
+      "harbor_power_plant"
+    ],
+    "rule": "All purchasable Harborline businesses must be registered in the existing Realtor/property listing flow."
+  },
+  "mapIntegration": {
+    "physicalWorld": "Must extend the existing Hyland Point game world, connected to Docks. A detached scene or standalone map app does not satisfy the requirement.",
+    "existingGameMap": "Harborline must be visible on the game's normal map with the same map projection/world-to-map conversion as vanilla locations.",
+    "mapBounds": null,
+    "worldToMapTransform": null,
+    "regionRegistration": "Extend/validate the existing Docks region's map, road, navigation and police coverage; no new Region enum value is required.",
+    "mapIconPolicy": "Use the native building/property marker category. Do not assign custom sprites to imitate game icons.",
+    "ownershipPolicy": "The native property ownership state must drive the owned-property icon (house/home marker where used by the game).",
+    "mapPOIPolicy": "S1API MapPOI is only for public landmarks that do not have native building/property markers; never use a POI as a fake shop or owned property.",
+    "status": "not-verified; requires target-build runtime inspection",
+    "regionId": "Docks"
+  },
+  "nativeRegion": "Docks",
+  "nativeRegionPolicy": "Display/creative name Harborline; native gameplay Region enum remains Docks. Exact positions must be checked against Docks map and police/navigation bounds."
+}

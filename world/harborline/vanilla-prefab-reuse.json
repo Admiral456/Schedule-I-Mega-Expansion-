@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Vanilla Schedule I scene source candidates discovered from the user-provided Daffy's Hills 1.2 DLL strings. Paths are lookup hypotheses and must be confirmed in the live scene.",
+  "policy": {
+    "reuseExistingGameObjects": true,
+    "copyOnlyRenderMeshesAndLightData": true,
+    "cloneNetworkObjects": false,
+    "cloneMonoBehaviours": false,
+    "cloneColliders": false,
+    "registerPropertyOrBusiness": false,
+    "requireRuntimeScanBeforeCriticalUse": true
+  },
+  "sourceCandidates": [
+    {
+      "id": "docks_clothing_store",
+      "path": "Map/Hyland Point/Region_Docks/Clothing store with interior",
+      "role": "Harbor Market visual shell only; no original scripts, colliders, stock, door, or property behavior copied",
+      "currentlyUsed": true
+    },
+    {
+      "id": "suburbia_green_house",
+      "path": "Map/Hyland Point/Region_Suburbia/Green House",
+      "role": "visual reference for industrial greenhouse",
+      "currentlyUsed": false
+    },
+    {
+      "id": "suburbia_wilkinson_house",
+      "path": "Map/Hyland Point/Region_Suburbia/Wilkinson House",
+      "role": "residential exterior source",
+      "currentlyUsed": false
+    },
+    {
+      "id": "suburbia_kennedy_house",
+      "path": "Map/Hyland Point/Region_Suburbia/Kennedy House",
+      "role": "residential exterior source",
+      "currentlyUsed": false
+    },
+    {
+      "id": "suburbia_long_house",
+      "path": "Map/Hyland Point/Region_Suburbia/Long House",
+      "role": "residential exterior source",
+      "currentlyUsed": false
+    },
+    {
+      "id": "suburbia_carls_house",
+      "path": "Map/Hyland Point/Region_Suburbia/Carl's House",
+      "role": "residential exterior source",
+      "currentlyUsed": false
+    },
+    {
+      "id": "westville_george_molly_house",
+      "path": "Map/Hyland Point/Region_Westville/George and Molly's House",
+      "role": "residential exterior source",
+      "currentlyUsed": false
+    },
+    {
+      "id": "westville_micks_house",
+      "path": "Map/Hyland Point/Region_Westville/Mick's house",
+      "role": "residential exterior source",
+      "currentlyUsed": false
+    },
+    {
+      "id": "downtown_boutique",
+      "path": "Map/Hyland Point/Region_Downtown/Boutique Store",
+      "role": "commercial exterior source",
+      "currentlyUsed": false
+    },
+    {
+      "id": "downtown_gas_station",
+      "path": "Map/Hyland Point/Region_Downtown/Gas Station/gas station",
+      "role": "service-station exterior source",
+      "currentlyUsed": false
+    },
+    {
+      "id": "street_light",
+      "path": "Map/Hyland Point/Region_Suburbia/StreetLight",
+      "role": "native streetlight visual",
+      "currentlyUsed": true
+    },
+    {
+      "id": "pier_bench",
+      "path": "Map/Hyland Point/Region_Uptown/Pier/Seats/OutdoorBench",
+      "role": "native bench visual; seat interaction intentionally not copied",
+      "currentlyUsed": true
+    },
+    {
+      "id": "bus_stop",
+      "path": "Map/Hyland Point/Bus stops/Bus Stop",
+      "role": "native bus-stop visual; transport timetable not copied",
+      "currentlyUsed": true
+    },
+    {
+      "id": "road_nodes",
+      "path": "Map/Pathfinding/RoadNodes",
+      "role": "native road-node hierarchy for road/nav survey",
+      "currentlyUsedForDiagnostics": true,
+      "diagnosticOutput": "native-road-nodes.csv"
+    },
+    {
+      "id": "pathfinding_root",
+      "path": "Map/Pathfinding",
+      "role": "native pathfinding graph root",
+      "currentlyUsedForDiagnostics": true
+    },
+    {
+      "id": "rocks",
+      "path": "Map/Hyland Point/Rocks",
+      "role": "terrain/rock survey root",
+      "currentlyUsed": false
+    },
+    {
+      "id": "cliffs",
+      "path": "Map/Hyland Point/Cliffs",
+      "role": "terrain/cliff survey root",
+      "currentlyUsed": false
+    },
+    {
+      "id": "docks_region",
+      "path": "Map/Hyland Point/Region_Docks",
+      "role": "Docks region boundary and world hierarchy survey",
+      "currentlyUsedForDiagnostics": true
+    }
+  ],
+  "implementationNotes": [
+    "Source paths were recovered from strings in the supplied compiled DLL; this is not proof that every path resolves in the installed game version.",
+    "HarborlineNativeVisualReuse copies MeshFilter.sharedMesh, MeshRenderer.sharedMaterials and basic Light settings into new local GameObjects.",
+    "It does not copy MonoBehaviours, colliders, NPCEnterableBuilding, InteractableObject, DoorController, AvatarSeatSet or FishNet NetworkObjects.",
+    "Streetlights, promenade benches and a bus-stop visual are used with geometry fallback when no source exists.",
+    "Road-node hierarchy and position output are exported by NativeScenePrefabExporter for the next verified road-navigation implementation.",
+    "Harbor Market now attempts to reuse the render-only shell of the vanilla Docks clothing store. It is visual-only and has no cloned storefront interactions, inventory or Property registration.",
+    "NativeRoadGraphExporter traverses every child under Map/Pathfinding/RoadNodes and exports world/local transforms and component types to native-road-nodes.csv. It does not alter the A* graph."
+  ]
+}
