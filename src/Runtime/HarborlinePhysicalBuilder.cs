@@ -713,15 +713,93 @@ namespace ScheduleIMegaExpansion.Runtime
             for (int i = 0; i < 4; i++)
             {
                 float z = -9.0f + i * 6.0f;
-                Add("Harbor lamp post " + i, 5.9f, 3.0f, z, 0.18f, 6.0f, 0.18f, 0.18f, 0.2f, 0.21f);
-                Add("Harbor lamp head " + i, 5.9f, 6.1f, z, 1.0f, 0.18f, 0.34f, 0.88f, 0.76f, 0.48f);
+                bool nativeLamp = TryReuseVanillaVisual(
+                    "Map/Hyland Point/Region_Suburbia/StreetLight",
+                    "Harborline native streetlight " + i,
+                    5.9f,
+                    0f,
+                    z,
+                    0f);
+
+                if (!nativeLamp)
+                {
+                    Add("Harbor lamp post " + i, 5.9f, 3.0f, z, 0.18f, 6.0f, 0.18f, 0.18f, 0.2f, 0.21f);
+                    Add("Harbor lamp head " + i, 5.9f, 6.1f, z, 1.0f, 0.18f, 0.34f, 0.88f, 0.76f, 0.48f);
+                }
+
                 Add("Harbor bollard " + i, 2.4f, 0.55f, z, 0.42f, 1.1f, 0.42f, 0.77f, 0.7f, 0.52f);
+            }
+
+            bool benchA = TryReuseVanillaVisual(
+                "Map/Hyland Point/Region_Uptown/Pier/Seats/OutdoorBench",
+                "Harborline native promenade bench A",
+                -13.5f,
+                0.12f,
+                7.2f,
+                90f);
+            bool benchB = TryReuseVanillaVisual(
+                "Map/Hyland Point/Region_Uptown/Pier/Seats/OutdoorBench",
+                "Harborline native promenade bench B",
+                -13.5f,
+                0.12f,
+                -6.5f,
+                90f);
+            if (!benchA)
+                BuildSimpleBench("Harborline promenade bench A", -13.5f, 0.15f, 7.2f);
+            if (!benchB)
+                BuildSimpleBench("Harborline promenade bench B", -13.5f, 0.15f, -6.5f);
+
+            bool busStop = TryReuseVanillaVisual(
+                "Map/Hyland Point/Bus stops/Bus Stop",
+                "Harborline native bus stop",
+                -20.0f,
+                0f,
+                7.5f,
+                90f);
+            if (!busStop)
+            {
+                // Decorative shelter fallback only; it has no bus timetable or transport logic.
+                Add("Harborline bus stop shelter roof", -20.0f, 2.4f, 7.5f, 4.0f, 0.25f, 1.8f, 0.22f, 0.28f, 0.31f);
+                Add("Harborline bus stop rear panel", -20.0f, 1.25f, 8.3f, 3.8f, 2.3f, 0.12f, 0.34f, 0.38f, 0.39f);
+                Add("Harborline bus stop side panel", -21.9f, 1.25f, 7.5f, 0.12f, 2.3f, 1.8f, 0.34f, 0.38f, 0.39f);
+                Add("Harborline bus stop bench", -20.0f, 0.65f, 7.65f, 2.4f, 0.12f, 0.48f, 0.35f, 0.22f, 0.12f);
             }
 
             Add("Dock safety barrier", 2.9f, 0.75f, 11.7f, 0.16f, 1.5f, 5.5f, 0.82f, 0.52f, 0.12f);
             Add("Dock notice board", -1.2f, 1.75f, 11.2f, 1.9f, 2.3f, 0.18f, 0.16f, 0.24f, 0.27f);
             Add("Market crate stack lower", -12.5f, 0.7f, -9.4f, 1.5f, 1.2f, 1.4f, 0.46f, 0.28f, 0.13f);
             Add("Market crate stack upper", -12.5f, 1.85f, -9.4f, 1.3f, 1.1f, 1.2f, 0.54f, 0.34f, 0.16f);
+        }
+
+        private static bool TryReuseVanillaVisual(
+            string sourcePath,
+            string cloneName,
+            float x,
+            float y,
+            float z,
+            float yaw)
+        {
+            if (_rootTransform == null)
+                return false;
+
+            return HarborlineNativeVisualReuse.TryCreateVisualClone(
+                sourcePath,
+                _rootTransform,
+                cloneName,
+                x,
+                y,
+                z,
+                yaw,
+                message => MelonLogger.Msg("[Schedule I Mega Expansion] " + message),
+                message => MelonLogger.Warning("[Schedule I Mega Expansion] " + message));
+        }
+
+        private static void BuildSimpleBench(string name, float x, float y, float z)
+        {
+            Add(name + " seat", x, y + 0.45f, z, 2.1f, 0.16f, 0.62f, 0.42f, 0.26f, 0.14f);
+            Add(name + " back", x, y + 0.95f, z - 0.24f, 2.1f, 0.78f, 0.14f, 0.42f, 0.26f, 0.14f);
+            for (int i = 0; i < 3; i++)
+                Add(name + " leg " + i, x - 0.8f + i * 0.8f, y + 0.2f, z, 0.12f, 0.48f, 0.14f, 0.2f, 0.21f, 0.2f);
         }
 
         private static void BuildQuay()
