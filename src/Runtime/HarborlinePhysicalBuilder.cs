@@ -106,6 +106,8 @@ namespace ScheduleIMegaExpansion.Runtime
                     6 => -11.0f,
                     7 => 0.0f,
                     8 => 10.0f,
+                    9 => 21.0f,
+                    10 => -19.0f,
                     _ => 21.0f
                 };
                 float localZ = slot switch
@@ -119,6 +121,8 @@ namespace ScheduleIMegaExpansion.Runtime
                     6 => 5.0f,
                     7 => -4.0f,
                     8 => 1.0f,
+                    9 => -3.0f,
+                    10 => -8.0f,
                     _ => -3.0f
                 };
                 float radians = placement.Yaw * (float)Math.PI / 180f;
