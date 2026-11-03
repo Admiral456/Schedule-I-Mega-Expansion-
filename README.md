@@ -43,7 +43,7 @@ NPC role a cílové počty jsou v `packs/Harborline/roster.json`: nově 42 fyzic
 
 ## Instalace a závislosti
 
-Pro mod manager je připraven manifest `manifest.json`. Balíček obsahuje samotný DLL a automaticky vyžaduje MelonLoader 0.7.3, S1API Forked 3.2.2 a S1MAPI 2.0.1. Všechny tři jsou samostatné knihovny; DLL modu je neobsahuje.
+Pro mod manager je připraven manifest `manifest.json`. Balíček obsahuje samotný DLL a automaticky vyžaduje MelonLoader 0.7.3, S1API Forked 3.2.2 a S1MAPI 2.0.1. Všechny tři jsou samostatné knihovny; DLL modu je neobsahuje. Diagnostický export nyní navíc vypisuje `native-shops.csv`, `native-shop-items.csv` a `native-items.csv` pro ověření reálného katalogu konkrétní instalace.
 
 ## Aktuální stav a limity
 
@@ -60,7 +60,7 @@ Pro mod manager je připraven manifest `manifest.json`. Balíček obsahuje samot
 - `docs/npc-generation-and-multiplayer.md` – náhodné preference, nativní generování vzhledu, policie a multiplayer.
 - `docs/native-map-buildings-interiors.md` – herní mapa, nativní ikony/vlastnictví, dveře a funkční interiéry.
 - `world/harborline/native-integration.json` – nativní integrační pravidla a kontrolní brány.
-- `src/` – IL2CPP runtime prototyp, automatická geometrie a read-only průzkum nativních registrů a prefabů.
+- `src/` – IL2CPP runtime prototyp, automatická geometrie a read-only průzkum nativních registrů, obchodů, položek a prefabů.
 - `world/harborline/anchors.json` – seznam lokalit a míst k zaměření.
 - `world/harborline/expansion-plan.json` – plán větší oblasti a pěti podčástí.
 - `world/harborline/prefabs.json` – katalog kandidátních prefabů k ověření v cílové hře.
