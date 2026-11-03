@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "status": "design_and_runtime_inventory; not all entries are active runtime entities",
+  "targets": {
+    "customerProfiles": 30,
+    "dealers": 2,
+    "physicalNpcTarget": 42,
+    "concurrentNpcBudgetTarget": 18
+  },
+  "nativeRuntimeInventory": {
+    "customers": [
+      "Caleb Price",
+      "Nina Brooks",
+      "Rafael Cole",
+      "Olivia Hayes",
+      "Ethan Ward",
+      "Maya Bennett",
+      "Lucas Foster",
+      "Ava Collins"
+    ],
+    "dealers": [
+      "Mason Reed",
+      "Sierra Voss"
+    ],
+    "supplier": [
+      "Portside Supply"
+    ]
+  },
+  "additionalCustomerProfiles": "customer-designs.json",
+  "serviceNpcRolesToDefine": [
+    "dock_supervisor",
+    "warehouse_clerk",
+    "forklift_operator",
+    "mechanic",
+    "market_vendor",
+    "office_receptionist",
+    "harbor_security",
+    "maintenance_worker",
+    "fisherman",
+    "bus_driver"
+  ],
+  "runtimeMapping": "New profiles and service roles do not spawn until mapped to supported S1API registrations and verified in game."
+}
