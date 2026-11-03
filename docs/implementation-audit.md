@@ -1,6 +1,6 @@
 # Harborline – audit implementace
 
-**Kontrolovaný stav:** větev `feat/harborline-foundation`, vývojová verze 0.3.0.
+**Kontrolovaný stav:** větev `feat/harborline-foundation`, vývojová verze 0.3.1.
 **Metoda:** kontrola C# implementace, S1API Forked 3.2.2 public source/API, konfiguračních dat a automatických testů. Audit nebyl proveden uvnitř Schedule I hry.
 
 ## Co se nově skutečně implementuje přes nativní API
@@ -13,7 +13,7 @@
 | Vzhled | `Appearance.GenerateRandomAppearance()` + `Build()` | Náhodný vzhled vytvořený herním generátorem při OnCreated | Čeká na render/save-load test |
 | NPC scheduler | `Schedule.Enable()` | Zapne nativní scheduler komponentu | Denní trasy zatím nejsou nastavené |
 | Sortiment | `HarborlineShopCatalog.cs` | 14 existujících vanilla item definitions přidá do nativního Hardware Store | Čeká na kontrolu shop UI a nákupu |
-| Ceny | `Shop.AddItem(item, customPrice)` | Používá ceny definované v mod katalogu, ne vlastní nákupní UI | Čeká na herní nákupní test |
+| Ceny | `StorableItemDefinition.BasePurchasePrice` | Nastaví cenu na existující nativní definici předmětu; `Shop.AddItem` používá tuto cenu | Čeká na herní nákupní test; cena je sdílená napříč obchody používajícími stejné ID |
 | Fyzická čtvrť | `HarborlinePhysicalBuilder.cs` | Geometrický prototyp Unity primitiv | Umístění dosud neověřeno ve hře |
 
 ### První nativní NPC
@@ -50,7 +50,7 @@ Hodnoty jsou uložené v nativním CustomerDataBuilder. Policejní šance a depe
 | Brick Press / `brickpress` | $900 |
 | Cauldron / `cauldron` | $3,500 |
 
-Kód používá `ItemManager.GetDefinition`, ověří existenci položky i to, zda už v obchodě je, a poté zavolá nativní `Shop.AddItem`. Neznámé item IDs přeskočí. Ceny jsou vlastní konfigurované prodejní ceny.
+Kód používá `ItemManager.GetDefinition` a upravuje `StorableItemDefinition.BasePurchasePrice`, tedy skutečný zdroj ceny, ze kterého nativní obchod počítá nákup. Poté ověří existenci položky v Hardware Store a případně zavolá `Shop.AddItem(item)`. Neznámé item IDs přeskočí. **Pozor:** tato cena patří sdílené definici předmětu, takže ji použijí všechny nativní obchody prodávající stejné item ID. S1API 3.2.2 parametr `Shop.AddItem(item, customPrice)` ve zdrojovém kódu ignoruje; mod na něj již nespoléhá.
 
 ## Co zůstává nedokončené
 
