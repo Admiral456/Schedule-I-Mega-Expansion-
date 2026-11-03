@@ -78,7 +78,7 @@ namespace ScheduleIMegaExpansion.Runtime
         public static bool TryGetPlannedNpcSpawnPosition(int slot, out float x, out float y, out float z)
         {
             x = y = z = 0f;
-            if (slot < 0 || slot > 4)
+            if (slot < 0 || slot > 9)
                 return false;
 
             try
@@ -101,7 +101,12 @@ namespace ScheduleIMegaExpansion.Runtime
                     1 => 4.5f,
                     2 => -17.0f,
                     3 => -1.5f,
-                    _ => 15.0f
+                    4 => 15.0f,
+                    5 => -21.0f,
+                    6 => -11.0f,
+                    7 => 0.0f,
+                    8 => 10.0f,
+                    _ => 21.0f
                 };
                 float localZ = slot switch
                 {
@@ -109,7 +114,12 @@ namespace ScheduleIMegaExpansion.Runtime
                     1 => 10.0f,
                     2 => -9.0f,
                     3 => -11.0f,
-                    _ => 7.0f
+                    4 => 7.0f,
+                    5 => 0.0f,
+                    6 => 5.0f,
+                    7 => -4.0f,
+                    8 => 1.0f,
+                    _ => -3.0f
                 };
                 float radians = placement.Yaw * (float)Math.PI / 180f;
                 float cos = (float)Math.Cos(radians);
