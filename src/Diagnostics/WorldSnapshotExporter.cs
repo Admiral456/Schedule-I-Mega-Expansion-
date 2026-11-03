@@ -83,6 +83,16 @@ namespace ScheduleIMegaExpansion.Diagnostics
                 AddError("HarborlineIntegrationApi", ex, summary, warn);
             }
 
+            try
+            {
+                int foundScenePrefabs = NativeScenePrefabExporter.Export(outputDirectory, summary, warn);
+                summary.Add("NativeScenePrefabPathsFound=" + foundScenePrefabs.ToString(CultureInfo.InvariantCulture));
+            }
+            catch (Exception ex)
+            {
+                AddError("NativeScenePrefabs", ex, summary, warn);
+            }
+
             string summaryPath = Path.Combine(outputDirectory, "summary.txt");
             File.WriteAllLines(summaryPath, summary);
             log("Native world snapshot complete.");
