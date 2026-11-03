@@ -3,6 +3,7 @@ using System.Linq;
 using MelonLoader;
 using System.Reflection;
 using S1API.Entities;
+using S1API.Entities.Supplier;
 using S1API.Economy;
 using S1API.Map;
 using S1API.Products;
@@ -19,7 +20,7 @@ namespace ScheduleIMegaExpansion.Runtime
         public static bool TryGet(int slot, out float x, out float y, out float z)
         {
             x = y = z = 0f;
-            if (slot < 0 || slot > 9)
+            if (slot < 0 || slot > 10)
                 return false;
 
             return HarborlinePhysicalBuilder.TryGetPlannedNpcSpawnPosition(
@@ -440,6 +441,58 @@ namespace ScheduleIMegaExpansion.Runtime
         protected override void OnCreated() { base.OnCreated(); HarborlineNpcLifecycle.InitializePhysicalNpc(this); }
     }
 
+    /// <summary>
+    /// Native supplier channel for Portside Supply. S1API creates the supplier's isolated
+    /// phone-shop listing, persistent stash and delivery vehicle; orders use the game's
+    /// existing delivery workflow rather than a mod-owned fake checkout.
+    /// </summary>
+    public sealed class HarborlineOnlineSupplier : NPC
+    {
+        public override bool IsPhysical => true;
+        public override bool IsSupplier => true;
+
+        public HarborlineOnlineSupplier() : base() { }
+
+        protected override void ConfigurePrefab(NPCPrefabBuilder builder)
+        {
+            HarborlineNpcSpawnPoints.Configure(
+                builder,
+                "harborline_supplier_portside",
+                "Portside",
+                "Supply",
+                10);
+
+            builder.WithSupplierDefaults(supplier =>
+            {
+                supplier.WithOrderLimits(25f, 8000f)
+                    .WithRecommendationMessage(
+                        "Portside Supply can provide <PRODUCT>. I've passed your details to <NAME>.")
+                    .WithUnlockHint(
+                        "Portside Supply is now available for phone orders.");
+                foreach (string itemId in HarborlineShopCatalog.GetSupplierCatalogIds())
+                    supplier.WithDeliveryItem(itemId);
+            });
+        }
+
+        protected override void OnCreated()
+        {
+            base.OnCreated();
+            try
+            {
+                Appearance.GenerateRandomAppearance();
+                Appearance.Build();
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning(
+                    "[Schedule I Mega Expansion] Portside Supply appearance initialization failed: " +
+                    ex.Message);
+            }
+            // Do not enable an ordinary roaming schedule: native suppliers use the
+            // game's reserved meeting/phone-order flow and are hidden while idle.
+        }
+    }
+
     internal static class HarborlineNpcLifecycle
     {
         public static void InitializePhysicalNpc(NPC npc)
@@ -486,7 +539,8 @@ namespace ScheduleIMegaExpansion.Runtime
             "harborline_customer_ethan",
             "harborline_customer_maya",
             "harborline_customer_lucas",
-            "harborline_customer_ava"
+            "harborline_customer_ava",
+            "harborline_supplier_portside"
         };
 
         public static bool EnsureInitialWave(Action<string> log, Action<string> warn)
@@ -537,6 +591,7 @@ namespace ScheduleIMegaExpansion.Runtime
                 CreateIfMissing("harborline_customer_maya", () => new HarborlineCustomerMaya(), 7, ref created, ref alreadyPresent);
                 CreateIfMissing("harborline_customer_lucas", () => new HarborlineCustomerLucas(), 8, ref created, ref alreadyPresent);
                 CreateIfMissing("harborline_customer_ava", () => new HarborlineCustomerAva(), 9, ref created, ref alreadyPresent);
+                CreateIfMissing("harborline_supplier_portside", () => new HarborlineOnlineSupplier(), 10, ref created, ref alreadyPresent);
             }
             catch (Exception ex)
             {
@@ -544,7 +599,7 @@ namespace ScheduleIMegaExpansion.Runtime
                 return false;
             }
 
-            log("Native Harborline NPC wave ready: " + created + " newly created, " +
+            log("Native Harborline NPC wave (2 dealers, 8 customers, 1 online-order supplier) ready: " + created + " newly created, " +
                 alreadyPresent + " already present. Stable NPC IDs: " + string.Join(", ", StableIds));
             return true;
         }
