@@ -162,7 +162,7 @@ namespace ScheduleIMegaExpansion.Runtime
                 _shopApplied = HarborlineShopCatalog.TryApply(log, warn);
 
             if (_npcApplied && _shopApplied)
-                log("Harborline native gameplay slice activated: 2 native dealers, 8 native customer NPCs, 1 native Portside Supply phone-order supplier and a shared 14-item catalog definition.");
+                log("Harborline native gameplay slice activated: 2 native dealers, 8 native customer NPCs, 1 native Portside Supply dead-drop/meeting supplier and a shared 14-item catalog definition. A separate physical Harborline storefront and Hyland Network phone-order flow are not yet implemented.");
             return _npcApplied && _shopApplied;
         }
 
