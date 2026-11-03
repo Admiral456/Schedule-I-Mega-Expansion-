@@ -13,6 +13,9 @@
   <ItemGroup>
     <PackageReference Include="LavaGang.MelonLoader" Version="0.7.3" PrivateAssets="all" NoWarn="NU1701" />
     <PackageReference Include="S1API.Forked" Version="3.2.2" />
+    <EmbeddedResource Include="../world/harborline/map-expansions-template.json">
+      <LogicalName>ScheduleIMegaExpansion.map-expansions-template.json</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 
   <!-- S1API is a runtime dependency supplied by the mod manager; the API package is compile-time only. -->
