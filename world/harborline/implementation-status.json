@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "project": "Schedule I Mega Expansion / Harborline",
-  "reviewedCommit": "c92728b9e17b2cc6fd7bbd0c5fba11ea2597fe9e",
-  "reviewMethod": "Source review of native Harborline NPC/shop pilot against official S1API Forked 3.2.2 public API, successful GitHub Actions compile, package assembly and all 36 repository tests. No Schedule I game runtime or user save was available; in-game behavior remains unverified.",
+  "reviewedCommit": "ab9a0f910e529ca9d067c490b286be2617898d54",
+  "reviewMethod": "Source review of native Harborline NPC/shop pilot against official S1API Forked 3.2.2 public API, successful latest GitHub Actions compile, Thunderstore package assembly and all 36 repository tests. No Schedule I game runtime or user save was available; in-game behavior remains unverified.",
   "statusLegend": {
     "implemented_code_unverified_runtime": "Code exists and builds, but target-game execution is not confirmed.",
     "design_only": "Requirements/data exist as a plan or configuration, not executable runtime behavior.",
@@ -264,15 +264,15 @@
   ],
   "overallVerdict": "The repository contains a buildable native gameplay pilot: two S1API PlayerDealer NPCs, eight S1API customer NPCs with individual customer preferences, and a native Hardware Store catalogue extension using existing vanilla item definitions and the native purchase UI. Ten of the target 42 physical NPCs are now coded. The 30-profile target is not complete; 22 profiles and 32 NPCs remain. A new Harborline storefront, online orders, Realtor-purchasable businesses, map integration, functional interiors, police, persistence, multiplayer and in-game validation remain incomplete or blocked.",
   "validation": {
-    "checkedCommit": "c92728b9e17b2cc6fd7bbd0c5fba11ea2597fe9e",
-    "staticValidationRunId": 41443011877,
+    "checkedCommit": "ab9a0f910e529ca9d067c490b286be2617898d54",
+    "staticValidationRunId": 41599289512,
     "staticValidationConclusion": "success",
-    "runtimeBuildRunId": 41443011860,
+    "runtimeBuildRunId": 41599289556,
     "runtimeBuildConclusion": "success",
-    "thunderstoreArtifactId": 13139039272,
-    "thunderstoreArtifactName": "ScheduleIMegaExpansion-0.3.0",
+    "thunderstoreArtifactId": 13213981965,
+    "thunderstoreArtifactName": "ScheduleIMegaExpansion-0.3.1",
     "runtimeGameExecution": "not performed",
-    "caveat": "CI success establishes compilation, JSON/package integrity and source tests only. It does not verify Unity/IL2CPP runtime behavior or the actual Docks placement.",
+    "caveat": "Latest CI success establishes compilation, JSON/package integrity and source tests only. It does not verify Unity/IL2CPP runtime behavior or actual Docks placement.",
     "reviewedVersion": "0.3.1",
     "nativeNpcAndShopCode": "added this development cycle; target game runtime not tested"
   },
