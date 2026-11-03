@@ -4,12 +4,12 @@ Tento projekt je stále rozpracované rozšíření. Unity primitiva nejsou nati
 
 ## Implementováno ve zdrojovém kódu
 
-### Nativní NPC – pilot 5 postav
+### Nativní NPC – pilot 10 postav
 - **Mason Reed** a **Sierra Voss**: fyzické postavy s rolí PlayerDealer. Používají nativní poplatek za nábor, provizi, pravidla kvality, uložení počtu obchodů, zamčený vztah s možností přímého oslovení a nativní události náboru/smluv.
-- **Caleb Price**, **Nina Brooks**, **Rafael Cole**: fyzičtí zákazníci s různým rozpočtem, počtem objednávek týdně, preferovaným dnem a časem, standardy, přístupem, šancí zavolat policii, závislostí a drogovými afinitami.
+- **Caleb Price**, **Nina Brooks**, **Rafael Cole**, **Olivia Hayes**, **Ethan Ward**, **Maya Bennett**, **Lucas Foster** a **Ava Collins**: fyzičtí zákazníci s individuálním rozpočtem, počtem objednávek týdně, preferovaným dnem a časem, standardy, přístupem, šancí zavolat policii, závislostí a drogovými afinitami.
 - Vzhled se vytváří herním generátorem přes `Appearance.GenerateRandomAppearance()` a aplikuje přes `Appearance.Build()`.
 - Nativní schedule engine se zapíná přes `Schedule.Enable()`. Konkrétní chození po čtvrti zatím není nastavené, protože nemáme ověřené navmesh trasy a funkční budovy.
-- Prefaby se registrují automaticky přes S1API/FishNet. Pět tříd NPC je odvozených ze `S1API.Entities.NPC` a používá jeho nativní save-loader/pre-registration tok; doplňkový fallback registrar čeká na `NPC.CustomNpcsReady`, ověřenou pozici a single-player session. ID jsou stabilní a kontrolují se proti `NPC.Get(id)`, aby se nevytvářely duplicity. Host/client spawn zatím nebyl ověřen ve hře.
+- Prefaby se registrují automaticky přes S1API/FishNet. Deset tříd NPC je odvozených ze `S1API.Entities.NPC` a používá jeho nativní save-loader/pre-registration tok; doplňkový fallback registrar čeká na `NPC.CustomNpcsReady`, ověřenou pozici a single-player session. ID jsou stabilní a kontrolují se proti `NPC.Get(id)`, aby se nevytvářely duplicity. Host/client spawn zatím nebyl ověřen ve hře.
 
 ### Nativní obchod a ceník
 `HarborlineShopCatalog` upravuje katalog skutečného **Hardware Store**. Nepoužívá vlastní falešné menu: získá existující `Shop` přes `ShopManager`, načte originální `StorableItemDefinition` z `ItemManager`, nastaví `BasePurchasePrice` na cenovou hodnotu katalogu a přes `Shop.AddItem` zajistí nativní listing. Před přidáním kontroluje duplicitní položky. Neexistující ID v konkrétním herním buildu přeskočí. S1API 3.2.2 parametr `Shop.AddItem(item, customPrice)` ignoruje, proto se používá skutečná cenová vlastnost definice.
@@ -35,7 +35,7 @@ Ceny níže jsou ceny nakonfigurované modem, nikoliv vanilla ceny hry. `BasePur
 
 ## Co ještě není hotové
 
-- Zbývajících 37 fyzických NPC z cíle 42 a zbylých 27 profilů ze zamýšlených 30.
+- Zbývajících 32 fyzických NPC z cíle 42 a zbylých 22 profilů ze zamýšlených 30.
 - Denní směny dělníků, trasy řidičů, rybářské a turistické chování. Nativní scheduler je zapnutý, ale bez ověřených bodů a dveří nelze tvrdit, že NPC chodí po čtvrti.
 - Samostatný Harborline Supply jako nová fyzická provozovna. Aktuální funkční integrace doplňuje existující Hardware Store, protože S1API veřejně neposkytuje registraci nového Shop.
 - Nové koupitelné podniky a bydlení v Realtoru. Veřejný `PropertyManager` a `BusinessManager` mají čtecí API pro existující záznamy, ale zatím nebyl ověřen bezpečný přidávací hook v cílové verzi Schedule I. Nezabíráme ani nepřepisujeme cizí nemovitosti.
