@@ -391,7 +391,16 @@ namespace ScheduleIMegaExpansion.Runtime
                 .WithCallPoliceChance(0.01f).WithDependence(0.08f, 0.18f)
                 .WithAffinities(new[] { (DrugType.Marijuana, 0.80f), (DrugType.Methamphetamine, -0.45f) }));
 
-}
+            // Native game schedule: the NPC walks to a real Docks AvatarSeatSet and sits.
+            // This is the seat-set path used by S1API's own SitAtSeatSet examples.
+            builder.WithSchedule(plan => plan.SitAtSeatSet(
+                seatSetName: null,
+                startTime: 1430,
+                durationMinutes: 30,
+                warpIfSkipped: false,
+                name: "HarborlineWaterfrontBreak",
+                seatSetPath: "Map/Hyland Point/Region_Docks/WaterFront/OutdoorBench (1)"));
+        }
         protected override void OnCreated() { base.OnCreated(); HarborlineNpcLifecycle.InitializePhysicalNpc(this); }
     }
 
