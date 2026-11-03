@@ -38,7 +38,7 @@ jobs:
           cp README.md package/
           cp LICENSE package/
           (cd package && zip -r ../ScheduleIMegaExpansion-0.3.2.zip .)
-          unzip -Z1 ScheduleIMegaExpansion-0.3.1.zip > package-contents.txt
+          unzip -Z1 ScheduleIMegaExpansion-0.3.2.zip > package-contents.txt
           grep -Fxq "Mods/ScheduleIMegaExpansion.dll" package-contents.txt
           grep -Fxq "manifest.json" package-contents.txt
           grep -Fxq "README.md" package-contents.txt
@@ -47,5 +47,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ScheduleIMegaExpansion-0.3.2
-          path: ScheduleIMegaExpansion-0.3.1.zip
+          path: ScheduleIMegaExpansion-0.3.2.zip
           if-no-files-found: error
