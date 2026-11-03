@@ -184,7 +184,7 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn("NPC.CustomNpcsReady", self.npcs)
         self.assertIn("IsConfirmedSinglePlayerSession()", self.npcs)
         self.assertIn("NPC.Get(id)", self.npcs)
-        self.assertEqual(self.npcs.count("new HarborlineCustomer"), 5)
+        self.assertEqual(self.npcs.count("new HarborlineCustomer"), 8)
         self.assertIn("slot > 9", self.npcs)
         self.assertIn("slot > 9", self.physical)
         self.assertIn("5 => -21.0f", self.physical)
