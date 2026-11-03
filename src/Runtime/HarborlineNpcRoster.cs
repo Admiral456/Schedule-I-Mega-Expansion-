@@ -123,9 +123,7 @@ namespace ScheduleIMegaExpansion.Runtime
                 .WithDelta(1.5f)
                 .SetUnlocked(false)
                 .SetUnlockType(NPCRelationship.UnlockType.DirectApproach));
-        
-            builder.WithSchedule(plan => plan.HandleDeal(900));
-}
+        }
 
         protected override void OnCreated()
         {
@@ -193,9 +191,7 @@ namespace ScheduleIMegaExpansion.Runtime
                 .WithDelta(1.5f)
                 .SetUnlocked(false)
                 .SetUnlockType(NPCRelationship.UnlockType.DirectApproach));
-        
-            builder.WithSchedule(plan => plan.HandleDeal(900));
-}
+        }
 
         protected override void OnCreated()
         {
@@ -464,7 +460,6 @@ namespace ScheduleIMegaExpansion.Runtime
             try
             {
                 npc.Schedule.Enable();
-                npc.Schedule.InitializeActions();
             }
             catch (Exception ex)
             {
