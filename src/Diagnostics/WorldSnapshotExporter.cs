@@ -41,6 +41,7 @@ namespace ScheduleIMegaExpansion.Diagnostics
             WriteBuildings(outputDirectory, summary, warn);
             WriteProperties(outputDirectory, summary, warn);
             WriteBusinesses(outputDirectory, summary, warn);
+            WriteShopsAndItems(outputDirectory, summary, warn);
             WriteStandaloneMapPois(outputDirectory, summary, warn);
             try
             {
@@ -184,6 +185,94 @@ namespace ScheduleIMegaExpansion.Diagnostics
             catch (Exception ex)
             {
                 AddError("NativeBusinesses", ex, summary, warn);
+            }
+        }
+
+        private static void WriteShopsAndItems(string directory, List<string> summary, Action<string> warn)
+        {
+            try
+            {
+                Type? shopManagerType = FindLoadedType("S1API.Shops.ShopManager");
+                List<object> shops = InvokeStaticCollection(shopManagerType, "GetAllShops");
+                Type? itemManagerType = FindLoadedType("S1API.Items.ItemManager");
+                MethodInfo? getDefinition = itemManagerType?.GetMethod(
+                    "GetDefinition",
+                    PublicStatic,
+                    null,
+                    new[] { typeof(string) },
+                    null);
+
+                var shopRows = new List<string[]>();
+                var listingRows = new List<string[]>();
+
+                foreach (object shop in shops)
+                {
+                    string shopName = ReadValue(shop, "Name");
+                    MethodInfo? getItemIds = shop.GetType().GetMethod("GetItemIds", PublicInstance);
+                    object? rawIds = getItemIds?.Invoke(shop, null);
+                    List<object> ids = ToObjects(rawIds);
+
+                    shopRows.Add(new[]
+                    {
+                        shopName,
+                        ids.Count.ToString(CultureInfo.InvariantCulture)
+                    });
+
+                    foreach (object idValue in ids)
+                    {
+                        string itemId = Convert.ToString(idValue, CultureInfo.InvariantCulture) ?? string.Empty;
+                        object? definition = getDefinition?.Invoke(null, new object[] { itemId });
+                        listingRows.Add(new[]
+                        {
+                            shopName,
+                            itemId,
+                            definition == null ? string.Empty : ReadValue(definition, "Name"),
+                            definition == null ? string.Empty : ReadValue(definition, "Category"),
+                            definition == null ? string.Empty : ReadValue(definition, "BasePurchasePrice")
+                        });
+                    }
+                }
+
+                WriteCsv(
+                    Path.Combine(directory, "native-shops.csv"),
+                    new[] { "shopName", "listingCount" },
+                    shopRows);
+                WriteCsv(
+                    Path.Combine(directory, "native-shop-items.csv"),
+                    new[] { "shopName", "itemId", "itemName", "category", "basePurchasePrice" },
+                    listingRows);
+
+                summary.Add("NativeShops=" + shops.Count.ToString(CultureInfo.InvariantCulture));
+                summary.Add("NativeShopListings=" + listingRows.Count.ToString(CultureInfo.InvariantCulture));
+                summary.Add("NativeShopRegistryAccess=read-only through S1API ShopManager");
+
+                List<object> items = InvokeStaticCollection(itemManagerType, "GetAllItemDefinitions");
+                var itemRows = items.Select(item => new[]
+                {
+                    ReadValue(item, "ID"),
+                    ReadValue(item, "Name"),
+                    ReadValue(item, "Category"),
+                    ReadValue(item, "BasePurchasePrice"),
+                    ReadValue(item, "ResellMultiplier"),
+                    ReadValue(item, "StackLimit")
+                });
+
+                WriteCsv(
+                    Path.Combine(directory, "native-items.csv"),
+                    new[] { "itemId", "itemName", "category", "basePurchasePrice", "resellMultiplier", "stackLimit" },
+                    itemRows);
+                summary.Add("NativeItemDefinitions=" + items.Count.ToString(CultureInfo.InvariantCulture));
+            }
+            catch (Exception ex)
+            {
+                AddError("NativeShopsAndItems", ex, summary, warn);
+                // Keep predictable output files even if this game/API version has a different surface.
+                if (!File.Exists(Path.Combine(directory, "native-shops.csv")))
+                    WriteCsv(Path.Combine(directory, "native-shops.csv"), new[] { "shopName", "listingCount" }, Array.Empty<string[]>());
+                if (!File.Exists(Path.Combine(directory, "native-shop-items.csv")))
+                    WriteCsv(Path.Combine(directory, "native-shop-items.csv"), new[] { "shopName", "itemId", "itemName", "category", "basePurchasePrice" }, Array.Empty<string[]>());
+                if (!File.Exists(Path.Combine(directory, "native-items.csv")))
+                    WriteCsv(Path.Combine(directory, "native-items.csv"), new[] { "itemId", "itemName", "category", "basePurchasePrice", "resellMultiplier", "stackLimit" }, Array.Empty<string[]>());
             }
         }
 
