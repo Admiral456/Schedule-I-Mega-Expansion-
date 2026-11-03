@@ -33,6 +33,7 @@ namespace ScheduleIMegaExpansion.Diagnostics
             "Map/Hyland Point/Region_Downtown/Boutique Store",
             "Map/Hyland Point/Region_Downtown/Gas Station/gas station",
             "Map/Hyland Point/Region_Uptown/Pier/Seats/OutdoorBench",
+            "Map/Hyland Point/Region_Docks/WaterFront/OutdoorBench (1)",
             "Map/Hyland Point/Bus stops/Bus Stop",
             "Map/Hyland Point/Region_Suburbia/StreetLight",
             "Map/Pathfinding/RoadNodes",
