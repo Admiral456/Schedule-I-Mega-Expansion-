@@ -245,6 +245,11 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn("ClearAroundBuilding", self.building_factory)
         self.assertIn('"FlattenTerrain"', self.building_factory)
         self.assertIn("S1MAPI.Building.Structural.TerrainClearer", self.building_factory)
+        self.assertIn("TryBuildNativeInteriorDecor(transform, warn)", self.building_factory)
+        self.assertIn("S1MAPI.Building.Interior.InteriorBuilder", self.building_factory)
+        for method in ("AddDesk", "AddChair", "AddCabinet", "AddLocker", "AddFridge", "AddPlant"):
+            self.assertIn(method, self.building_factory)
+        self.assertIn("visual only", self.building_factory)
         self.assertIn("HarborlineNativeVisualReuse.TryCreateVisualClone(", self.physical)
         self.assertIn("Map/Hyland Point/Region_Suburbia/StreetLight", self.physical)
         self.assertIn("Map/Hyland Point/Region_Uptown/Pier/Seats/OutdoorBench", self.physical)
