@@ -23,8 +23,8 @@ NPC role a cílové počty jsou v `packs/Harborline/roster.json`: nově 42 fyzic
 - `HarborlineNpcRoster.cs` registruje dva fyzické dealery (Mason Reed, Sierra Voss) přes `IsDealer` a `WithDealerDefaults`, včetně náborového poplatku, provize, kvality a nativních událostí náboru/smluv.
 - Tři fyzické zákaznické NPC (Caleb Price, Nina Brooks, Rafael Cole) mají odlišné rozpočty, týdenní počet objednávek, den/čas, standardy, šanci zavolat policii, závislost a afinity k typům drog.
 - Vzhled se vytváří herním generátorem přes `Appearance.GenerateRandomAppearance()` a `Appearance.Build()`; scheduler se zapíná přes `Schedule.Enable()`.
-- `HarborlineShopCatalog.cs` přidává 14 existujících vanilla předmětů do existujícího nativního Hardware Store přes `ItemManager` a `Shop.AddItem`. Používá originální nákupní UI a doručení předmětů hry.
-- První vlna NPC je povolena jen v single-playeru a čeká na potvrzení S1API prefabs a pozice. Runtime ve hře zatím nebyl ověřen; denní chození po čtvrti zatím není nakonfigurované.
+- `HarborlineShopCatalog.cs` upravuje ceny 14 existujících vanilla předmětů přímo v nativním `StorableItemDefinition.BasePurchasePrice` a zajišťuje jejich listing v existujícím Hardware Store přes `Shop.AddItem`. Používá originální nákupní UI a doručení předmětů hry. Cena definice je sdílená napříč všemi obchody používajícími stejné item ID.
+- Vlastní NPC typy jsou definované přes S1API a používají jeho nativní prefab, save/load a FishNet pipeline. Doplňkový fallback registrar je omezený na single-player, aby nevytvářel duplicitní NPC mimo ověřený serverový tok. Runtime ve hře zatím nebyl ověřen; denní chození po čtvrti zatím není nakonfigurované.
 
 ## Zatím blokované / další fáze
 
@@ -47,9 +47,9 @@ Pro mod manager je připraven manifest `manifest.json`. Balíček obsahuje samot
 
 ## Aktuální stav a limity
 
-- Runtime vytváří první geometrickou prototypovou část z Unity primitiv a následně se pokouší o vytvoření pěti nativních NPC a úpravu vanilla Hardware Store. To vše je zatím ověřené pouze zdrojovou kontrolou, nikoli během v cílové hře.
+- Runtime vytváří první geometrickou prototypovou část z Unity primitiv. Po načtení save nezávisle zkouší aktivovat nativní NPC a katalog Hardware Store; katalog již není blokován tím, zda se podařilo vytvořit fyzickou geometrii. Vše je zatím ověřené pouze zdrojovou kontrolou, nikoli během v cílové hře.
 - Umístění se odvozuje z nativní pozice Docks Warehouse a runtime fyzikálních kontrol. To ale samo o sobě nezaručuje, že kandidát leží uvnitř hranic Docks nebo že není nad vodou s neoznačeným colliderem.
-- Nové Realtor/property registrace, mapové ikony, funkční interiéry, nové fyzické obchody v Harborline, online objednávky, policie, ukládání geometrie a multiplayer nejsou v runtime implementované. Veřejné S1API PropertyManager a BusinessManager zatím pouze enumerují existující záznamy. Vanilla Hardware Store už má doplněný sortiment.
+- Nové Realtor/property registrace, mapové ikony, funkční interiéry, nové fyzické obchody v Harborline, online objednávky, policie, ukládání geometrie a multiplayer nejsou v runtime implementované. Veřejné S1API PropertyManager a BusinessManager zatím pouze enumerují existující záznamy. Vanilla Hardware Store má připravený katalog 14 existujících položek; jejich nativní definice dostanou nastavené ceny. Změna ceny je globální pro stejné item ID, ne pouze pro Hardware Store.
 - GitHub Actions sestavuje IL2CPP mod a balí Thunderstore ZIP. Statické testy a build neprokazují chování ve hře. Diagnostické exportéry pouze čtou registry, ale celý mod navíc vytváří session-local Unity geometrii.
 
 ## Struktura
