@@ -1,6 +1,6 @@
 # Harborline – audit implementace
 
-**Kontrolovaný stav:** větev `feat/harborline-foundation`, commit `e29435899daf2cb2f2f46f526883636952996356`, vývojová verze 0.3.1.
+**Kontrolovaný stav:** větev `feat/harborline-foundation`, commit `5f862a62030fd78dcbe5a61939794a194c2672c8`, vývojová verze 0.3.1.
 **Metoda:** kontrola C# implementace, S1API Forked 3.2.2 public source/API, konfiguračních dat a automatických testů. Audit nebyl proveden uvnitř Schedule I hry.
 
 ## Co se nově skutečně implementuje přes nativní API
@@ -15,7 +15,7 @@
 | NPC scheduler | `WithSchedule`, `Schedule.Enable()` | Zákaznické čekání na handover je automatické pro `IsCustomer=true`; zastaralé `EnsureDealSignal()` jsme odstranili. Dealeři používají automatické `DealerAttendDealBehaviour` v cílové herní verzi. `HandleDeal()` je zastaralé a `NPCSchedule.InitializeActions()` v S1API 3.2.2 není dostupné. | Základní zákaznické handover chování poskytuje hra; pěší trasy a návštěvy budov čekají na ověřené navmesh body a nativní budovy |
 | Sortiment | `HarborlineShopCatalog.cs` | 14 existujících vanilla item definitions přidá do nativního Hardware Store | Čeká na kontrolu shop UI a nákupu |
 | Ceny | `StorableItemDefinition.BasePurchasePrice` | Nastaví cenu na existující nativní definici předmětu; `Shop.AddItem` používá tuto cenu | Čeká na herní nákupní test; cena je sdílená napříč obchody používajícími stejné ID |
-| Fyzická čtvrť/sklad | `HarborlinePhysicalBuilder.cs`, `HarborlineProceduralBuildingFactory.cs` | Dockyard geometrie zůstává prototyp; sklad používá S1MAPI BuildingBuilder s primitive fallbackem | Umístění, vstup a navigace dosud neověřeny ve hře |
+| Fyzická čtvrť/sklad | `HarborlinePhysicalBuilder.cs`, `HarborlineProceduralBuildingFactory.cs` | Dockyard geometrie zůstává prototyp; sklad používá S1MAPI BuildingBuilder s TerrainClearer/FlattenTerrain, InteriorBuilder vizuální dekorací a primitive fallbackem. Harbor Market zkouší původní Docks clothing-store render shell | Umístění, vstup, navigace i vizuální zdroje dosud neověřeny ve hře |
 
 ### První nativní NPC
 
@@ -62,11 +62,17 @@ Kód používá `ItemManager.GetDefinition` a upravuje `StorableItemDefinition.B
 
 ### Procedurální budova a focused API scan
 
-`HarborlineProceduralBuildingFactory.cs` se pokouší vytvořit sklad přes S1MAPI `BuildingBuilder` a `BuildingConfig`, posuvné dveře přes `AddSlidingDoors` a vnitřní pathfinding přes `NavigationBuilder`. V případě chyby se zachová stávající geometrický fallback. Vytvořená budova není automaticky registrovanou nativní Property/Business nebo novým Shop. `HarborlineIntegrationApiScanner.cs` rozšiřuje read-only diagnostiku o přesné podpisy metod/událostí pro Realtor, Property, Business, dveře, NPC movement, Navigation, road a map API.
+`HarborlineProceduralBuildingFactory.cs` vytváří sklad přes S1MAPI `BuildingBuilder`/`BuildingConfig`, před stavbou zkouší `TerrainClearer.ClearAroundBuilding` a `FlattenTerrain()`, následně přidává statické mesh dekorace přes S1MAPI `InteriorBuilder` (desk, chair, cabinet, locker, fridge, plant), posuvné dveře přes `AddSlidingDoors` a vnitřní pathfinding přes `NavigationBuilder`. Při chybě se zachová původní geometrický fallback. Vnitřní dekorace jsou vizuální, nikoli funkční pokladna/sklad. Vytvořená budova není automaticky registrovanou nativní Property/Business nebo novým Shop. `HarborlineIntegrationApiScanner.cs` rozšiřuje read-only diagnostiku o přesné podpisy metod/událostí pro Realtor, Property, Business, dveře, NPC movement, A* graphy, Navigation, road, seat-set, transport a map API. `NativeScenePrefabExporter.cs` hledá přesné vanilla hierarchy paths. `NativeTerrainSurveyExporter.cs` čte terénní rozměry, vrstvy a výškovou mřížku. `NativeRoadGraphExporter.cs` exportuje všechny uzly z `Map/Pathfinding/RoadNodes` včetně world/local pozic.
 
 ### Nová diagnostika obchodů a položek
 
 `WorldSnapshotExporter` nyní čte přes `ShopManager.GetAllShops()` a `ItemManager.GetAllItemDefinitions()` tři soubory: `native-shops.csv`, `native-shop-items.csv` a `native-items.csv`. Samostatný `NativeLawSnapshotExporter` přidává šest read-only souborů: `native-law-controller.csv`, `native-law-manager.csv`, `native-law-checkpoint-locations.csv`, `native-law-checkpoints.csv`, `native-law-foot-patrol-routes.csv` a `native-law-vehicle-patrol-routes.csv`. Jde pouze o čtení nativních registrů; export nespouští hlídky, nepovoluje checkpointy a nemění herní stav.
+
+### Rozšířené používání vanilla mapových zdrojů podle Daffy's Hills
+
+`HarborlineNativeVisualReuse.cs` nyní používá původní Docks clothing-store render mesh jako vizuální shell Harbor Market, Suburbia streetlight pro lampy, Uptown OutdoorBench pro vzhled laviček a vanilla Bus Stop pro vzhled zastávky. Kopírují se jen MeshFilter/MeshRenderer/Light; neklonují se collidery, scripts, seat sets, doors ani NetworkObjects. Při chybě je vlastní geometrický fallback. Vizuální lavička není sedátko, autobusová zastávka nezíská dopravní logiku a Harbor Market není funkční Shop.
+
+`NativeScenePrefabExporter` ukládá zdrojové prefab paths a hierarchii do `native-scene-prefabs.csv`; `NativeRoadGraphExporter` exportuje jednotlivé RoadNodes do `native-road-nodes.csv`; `NativeTerrainSurveyExporter` exportuje terrain dimensions/layers/height samples do tří CSV. Všechny exportéry pouze čtou běžící scénu.
 
 ## Co zůstává nedokončené
 
@@ -79,7 +85,7 @@ Kód používá `ItemManager.GetDefinition` a upravuje `StorableItemDefinition.B
 | Online objednávky | Nedokončeno | Supplier NPC využívá dead-drop/meeting-shop flow; samostatná Hyland Network aplikace a plně funkční online objednávky nejsou implementované |
 | Koupitelné podniky / Realtor | Blokováno neověřeným API | `PropertyManager` a `BusinessManager` zpřístupňují existující záznamy; ověřený aditivní registrační hook pro novou Property/Business není znám |
 | Nové mapové ikony | Nedokončeno | Chybí ověřený map registry/projekce a vlastnické změny |
-| Procedurální sklad/interiér/dveře | Kód implementován, runtime neověřen | S1MAPI BuildingBuilder je zapojen do skladu; AddSlidingDoors a vnitřní NavigationBuilder jsou pouze pokusy o vytvoření. Není to registrace nativní Property/Business a vstup ani NPC navigace nejsou ve hře otestovány |
+| Procedurální sklad/interiér/dveře | Kód implementován, runtime neověřen | S1MAPI BuildingBuilder, TerrainClearer/FlattenTerrain, InteriorBuilder statické dekorace, AddSlidingDoors a vnitřní NavigationBuilder jsou zapojené v kódu, ale jejich výsledek není ve hře otestovaný. Harbor Market znovu používá jen render mesh Docks obchodu; nic z jeho interakcí není klonováno. Není to registrace nativní Property/Business |
 | Policie | Nedokončeno | Není připojený nativní dispatch/patrol/checkpoint flow |
 | Save geometrie | Nedokončeno | Fyzická geometrie je zatím session-local |
 | Multiplayer | Zablokováno | NPC a geometrie jsou v této pilotní fázi omezené na single-player; host/client/late join nebyl testován |
