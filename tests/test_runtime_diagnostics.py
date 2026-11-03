@@ -184,10 +184,17 @@ class RuntimeDiagnosticTests(unittest.TestCase):
             "harborline_customer_olivia", "harborline_customer_ethan",
             "harborline_customer_maya", "harborline_customer_lucas",
             "harborline_customer_ava",
+            "harborline_supplier_portside",
         ):
             self.assertIn(npc_id, self.npcs)
         self.assertEqual(self.npcs.count("public override bool IsDealer => true;"), 2)
         self.assertEqual(self.npcs.count("public override bool IsCustomer => true;"), 8)
+        self.assertEqual(self.npcs.count("public override bool IsPhysical => true;"), 11)
+        self.assertIn("public override bool IsSupplier => true;", self.npcs)
+        self.assertIn("builder.WithSupplierDefaults(supplier =>", self.npcs)
+        self.assertIn("supplier.WithOrderLimits(25f, 8000f)", self.npcs)
+        self.assertIn("HarborlineShopCatalog.GetSupplierCatalogIds()", self.npcs)
+        self.assertIn("supplier.WithDeliveryItem(itemId)", self.npcs)
         self.assertIn("WithDealerDefaults(", self.npcs)
         self.assertIn("WithCustomerDefaults(", self.npcs)
         self.assertIn("WithAffinities(", self.npcs)
@@ -202,13 +209,14 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn("IsConfirmedSinglePlayerSession()", self.npcs)
         self.assertIn("NPC.Get(id)", self.npcs)
         self.assertEqual(self.npcs.count("new HarborlineCustomer"), 8)
-        self.assertIn("deseti nativních S1API NPC", self.root_readme)
-        self.assertIn("Dalších 32 postav", self.root_readme)
+        self.assertIn("new HarborlineOnlineSupplier()", self.npcs)
+        self.assertIn("jedenácti nativních S1API NPC", self.root_readme)
+        self.assertIn("Dalších 31 postav", self.root_readme)
         self.assertIn("Osm fyzických zákaznických NPC", self.root_readme)
-        self.assertIn("pilot 10 postav", self.src_readme)
+        self.assertIn("pilot 11 postav", self.src_readme)
         self.assertIn("zbylých 22 profilů", self.src_readme)
-        self.assertIn("10 fyzických S1API NPC", (ROOT / "docs" / "implementation-audit.md").read_text(encoding="utf-8"))
-        self.assertIn("slot > 9", self.npcs)
+        self.assertIn("11 fyzických S1API NPC", (ROOT / "docs" / "implementation-audit.md").read_text(encoding="utf-8"))
+        self.assertIn("slot > 10", self.npcs)
         self.assertIn("slot > 9", self.physical)
         self.assertIn("5 => -21.0f", self.physical)
         self.assertNotIn("InitializeActions()", self.npcs)
