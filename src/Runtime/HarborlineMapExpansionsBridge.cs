@@ -118,91 +118,15 @@ namespace ScheduleIMegaExpansion.Runtime
             if (File.Exists(path))
                 return;
 
-            const string template = @"{
-  ""schemaVersion"": 1,
-  ""id"": ""harborline"",
-  ""displayName"": ""Harborline"",
-  ""version"": ""0.3.2"",
-  ""mode"": ""source-scene-expansion"",
-  ""source"": {
-    ""sceneName"": """",
-    ""rootName"": ""Map"",
-    ""roadNodesName"": ""RoadNodes"",
-    ""testedGameVersions"": []
-  },
-  ""offset"": null,
-  ""quarterTurns"": 0,
-  ""minimumWorldHeight"": -5.0,
-  ""separateViews"": false,
-  ""regions"": [
-    {
-      ""name"": ""Harborline"",
-      ""standInRegion"": 3,
-      ""unlockedByDefault"": true,
-      ""polygon"": []
-    }
-  ],
-  ""map"": {
-    ""pngPath"": """",
-    ""centre"": null,
-    ""halfSize"": 0,
-    ""labels"": []
-  },
-  ""connections"": [
-    {
-      ""name"": ""Docks road connection"",
-      ""roadWidth"": 8.0,
-      ""walkwayWidth"": 1.4,
-      ""route"": [
-        { ""side"": ""Main"", ""position"": null, ""style"": ""Road"" },
-        { ""side"": ""Expansion"", ""position"": null, ""style"": ""Road"" }
-      ],
-      ""vehicleJoin"": null
-    }
-  ],
-  ""locations"": [],
-  ""buildings"": [],
-  ""parkingLots"": [],
-  ""dealLocations"": [],
-  ""properties"": [
-    {
-      ""id"": ""harborline_portside_warehouse"",
-      ""code"": ""harborline_portside_warehouse"",
-      ""name"": ""Portside Supply Warehouse"",
-      ""template"": """",
-      ""price"": 65000,
-      ""employeeCapacity"": 4,
-      ""root"": null,
-      ""yaw"": 0,
-      ""soldByRealtor"": true
-    },
-    {
-      ""id"": ""harborline_market_property"",
-      ""code"": ""harborline_market"",
-      ""name"": ""Harbor Market"",
-      ""template"": """",
-      ""price"": 45000,
-      ""employeeCapacity"": 3,
-      ""root"": null,
-      ""yaw"": 0,
-      ""soldByRealtor"": true
-    }
-  ],
-  ""shops"": [
-    {
-      ""id"": ""harborline_market_shop"",
-      ""kind"": ""Store"",
-      ""shopCode"": """",
-      ""seller"": ""harborline_shop_clerk"",
-      ""counter"": null,
-      ""counterReach"": 1.5,
-      ""copies"": []
-    }
-  ],
-  ""copies"": []
-}";
+            const string resourceName = "ScheduleIMegaExpansion.map-expansions-template.json";
+            using Stream? resource = typeof(HarborlineMapExpansionsBridge).Assembly.GetManifestResourceStream(resourceName);
+            if (resource == null)
+                throw new FileNotFoundException("Embedded MapExpansions config template was not found: " + resourceName);
+
             Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-            File.WriteAllText(path, template);
+            using var reader = new StreamReader(resource);
+            File.WriteAllText(path, reader.ReadToEnd());
+            MelonLogger.Msg("[Schedule I Mega Expansion] Created the editable MapExpansions template: " + path);
         }
 
         private static bool Validate(JsonElement root, out string reason)
