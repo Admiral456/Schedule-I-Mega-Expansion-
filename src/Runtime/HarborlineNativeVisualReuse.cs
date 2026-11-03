@@ -122,7 +122,23 @@ namespace ScheduleIMegaExpansion.Runtime
                     && method.GetParameters()[0].ParameterType.IsAssignableFrom(targetParent.GetType()));
             setParent.Invoke(targetTransform, new[] { targetParent, (object)false });
 
-            CopyTransform(sourceTransform, targetTransform);
+            if (isSourceRoot)
+            {
+                // The source object lives in its original district coordinates.
+                // Keep only its authored local scale; the clone receives the
+                // requested Harborline position/rotation from ParentAndPlace().
+                SetMember(targetTransform, "localPosition",
+                    Activator.CreateInstance(_vector3Type!, new object[] { 0f, 0f, 0f }));
+                SetMember(targetTransform, "localRotation",
+                    _quaternionType!.GetProperty("identity", PublicStatic)?.GetValue(null, null));
+                object? sourceScale = ReadMember(sourceTransform, "localScale");
+                if (sourceScale != null)
+                    SetMember(targetTransform, "localScale", sourceScale);
+            }
+            else
+            {
+                CopyTransform(sourceTransform, targetTransform);
+            }
 
             if (sourceGameObject != null)
             {
