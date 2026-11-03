@@ -35,7 +35,7 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertEqual(target.text, "net6.0")
         self.assertIsNotNone(version)
         self.assertEqual(version.text, self.manifest["version_number"])
-        self.assertEqual(version.text, "0.3.1")
+        self.assertEqual(version.text, "0.3.2")
 
     def test_runtime_uses_official_s1api_package_without_bundling_game_assemblies(self):
         self.assertEqual(self.project.findall(".//Reference"), [])
@@ -44,11 +44,22 @@ class RuntimeDiagnosticTests(unittest.TestCase):
             for element in self.project.findall(".//PackageReference")
         }
         self.assertEqual(packages.get("LavaGang.MelonLoader"), "0.7.3")
-        self.assertEqual(packages.get("S1API.Forked"), "3.2.2")
+        self.assertEqual(packages.get("S1API.Forked"), "3.2.3")
         self.assertNotIn("RefGen.Schedule-I.Il2Cpp", packages)
         self.assertNotIn("Il2CppInterop.Common", packages)
         self.assertNotIn("S1MAPI", packages)
-        self.assertIn('PackageReference Include="S1API.Forked" Version="3.2.2"', self.build_workflow + self.project.read_text() if hasattr(self.project, "read_text") else (ROOT / "src" / "ScheduleIMegaExpansion.csproj").read_text(encoding="utf-8"))
+        self.assertIn('PackageReference Include="S1API.Forked" Version="3.2.3"', self.build_workflow + self.project.read_text() if hasattr(self.project, "read_text") else (ROOT / "src" / "ScheduleIMegaExpansion.csproj").read_text(encoding="utf-8"))
+
+    def test_native_npc_schedule_uses_game_navmesh_and_seat_sets(self):
+        navigation = (ROOT / "src" / "Diagnostics" / "NativeNavigationSurveyExporter.cs").read_text(encoding="utf-8")
+        self.assertIn("SitAtSeatSet(", self.npcs)
+        self.assertIn("WithSchedule(", self.npcs)
+        self.assertIn("OutdoorBench (1)", self.npcs)
+        self.assertNotIn("EnsureDealSignal()", self.npcs)
+        self.assertIn("SamplePosition", navigation)
+        self.assertIn("CalculatePath", navigation)
+        self.assertIn("AvatarSeatSet", navigation)
+        self.assertIn("NativeNavigationSurveyExporter.Export(", self.exporter)
 
     def test_core_uses_native_save_and_scene_lifecycle(self):
         self.assertIn('GetType("S1API.Lifecycle.GameLifecycle", false)', self.core)
@@ -259,14 +270,14 @@ class RuntimeDiagnosticTests(unittest.TestCase):
 
     def test_thunderstore_manifest_and_package_layout_are_consistent(self):
         self.assertEqual(self.manifest["name"], "ScheduleIMegaExpansion")
-        self.assertEqual(self.manifest["version_number"], "0.3.1")
+        self.assertEqual(self.manifest["version_number"], "0.3.2")
         dependencies = set(self.manifest["dependencies"])
         self.assertIn("LavaGang-MelonLoader-0.7.3", dependencies)
-        self.assertIn("ifBars-S1API_Forked-3.2.2", dependencies)
+        self.assertIn("ifBars-S1API_Forked-3.2.3", dependencies)
         self.assertIn("ifBars-S1MAPI-2.0.1", dependencies)
         workflow = self.build_workflow
         self.assertIn("package/Mods/", workflow)
-        self.assertIn("ScheduleIMegaExpansion-0.3.1.zip", workflow)
+        self.assertIn("ScheduleIMegaExpansion-0.3.2.zip", workflow)
         for required in (
             "Mods/ScheduleIMegaExpansion.dll",
             "manifest.json",
