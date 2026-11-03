@@ -1,6 +1,6 @@
 # Harborline runtime – první nativní herní vlna
 
-Tento projekt je stále rozpracované rozšíření. Unity primitiva nejsou nativní Schedule I Building, Property, Business ani Shop. Vedle fyzického Unity prototypu už obsahuje první skutečné herní integrace přes S1API 3.2.2.
+Tento projekt je stále rozpracované rozšíření. Unity primitiva nejsou nativní Schedule I Building, Property, Business ani Shop. Vedle fyzického Unity prototypu už obsahuje první skutečné herní integrace přes S1API 3.2.2. Zdrojové ověření zatím nenahrazuje herní test.
 
 ## Implementováno ve zdrojovém kódu
 
@@ -9,10 +9,10 @@ Tento projekt je stále rozpracované rozšíření. Unity primitiva nejsou nati
 - **Caleb Price**, **Nina Brooks**, **Rafael Cole**: fyzičtí zákazníci s různým rozpočtem, počtem objednávek týdně, preferovaným dnem a časem, standardy, přístupem, šancí zavolat policii, závislostí a drogovými afinitami.
 - Vzhled se vytváří herním generátorem přes `Appearance.GenerateRandomAppearance()` a aplikuje přes `Appearance.Build()`.
 - Nativní schedule engine se zapíná přes `Schedule.Enable()`. Konkrétní chození po čtvrti zatím není nastavené, protože nemáme ověřené navmesh trasy a funkční budovy.
-- Prefaby se registrují automaticky přes S1API/FishNet. Runtime tvorba pilotní vlny čeká na `NPC.CustomNpcsReady`, ověřenou pozici a single-player session; ID jsou stabilní a kontrolují se proti `NPC.Get(id)`, aby se nevytvářely duplicity.
+- Prefaby se registrují automaticky přes S1API/FishNet. Fallback registrar čeká na `NPC.CustomNpcsReady`, ověřenou pozici a single-player session; ID jsou stabilní a kontrolují se proti `NPC.Get(id)`, aby se nevytvářely duplicity.
 
 ### Nativní obchod a ceník
-`HarborlineShopCatalog` rozšiřuje skutečný **Hardware Store**. Nepoužívá vlastní falešné menu: získá existující `Shop` přes `ShopManager`, načte originální `ItemDefinition` z `ItemManager` a zavolá `Shop.AddItem`. Před přidáním kontroluje duplicitní položky. Neexistující ID v konkrétním herním buildu přeskočí.
+`HarborlineShopCatalog` upravuje katalog skutečného **Hardware Store**. Nepoužívá vlastní falešné menu: získá existující `Shop` přes `ShopManager`, načte originální `StorableItemDefinition` z `ItemManager`, nastaví `BasePurchasePrice` na cenovou hodnotu katalogu a přes `Shop.AddItem` zajistí nativní listing. Před přidáním kontroluje duplicitní položky. Neexistující ID v konkrétním herním buildu přeskočí. S1API 3.2.2 parametr `Shop.AddItem(item, customPrice)` ignoruje, proto se používá skutečná cenová vlastnost definice.
 
 | Předmět | ID | Cena |
 |---|---|---:|
@@ -31,7 +31,7 @@ Tento projekt je stále rozpracované rozšíření. Unity primitiva nejsou nati
 | Brick Press | `brickpress` | $900 |
 | Cauldron | `cauldron` | $3,500 |
 
-Ceny jsou nastavené modifikací jako vlastní prodejní ceny v nativním shopu; nejde o ověřené původní ceny hry. Položky se přidají pouze tehdy, pokud je herní registry skutečně obsahuje.
+Ceny níže jsou ceny nakonfigurované modem, nikoliv vanilla ceny hry. `BasePurchasePrice` je součást sdílené definice předmětu, takže změna platí všude, kde hra stejné item ID prodává; není to per-shop override. Položky se přidají pouze tehdy, pokud je herní registry skutečně obsahuje.
 
 ## Co ještě není hotové
 
