@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "region": "Harborline",
+  "scale": "large connected district",
+  "subdistricts": [
+    {
+      "id": "port_district",
+      "name": "Port District",
+      "features": [
+        "container terminal",
+        "quayside",
+        "crane yard",
+        "ship service ramp",
+        "port offices"
+      ]
+    },
+    {
+      "id": "freight_industrial",
+      "name": "Freight & Industrial Quarter",
+      "features": [
+        "large freight warehouse",
+        "truck staging and parking",
+        "industrial power site",
+        "vehicle workshop",
+        "cargo inspection road"
+      ]
+    },
+    {
+      "id": "market_commercial",
+      "name": "Harbor Market & Commercial Street",
+      "features": [
+        "physical general store",
+        "market stalls",
+        "commercial storefronts",
+        "purchasable businesses"
+      ]
+    },
+    {
+      "id": "waterfront",
+      "name": "Waterfront Promenade",
+      "features": [
+        "pier walk",
+        "fishing points",
+        "public seating",
+        "tourist footpaths",
+        "night lighting"
+      ]
+    },
+    {
+      "id": "residential_backstreets",
+      "name": "Residential Backstreets",
+      "features": [
+        "small residential blocks",
+        "worker housing",
+        "service alleys",
+        "NPC home/work schedule anchors"
+      ]
+    }
+  ],
+  "connections": {
+    "mustConnectTo": [
+      "Docks"
+    ],
+    "roadNetwork": "Reuse and extend vanilla road/navigation graph; no disconnected island scene.",
+    "coordinates": "All positions and nav links require in-game capture."
+  },
+  "target": {
+    "customPhysicalNpcs": 42,
+    "simultaneouslyActiveInitial": 18,
+    "customerProfiles": 30,
+    "dealers": 2,
+    "nativePolice": "additional; existing game police system"
+  },
+  "gameplay": {
+    "shops": "in-person and Hyland Network mobile order channels share the same native catalog/inventory",
+    "realEstate": "all purchasable businesses listed through the existing Realtor flow",
+    "police": "native dispatch/spawn/response system registered for Harborline"
+  },
+  "performance": {
+    "phasedActivation": true,
+    "initialTestNpcCount": 5,
+    "scaleAfterProfiling": true,
+    "streamingAndDistanceActivation": "Use only if supported by the native world/NPC systems; do not invent a parallel streaming system."
+  },
+  "mapIntegration": {
+    "sameGameMap": true,
+    "physicallyExtendPlayableWorld": true,
+    "attachToExistingDistrict": "Docks",
+    "includeTerrainCoastRoadsCollisionNavigation": true,
+    "normalPhoneMapMustShowFullNewDistrict": true,
+    "notSatisfiedBy": [
+      "standalone map image",
+      "custom phone app map",
+      "POI markers without world geometry"
+    ],
+    "mapBounds": null,
+    "worldToMapTransform": null,
+    "newRegionId": null,
+    "status": "requires in-game map/scene survey and verified native map-region hook"
+  },
+  "buildings": {
+    "useNativeBuildingPrefabFirst": true,
+    "fallback": "S1MAPI BuildingBuilder may create structure geometry only; it does not automatically make the shell a native Building, Property, Shop or functional business.",
+    "functionalInteriorsRequired": true,
+    "doors": "native interactive networked door prefab/controller",
+    "navigation": "colliders plus verified navmesh/NavigationBuilder doorway links; NPCs must traverse entrances and use native StayInBuilding schedules"
+  },
+  "nativeRegion": "Docks",
+  "regionIdentity": {
+    "displayDistrict": "Harborline",
+    "nativeGameRegion": "Docks",
+    "isNewNativeRegion": false,
+    "allowedNativeRegionEnums": [
+      "Northtown",
+      "Westville",
+      "Downtown",
+      "Docks",
+      "Suburbia",
+      "Uptown"
+    ],
+    "rule": "Do not invent Region.Harborline. Keep Harborline as a named subdistrict in Docks; verify its coordinates, map bounds, navigation and police coverage against the native Docks area."
+  }
+}
