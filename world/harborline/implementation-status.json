@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "project": "Schedule I Mega Expansion / Harborline",
   "reviewedCommit": "a8cc552be385f1fffd6279123d03cc3f22588248",
-  "reviewMethod": "Source review of the current S1API 3.2.2 NPC/customer/supplier and shop surfaces, S1MAPI 2.0.1 procedural building APIs, plus the Daffy's Hills 1.2 reference archive. Focused runtime API scanner and procedural warehouse factory are included. GitHub Actions verifies compile/package/static tests only; Schedule I in-game generation, door behavior, navigation, Realtor transaction and saves remain unverified. The NPC schedule layer now uses S1API 3.2.3 prefab-time SitAtSeatSet for a single pilot routine and exports read-only native NavMesh/seat-set reachability data; no in-game movement is claimed until a user runtime survey confirms it.",
+  "reviewMethod": "Source review of the S1API 3.2.3 NPC/customer/supplier and native schedule surfaces, plus S1API 3.2.2 shop AddItem pricing surface, S1MAPI 2.0.1 procedural building APIs, plus the Daffy's Hills 1.2 reference archive. Focused runtime API scanner and procedural warehouse factory are included. GitHub Actions verifies compile/package/static tests only; Schedule I in-game generation, door behavior, navigation, Realtor transaction and saves remain unverified. The NPC schedule layer now uses S1API 3.2.3 prefab-time SitAtSeatSet for a single pilot routine and exports read-only native NavMesh/seat-set reachability data; no in-game movement is claimed until a user runtime survey confirms it.",
   "statusLegend": {
     "implemented_code_unverified_runtime": "Code exists and builds, but target-game execution is not confirmed.",
     "design_only": "Requirements/data exist as a plan or configuration, not executable runtime behavior.",
@@ -301,5 +301,5 @@
     "nativeSchedulePlan": "Maya Bennett: S1API SitAtSeatSet at Docks WaterFront OutdoorBench (1), 14:30 for 30 minutes; in-game verification pending.",
     "navMeshSurvey": "new read-only exports: native-navmesh-anchor.csv, harborline-spawn-navigation.csv, native-seat-sets.csv"
   },
-  "reviewedVersion": "0.3.1"
+  "reviewedVersion": "0.3.2"
 }
