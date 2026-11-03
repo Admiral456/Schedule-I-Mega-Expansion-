@@ -54,11 +54,12 @@ Při druhém průchodu celým string table se objevily další konkrétní stopy
 ## Nové použití těchto poznatků v Harborline
 
 - `NativeScenePrefabExporter` hledá vybrané vanilla hierarchy paths v živé scéně; včetně původního Docks clothing store, domů, lamp, laviček, zastávky a `Map/Pathfinding/RoadNodes`. Exportuje názvy, souřadnice, měřítko a typy komponent.
-- `HarborlineNativeVisualReuse` kopíruje jen `MeshFilter.sharedMesh`, `MeshRenderer.sharedMaterials` a základní nastavení Light komponent do nových lokálních GameObjectů. Neklonuje žádné síťové prefab objekty, interakční skripty ani collidery. Streetlight, promenade bench a bus stop visual mají vlastní geometry fallback, když konkrétní cesta ve scéně není.
+- `HarborlineNativeVisualReuse` kopíruje jen `MeshFilter.sharedMesh`, `MeshRenderer.sharedMaterials` a základní nastavení Light komponent do nových lokálních GameObjectů. Neklonuje žádné síťové prefab objekty, interakční skripty ani collidery. Streetlight, promenade bench, bus stop visual a Docks clothing-store shell pro Harbor Market mají vlastní geometry fallback, když konkrétní cesta ve scéně není. Harbor Market tedy zatím není skutečný obchod — pouze znovu používá vzhled originální budovy.
 - `NativeTerrainSurveyExporter` exportuje `native-terrain-surfaces.csv`, `native-terrain-layers.csv` a `native-terrain-height-samples.csv`. Získáme tak skutečné výšky a materiálové vrstvy, než začneme kreslit novou silnici nebo upravovat terén.
+- `NativeRoadGraphExporter` prochází celý `Map/Pathfinding/RoadNodes` hierarchy a exportuje každý nalezený node do `native-road-nodes.csv` včetně world/local position, hierarchie a komponent. Neprovádí žádné změny A* grafu. Tyto body budou podkladem pro skutečnou spojovací cestu a její path test.
 - `HarborlineIntegrationApiScanner` nyní sleduje také A* graph typy, road nodes, NPC movement, seat sets a transport/parking typy. Cílem je ověřit, jak bezpečně připojit novou trasu k již existujícímu grafu.
 
-Tyto nové exportéry jsou read-only. Vlastní silniční síť, terénní úpravy, rezidenční routiny a Realtor transakce ještě nejsou hotové; nejdřív potřebujeme ověřené výstupy z cílové hry.
+Tyto exportéry jsou read-only. Vlastní silniční síť, úpravy terénu mimo footprint skladu, rezidenční routiny a Realtor transakce ještě nejsou hotové; nejdřív potřebujeme ověřené výstupy z cílové hry.
 
 ## Co je již převedeno do vlastního projektu
 
