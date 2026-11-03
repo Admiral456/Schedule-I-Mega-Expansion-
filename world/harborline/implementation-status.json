@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "project": "Schedule I Mega Expansion / Harborline",
   "reviewedCommit": "a8cc552be385f1fffd6279123d03cc3f22588248",
-  "reviewMethod": "Source review of the current S1API 3.2.2 NPC/customer/supplier and shop surfaces, S1MAPI 2.0.1 procedural building APIs, plus the Daffy's Hills 1.2 reference archive. Focused runtime API scanner and procedural warehouse factory are included. GitHub Actions verifies compile/package/static tests only; Schedule I in-game generation, door behavior, navigation, Realtor transaction and saves remain unverified.",
+  "reviewMethod": "Source review of the S1API 3.2.3 NPC/customer/supplier and native schedule surfaces, plus S1API 3.2.2 shop AddItem pricing surface, S1MAPI 2.0.1 procedural building APIs, plus the Daffy's Hills 1.2 reference archive. Focused runtime API scanner and procedural warehouse factory are included. GitHub Actions verifies compile/package/static tests only; Schedule I in-game generation, door behavior, navigation, Realtor transaction and saves remain unverified. The NPC schedule layer now uses S1API 3.2.3 prefab-time SitAtSeatSet for a single pilot routine and exports read-only native NavMesh/seat-set reachability data; no in-game movement is claimed until a user runtime survey confirms it.",
   "statusLegend": {
     "implemented_code_unverified_runtime": "Code exists and builds, but target-game execution is not confirmed.",
     "design_only": "Requirements/data exist as a plan or configuration, not executable runtime behavior.",
@@ -129,10 +129,12 @@
       "requirement": "Use native NPC schedules and allow NPCs to enter buildings.",
       "status": "implemented_code_unverified_runtime",
       "evidence": [
-        "All eight customer types use IsCustomer=true; current S1API documents customer deal attendance as automatic and EnsureDealSignal() as an obsolete no-op since Schedule I 0.4.6.",
-        "HarborlineNpcLifecycle enables the native NPC scheduler with Schedule.Enable()."
+        "All eight customer types use IsCustomer=true; S1API 3.2.3 configures native customer deal-attendance behaviour without the obsolete NPCSignal_WaitForDelivery.",
+        "HarborlineNpcLifecycle enables each native NPC schedule through NPC.Schedule.Enable().",
+        "Maya Bennett has a prefab-time S1API WithSchedule plan using SitAtSeatSet against the existing Docks WaterFront/OutdoorBench (1) AvatarSeatSet at 14:30 for 30 in-game minutes. The game owns seat resolution, pathfinding, movement and sitting.",
+        "NativeNavigationSurveyExporter records the live Unity NavMesh.SamplePosition/CalculatePath results and real AvatarSeatSet hierarchy paths from the installed game."
       ],
-      "remaining": "Daily home/work/street routes, building visits, resident interactions and dealer work shifts are not yet configured. Add current S1API WalkTo/StayInBuilding actions only after coordinates, registered buildings, doors and paths are verified."
+      "remaining": "The Maya waterfront routine and pathfinding still require in-game verification. Add more customer routines only after native-seat-sets.csv and harborline-spawn-navigation.csv confirm real reachable seat sets/routes. StayInBuilding actions wait until Harborline buildings are registered in the native Building registry; do not use the procedural shell as a substitute. Dealer work/home behaviour remains owned by native DealerAttendDealBehaviour and HomeEvent."
     },
     {
       "id": "packaging",
@@ -280,7 +282,7 @@
       "remaining": "Run the exporter in the target Schedule I installation and inspect all six native-law-*.csv files; confirm actual loaded wrapper members and route coordinates before changing law coverage."
     }
   ],
-  "overallVerdict": "The repository now contains a native S1API gameplay slice (2 dealers, 8 customers and 1 supplier using the dead-drop/meeting flow), a 14-item Hardware Store extension, and a procedural Harborline warehouse path using S1MAPI BuildingBuilder with a guarded primitive fallback. The S1MAPI door and interior A* calls are code-level integrations only and still require in-game validation. A focused read-only API scanner was added for Realtor, ownership, doors, navigation, roads and map hooks. The reference Daffy's Hills archive was inspected for architecture only; no code/assets were copied. 11 of the target 42 NPCs are coded, with 31 remaining; 8 of 30 customer profiles are coded, with 22 remaining. Separate Harborline storefront/phone orders, Realtor listing/ownership registration, normal map integration, city roads, full routines, police extension, persistence and multiplayer remain incomplete or blocked.",
+  "overallVerdict": "The repository now contains a native S1API gameplay slice (2 dealers, 8 customers and 1 supplier using the dead-drop/meeting flow), a 14-item Hardware Store extension, and a procedural Harborline warehouse path using S1MAPI BuildingBuilder with a guarded primitive fallback. The S1MAPI door and interior A* calls are code-level integrations only and still require in-game validation. A focused read-only API scanner was added for Realtor, ownership, doors, navigation, roads and map hooks. Native schedule definitions now include one S1API SitAtSeatSet pilot for Maya; actual movement remains runtime-unverified. The reference Daffy's Hills archive was inspected for architecture only; no code/assets were copied. 11 of the target 42 NPCs are coded, with 31 remaining; 8 of 30 customer profiles are coded, with 22 remaining. Separate Harborline storefront/phone orders, Realtor listing/ownership registration, normal map integration, city roads, full routines, police extension, persistence and multiplayer remain incomplete or blocked.",
   "validation": {
     "checkedCommit": "fd84b89888441bb6be9b8cfeb75bc5b742d77d6e",
     "staticValidationRunId": 41603985697,
@@ -291,10 +293,13 @@
     "thunderstoreArtifactName": "ScheduleIMegaExpansion-0.3.1",
     "runtimeGameExecution": "not performed",
     "caveat": "CI compile/package/static tests do not prove Unity/IL2CPP runtime behavior, BuildingBuilder calls, server-spawned door creation, NPC pathfinding, transactions or persistence.",
-    "reviewedVersion": "0.3.1",
+    "reviewedVersion": "0.3.2",
     "nativeNpcAndShopCode": "added this development cycle; target game runtime not tested",
     "latestSourceBuild": "pending",
-    "latestStaticValidation": "pending"
+    "latestStaticValidation": "pending",
+    "s1apiCompileAndRuntimeDependency": "3.2.3",
+    "nativeSchedulePlan": "Maya Bennett: S1API SitAtSeatSet at Docks WaterFront OutdoorBench (1), 14:30 for 30 minutes; in-game verification pending.",
+    "navMeshSurvey": "new read-only exports: native-navmesh-anchor.csv, harborline-spawn-navigation.csv, native-seat-sets.csv"
   },
-  "reviewedVersion": "0.3.1"
+  "reviewedVersion": "0.3.2"
 }
