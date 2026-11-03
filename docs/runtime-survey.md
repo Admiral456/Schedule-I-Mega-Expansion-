@@ -46,3 +46,20 @@ The chosen prototype geometry anchor is recorded in Schedule I/UserData/Schedule
 S1API's public PropertyManager and BusinessManager methods inspected so far enumerate existing records. No supported public hook to register a new Realtor property/business has been confirmed. Normal-map projection, map icons, road/navmesh extension, native doors, shops, online orders, daily NPC routes and police dispatch remain unimplemented.
 
 See docs/implementation-audit.md and world/harborline/implementation-status.json for the requirement-by-requirement status.
+
+
+## Automatický přehled exportu
+
+Po zkopírování celé složky diagnostiky nebo jejího ZIPu lze soubory shrnout bez ručního otevírání jednotlivých CSV:
+
+```bash
+python tools/analyze_runtime_survey.py "/path/to/Diagnostics/<timestamp>" --markdown runtime-survey-report.md --json runtime-survey-report.json
+```
+
+Nebo přímo ze ZIPu:
+
+```bash
+python tools/analyze_runtime_survey.py "./ScheduleIMegaExpansion-Diagnostics.zip" --markdown runtime-survey-report.md
+```
+
+Report vypíše přesný exportovaný záznam Docks Warehouse, nativní regiony, existující obchody a katalog, nemovitosti/podniky, policejní checkpointy/trasy a prefab kandidáty. Nástroj je read-only: nevymýšlí souřadnice, nevytváří nové Realtor nabídky a neoznačuje neověřený prefab za bezpečný pro spawn.
