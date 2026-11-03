@@ -113,6 +113,16 @@ namespace ScheduleIMegaExpansion.Diagnostics
                 AddError("NativeRoadGraph", ex, summary, warn);
             }
 
+            try
+            {
+                int scenes = NativeSceneListExporter.Export(outputDirectory, summary, warn);
+                summary.Add("NativeScenesScanned=" + scenes.ToString(CultureInfo.InvariantCulture));
+            }
+            catch (Exception ex)
+            {
+                AddError("NativeSceneList", ex, summary, warn);
+            }
+
             string summaryPath = Path.Combine(outputDirectory, "summary.txt");
             File.WriteAllLines(summaryPath, summary);
             log("Native world snapshot complete.");
@@ -265,6 +275,7 @@ namespace ScheduleIMegaExpansion.Diagnostics
                     shopRows.Add(new[]
                     {
                         shopName,
+                        ReadValue(shop, "Code"),
                         ids.Count.ToString(CultureInfo.InvariantCulture)
                     });
 
@@ -285,7 +296,7 @@ namespace ScheduleIMegaExpansion.Diagnostics
 
                 WriteCsv(
                     Path.Combine(directory, "native-shops.csv"),
-                    new[] { "shopName", "listingCount" },
+                    new[] { "shopName", "shopCode", "listingCount" },
                     shopRows);
                 WriteCsv(
                     Path.Combine(directory, "native-shop-items.csv"),
@@ -318,7 +329,7 @@ namespace ScheduleIMegaExpansion.Diagnostics
                 AddError("NativeShopsAndItems", ex, summary, warn);
                 // Keep predictable output files even if this game/API version has a different surface.
                 if (!File.Exists(Path.Combine(directory, "native-shops.csv")))
-                    WriteCsv(Path.Combine(directory, "native-shops.csv"), new[] { "shopName", "listingCount" }, Array.Empty<string[]>());
+                    WriteCsv(Path.Combine(directory, "native-shops.csv"), new[] { "shopName", "shopCode", "listingCount" }, Array.Empty<string[]>());
                 if (!File.Exists(Path.Combine(directory, "native-shop-items.csv")))
                     WriteCsv(Path.Combine(directory, "native-shop-items.csv"), new[] { "shopName", "itemId", "itemName", "category", "basePurchasePrice" }, Array.Empty<string[]>());
                 if (!File.Exists(Path.Combine(directory, "native-items.csv")))
