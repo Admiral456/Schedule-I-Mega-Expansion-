@@ -9,7 +9,7 @@ Tento projekt je stále rozpracované rozšíření. Unity primitiva nejsou nati
 - **Caleb Price**, **Nina Brooks**, **Rafael Cole**: fyzičtí zákazníci s různým rozpočtem, počtem objednávek týdně, preferovaným dnem a časem, standardy, přístupem, šancí zavolat policii, závislostí a drogovými afinitami.
 - Vzhled se vytváří herním generátorem přes `Appearance.GenerateRandomAppearance()` a aplikuje přes `Appearance.Build()`.
 - Nativní schedule engine se zapíná přes `Schedule.Enable()`. Konkrétní chození po čtvrti zatím není nastavené, protože nemáme ověřené navmesh trasy a funkční budovy.
-- Prefaby se registrují automaticky přes S1API/FishNet. Fallback registrar čeká na `NPC.CustomNpcsReady`, ověřenou pozici a single-player session; ID jsou stabilní a kontrolují se proti `NPC.Get(id)`, aby se nevytvářely duplicity.
+- Prefaby se registrují automaticky přes S1API/FishNet. Pět tříd NPC je odvozených ze `S1API.Entities.NPC` a používá jeho nativní save-loader/pre-registration tok; doplňkový fallback registrar čeká na `NPC.CustomNpcsReady`, ověřenou pozici a single-player session. ID jsou stabilní a kontrolují se proti `NPC.Get(id)`, aby se nevytvářely duplicity. Host/client spawn zatím nebyl ověřen ve hře.
 
 ### Nativní obchod a ceník
 `HarborlineShopCatalog` upravuje katalog skutečného **Hardware Store**. Nepoužívá vlastní falešné menu: získá existující `Shop` přes `ShopManager`, načte originální `StorableItemDefinition` z `ItemManager`, nastaví `BasePurchasePrice` na cenovou hodnotu katalogu a přes `Shop.AddItem` zajistí nativní listing. Před přidáním kontroluje duplicitní položky. Neexistující ID v konkrétním herním buildu přeskočí. S1API 3.2.2 parametr `Shop.AddItem(item, customPrice)` ignoruje, proto se používá skutečná cenová vlastnost definice.
@@ -48,4 +48,4 @@ Ceny níže jsou ceny nakonfigurované modem, nikoliv vanilla ceny hry. `BasePur
 - Pro lokální build stačí `dotnet restore` a `dotnet build`; projekt používá oficiální NuGet balíček `S1API.Forked` 3.2.2. Runtime mod manager stáhne S1API samostatně podle manifestu.
 - Kompilace a statické testy neprokazují, že NPC, spawn body a změna nabídky skutečně fungují ve hře. Je potřeba otestovat instalaci v cílové verzi Schedule I.
 
-Diagnostické soubory se ukládají do `UserData/ScheduleIMegaExpansion/Diagnostics/`; fyzická poloha Harborline do `UserData/ScheduleIMegaExpansion/Harborline/last-generation.json`.
+Diagnostické soubory se ukládají do `UserData/ScheduleIMegaExpansion/Diagnostics/<timestamp>/`. Vedle regionů, budov, nemovitostí a podniků nyní vznikají také `native-shops.csv`, `native-shop-items.csv` a `native-items.csv`; obsahují skutečné názvy obchodů, jejich položky a základní ceny z item registry. Fyzická poloha Harborline se zapisuje do `UserData/ScheduleIMegaExpansion/Harborline/last-generation.json`.
