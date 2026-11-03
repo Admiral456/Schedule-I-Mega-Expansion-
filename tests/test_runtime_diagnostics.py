@@ -15,6 +15,7 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         cls.audit = json.loads((ROOT / "world" / "harborline" / "implementation-status.json").read_text(encoding="utf-8"))
         cls.core = (ROOT / "src" / "Core.cs").read_text(encoding="utf-8")
         cls.exporter = (ROOT / "src" / "Diagnostics" / "WorldSnapshotExporter.cs").read_text(encoding="utf-8")
+        cls.law_exporter = (ROOT / "src" / "Diagnostics" / "NativeLawSnapshotExporter.cs").read_text(encoding="utf-8")
         cls.scanner = (ROOT / "src" / "Diagnostics" / "NativeApiSurfaceScanner.cs").read_text(encoding="utf-8")
         cls.prefabs = (ROOT / "src" / "Diagnostics" / "NativePrefabCatalogExporter.cs").read_text(encoding="utf-8")
         cls.installer = (ROOT / "src" / "install.ps1").read_text(encoding="utf-8")
@@ -136,7 +137,7 @@ class RuntimeDiagnosticTests(unittest.TestCase):
             "native-law-foot-patrol-routes.csv",
             "native-law-vehicle-patrol-routes.csv",
         ):
-            self.assertIn(filename, self.exporter)
+            self.assertIn(filename, self.exporter + self.law_exporter)
 
     def test_prefab_survey_never_instantiates_prefabs_and_marks_unknown_network_status(self):
         self.assertIn("S1MAPI.Core.PrefabRef", self.prefabs)
