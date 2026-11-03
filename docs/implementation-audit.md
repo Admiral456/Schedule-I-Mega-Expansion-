@@ -1,15 +1,15 @@
 # Harborline – audit implementace
 
-**Kontrolovaný stav:** větev `feat/harborline-foundation`, vývojová verze 0.3.1.
+**Kontrolovaný stav:** větev `feat/harborline-foundation`, commit `ab9a0f910e529ca9d067c490b286be2617898d54`, vývojová verze 0.3.1.
 **Metoda:** kontrola C# implementace, S1API Forked 3.2.2 public source/API, konfiguračních dat a automatických testů. Audit nebyl proveden uvnitř Schedule I hry.
 
 ## Co se nově skutečně implementuje přes nativní API
 
 | Oblast | Kód | Co dělá | Ověření |
 |---|---|---|---|
-| NPC – první vlna | `HarborlineNpcRoster.cs` | 5 fyzických S1API NPC: 2 dealeři, 3 zákazníci | Čeká na spuštění ve hře |
+| NPC – první vlna | `HarborlineNpcRoster.cs` | 10 fyzických S1API NPC: 2 dealeři, 8 zákazníků | Čeká na spuštění ve hře |
 | Dealeři | `WithDealerDefaults` | PlayerDealer, poplatek, provize, pravidla kvality, počitadlo smluv a nativní dealer události | Čeká na nábor a obchodní test |
-| Zákazníci | `WithCustomerDefaults` | Tři různé rozpočty, frekvence/čas objednávek, standardy, affinities, policejní šance a dependence | Čeká na test objednávek |
+| Zákazníci | `WithCustomerDefaults` | Osm individuálních rozpočtů, frekvencí/časů objednávek, standardů, affinities, policejních šancí a dependence | Čeká na test objednávek |
 | Vzhled | `Appearance.GenerateRandomAppearance()` + `Build()` | Náhodný vzhled vytvořený herním generátorem při OnCreated | Čeká na render/save-load test |
 | NPC scheduler | `Schedule.Enable()` | Zapne nativní scheduler komponentu | Denní trasy zatím nejsou nastavené |
 | Sortiment | `HarborlineShopCatalog.cs` | 14 existujících vanilla item definitions přidá do nativního Hardware Store | Čeká na kontrolu shop UI a nákupu |
@@ -25,9 +25,16 @@
 Oba mají nativní dealer defaults, omezení kvality, vlastní completed-deals proměnnou a reakce na události náboru, smlouvy a doporučení.
 
 **Zákazníci**
-- Caleb Price – $180–$420 týdenního rozpočtu, 1–2 objednávky týdně, pondělí 06:30, Moderate, afinita Marijuana +0.75 / Methamphetamine −0.25.
-- Nina Brooks – $450–$850, 2–3 objednávky týdně, středa 12:00, High, afinita Methamphetamine +0.75 / Marijuana −0.30.
-- Rafael Cole – $800–$1,600, 1–3 objednávky týdně, pátek 19:30, VeryHigh, afinita Cocaine +0.70 / Shrooms +0.35 / Methamphetamine −0.30.
+- Caleb Price – $180–$420, 1–2 objednávky týdně, pondělí 06:30, Moderate.
+- Nina Brooks – $450–$850, 2–3 objednávky týdně, středa 12:00, High.
+- Rafael Cole – $800–$1,600, 1–3 objednávky týdně, pátek 19:30, VeryHigh.
+- Olivia Hayes – $260–$560, 1–3 objednávky týdně, úterý 09:00, Moderate.
+- Ethan Ward – $600–$1,100, 2–4 objednávky týdně, čtvrtek 17:40, High.
+- Maya Bennett – $120–$300, 1–2 objednávky týdně, sobota 11:30, Low.
+- Lucas Foster – $900–$1,750, 1–2 objednávky týdně, neděle 20:10, VeryHigh.
+- Ava Collins – $350–$720, 2–3 objednávky týdně, pátek 15:15, High.
+
+Všech osm profilů navíc nastavuje individuální policejní šanci, dependence a drogové afinity v `WithCustomerDefaults`.
 
 Hodnoty jsou uložené v nativním CustomerDataBuilder. Policejní šance a dependence se nastavují individuálně. Kompletní 30členný zákaznický roster zatím dokončený není.
 
@@ -60,8 +67,8 @@ Kód používá `ItemManager.GetDefinition` a upravuje `StorableItemDefinition.B
 
 | Oblast | Stav | Co chybí |
 |---|---|---|
-| Cílových 42 NPC | Částečně | Implementováno 5; zbývá 37 |
-| 30 zákaznických profilů | Částečně | Implementováno 3; zbývá 27 |
+| Cílových 42 NPC | Částečně | Implementováno 10; zbývá 32 |
+| 30 zákaznických profilů | Částečně | Implementováno 8; zbývá 22 |
 | Denní režimy NPC | Nedokončeno | Ověřené navmesh trasy, body a native building visits |
 | Harborline Supply – nová provozovna | Nedokončeno | S1API veřejně poskytuje čtení existujících shopů a přidání itemu do nich; registrace nového Shop nebyla doložena |
 | Online objednávky | Nedokončeno | Není propojená phone order cesta se stejným inventářem a skladovostí |
