@@ -23,6 +23,9 @@ Schedule I/UserData/ScheduleIMegaExpansion/Diagnostics/<timestamp>/
 - native-buildings.csv – names from S1API Building lookup.
 - native-properties.csv – existing property names/codes/prices/ownership/spawn positions.
 - native-businesses.csv – existing business records and ownership.
+- native-shops.csv – all loaded native shop names and listing counts.
+- native-shop-items.csv – each native shop listing, item ID/name/category and shared base purchase price.
+- native-items.csv – item registry definitions with category, base purchase price, resale multiplier and stack limit.
 - standalone-phone-map-pois.csv – standalone phone-map POIs if available.
 - native-game-api-surface.txt – metadata-only signatures from Assembly-CSharp, S1API, S1MAPI and FishNet.
 - native-prefabs.csv – candidate prefab references found through S1MAPI PrefabRef.Find() and the component/network inspection status.
@@ -36,10 +39,10 @@ The chosen prototype geometry anchor is recorded in Schedule I/UserData/Schedule
 - It scans nearby candidate sites and requires collision-free footprint checks plus multiple ground raycasts.
 - It rejects known water collider names/tags/layers, but this is a heuristic and does not guarantee detection of unnamed water surfaces.
 - The generated objects are session-local Unity primitives. They are not native registered buildings and are not saved into the game's save.
-- Multiplayer, networked prefab instantiation and custom NPC spawning are intentionally not enabled.
+- The geometry prototype remains single-player-only. The five Harborline NPC classes are derived from S1API.Entities.NPC and are eligible for S1API's own save-loader/FishNet prefab registration path; the optional fallback registrar is single-player-only. Actual host/client spawn, coordinates, late join and save/load still require a runtime test.
 
 ## Native integration limits
 
-S1API's public PropertyManager and BusinessManager methods inspected so far enumerate existing records. No supported public hook to register a new Realtor property/business has been confirmed. Normal-map projection, map icons, road/navmesh extension, native doors, shops, online orders, NPC behavior and police dispatch remain unimplemented.
+S1API's public PropertyManager and BusinessManager methods inspected so far enumerate existing records. No supported public hook to register a new Realtor property/business has been confirmed. Normal-map projection, map icons, road/navmesh extension, native doors, shops, online orders, daily NPC routes and police dispatch remain unimplemented.
 
 See docs/implementation-audit.md and world/harborline/implementation-status.json for the requirement-by-requirement status.
