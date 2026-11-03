@@ -31,7 +31,7 @@ Oba mají nativní dealer defaults, omezení kvality, vlastní completed-deals p
 
 Hodnoty jsou uložené v nativním CustomerDataBuilder. Policejní šance a dependence se nastavují individuálně. Kompletní 30členný zákaznický roster zatím dokončený není.
 
-### Sortiment přidaný do nativního Hardware Store
+### Sortiment a cenová vrstva nativního Hardware Store
 
 | Předmět / item ID | Cena |
 |---|---:|
@@ -51,6 +51,10 @@ Hodnoty jsou uložené v nativním CustomerDataBuilder. Policejní šance a depe
 | Cauldron / `cauldron` | $3,500 |
 
 Kód používá `ItemManager.GetDefinition` a upravuje `StorableItemDefinition.BasePurchasePrice`, tedy skutečný zdroj ceny, ze kterého nativní obchod počítá nákup. Poté ověří existenci položky v Hardware Store a případně zavolá `Shop.AddItem(item)`. Neznámé item IDs přeskočí. **Pozor:** tato cena patří sdílené definici předmětu, takže ji použijí všechny nativní obchody prodávající stejné item ID. S1API 3.2.2 parametr `Shop.AddItem(item, customPrice)` ve zdrojovém kódu ignoruje; mod na něj již nespoléhá.
+
+### Nová diagnostika obchodů a položek
+
+`WorldSnapshotExporter` nyní čte přes `ShopManager.GetAllShops()` a `ItemManager.GetAllItemDefinitions()` tři další výpisy: `native-shops.csv`, `native-shop-items.csv` a `native-items.csv`. Jde pouze o čtení nativních registrů; neprovádí nákup ani nemění herní stav. Výpis umožní vybrat další skutečně existující předměty a obchody v konkrétní verzi hry.
 
 ## Co zůstává nedokončené
 
