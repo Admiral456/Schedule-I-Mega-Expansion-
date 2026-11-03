@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "project": "Schedule I Mega Expansion / Harborline",
-  "reviewedCommit": "4de4c3d0417dd2c6200c160065f24067d1ac3198",
-  "reviewMethod": "Source review of the current S1API 3.2.2 NPC/customer/supplier and shop surfaces, S1MAPI 2.0.1 procedural building APIs, plus the Daffy's Hills 1.2 reference archive. Focused runtime API scanner and procedural warehouse factory are included. GitHub Actions verifies compile/package/static tests only; Schedule I in-game generation, door behavior, navigation, Realtor transaction and saves remain unverified.",
+  "reviewedCommit": "249be0b0577edcd68a4c1b290f48640bf007e9a6",
+  "reviewMethod": "Source review of S1API Forked 3.2.2 and S1MAPI 2.0.1 integration plus static analysis of the user-provided Daffy's Hills 1.2 reference DLL string table. Harborline now reuses selected vanilla render meshes only, surveys the full vanilla RoadNodes hierarchy and Terrain height/layer data, and uses TerrainClearer/FlattenTerrain/InteriorBuilder in the procedural Portside warehouse path. No Schedule I runtime export has been inspected yet.",
   "statusLegend": {
     "implemented_code_unverified_runtime": "Code exists and builds, but target-game execution is not confirmed.",
     "design_only": "Requirements/data exist as a plan or configuration, not executable runtime behavior.",
@@ -16,11 +16,12 @@
       "requirement": "Create functional native buildings and enterable interiors.",
       "status": "implemented_code_unverified_runtime",
       "evidence": [
-        "src/Runtime/HarborlineProceduralBuildingFactory.cs uses reflection to invoke S1MAPI BuildingBuilder/BuildingConfig for procedural floor, walls, roof and lights.",
-        "A server-side S1MAPI AddSlidingDoors call is attempted for the warehouse entrance; if the installed API surface differs, the original primitive shell fallback remains.",
-        "NavigationBuilder.CreateNavigationBuilder().Build() is attempted for interior A* navigation; this is not the city street graph and is not an enterable native Property registration."
+        "src/Runtime/HarborlineProceduralBuildingFactory.cs uses S1MAPI BuildingBuilder/BuildingConfig for floor, walls, roof and lights.",
+        "Before building, the factory attempts TerrainClearer.ClearAroundBuilding and BuildingBuilder.FlattenTerrain().",
+        "S1MAPI InteriorBuilder adds static vanilla mesh decorations (desk, chair, cabinet, locker, fridge, plant); these are visual-only and not functional register, stock or storage interactions.",
+        "The factory attempts AddSlidingDoors and an interior NavigationBuilder; it is not registered as a native Property/Business."
       ],
-      "remaining": "Verify BuildingBuilder method signatures and visible placement in the target game; test door open/manual interaction, network replication, interior NPC pathing and save/load. Replace temporary interior rack/counter props with functional native prefabs. The warehouse is not yet registered as a native Building/Property/Business."
+      "remaining": "Verify all calls in the target game. Test actual door, collision, NPC pathing, furniture placement and save/load. Replace temporary visual props with functional native prefabs. Building is not registered as native Building/Property/Business/Shop."
     },
     {
       "id": "diagnostics.api_surface",
@@ -39,9 +40,10 @@
       "evidence": [
         "src/Diagnostics/NativePrefabCatalogExporter.cs",
         "native-prefabs.csv",
-        "PrefabRef.Find()"
+        "PrefabRef.Find()",
+        "NativeScenePrefabExporter.cs checks Daffy's Hills reference hierarchy paths against the loaded scene, including Docks store, houses, lights, benches, bus stop and RoadNodes. Exports native-scene-prefabs.csv."
       ],
-      "remaining": "Validate that Find() resolves the documented prefab names and that IL2CPP component inspection reports reliable network status in game."
+      "remaining": "Run in game and confirm source paths in the target version. The scanner is read-only; visual reuse does not include functional behavior."
     },
     {
       "id": "diagnostics.registries",
@@ -52,7 +54,10 @@
         "native-regions.csv, native-buildings.csv, native-properties.csv and native-businesses.csv",
         "native-shops.csv and native-shop-items.csv from ShopManager.GetAllShops/GetItemIds",
         "native-items.csv from ItemManager.GetAllItemDefinitions",
-        "standalone-phone-map-pois.csv"
+        "standalone-phone-map-pois.csv",
+        "NativeTerrainSurveyExporter.cs exports native-terrain-surfaces.csv, native-terrain-layers.csv and native-terrain-height-samples.csv.",
+        "NativeRoadGraphExporter.cs exports all descendants of Map/Pathfinding/RoadNodes to native-road-nodes.csv with transforms and component types.",
+        "HarborlineIntegrationApiScanner.cs also records A*/RecastGraph/PointGraph/Seeker, seat-set, parking and vehicle API signatures."
       ],
       "remaining": "Run in game and inspect row counts/errors and actual shop/item IDs; all added exports are read-only snapshots. Public property/business managers still only enumerate existing registrations."
     },
@@ -223,7 +228,8 @@
         "S1API.Property.PropertyManager.GetAllProperties()",
         "PropertyWrapper.PropertyName",
         "PropertyWrapper.ExteriorSpawnPosition",
-        "Unity GameObject.CreatePrimitive"
+        "Unity GameObject.CreatePrimitive",
+        "HarborlinePhysicalBuilder now builds a Harbor Market visual shell by reusing the vanilla Docks clothing-store render mesh, with a primitive fallback. No native store components or interactions are cloned."
       ],
       "remaining": "Test automatic generation in game, verify the exact Docks Warehouse record and visual placement. Current pieces are generic Unity cubes, not production models or native registered buildings."
     },
@@ -241,10 +247,10 @@
       "requirement": "Connect Harborline roads and pedestrian paths to native road/navigation graph.",
       "status": "not_implemented",
       "evidence": [
-        "The external dockyard road remains primitive visual geometry only.",
-        "S1MAPI NavigationBuilder is called only as an interior A* builder; it is not a full Harborline street/road graph."
+        "Exterior road is still primitive visual geometry only; no native RoadNodes links, A* graph update or road network is created.",
+        "NativeRoadGraphExporter reads the existing Map/Pathfinding/RoadNodes transform hierarchy and records world/local positions; this is diagnostic only."
       ],
-      "remaining": "Connect roads and sidewalks to the native street graph/navmesh; add measured junctions and route checks. Verify NPC and vehicle travel to/from Docks."
+      "remaining": "Inspect native-road-nodes.csv from the target save, determine the actual node/link classes and A* path APIs, then create and validate a server-safe link from existing Docks road to Harborline. Must verify complete routes to each building door; no route is marked connected yet."
     },
     {
       "id": "world.water_safety",
@@ -254,9 +260,10 @@
         "Physics.CheckBox footprint test",
         "five-point ground raycast sampling",
         "slope/height checks",
-        "water name/tag/layer token filter"
+        "water name/tag/layer token filter",
+        "NativeTerrainSurveyExporter samples active Unity Terrain 5x5 and records terrain layers, sizes and resolutions. The warehouse attempts S1MAPI TerrainClearer/FlattenTerrain only within its footprint."
       ],
-      "remaining": "Water filtering is heuristic; generic/unlabelled water colliders can still pass. Test on the real Docks shoreline and add a verified terrain/region boundary check before treating placement as safe."
+      "remaining": "Water filtering is heuristic; generic/unlabelled water colliders can still pass. Test on the real Docks shoreline and add a verified terrain/region boundary check before treating placement as safe. Terrain samples still need in-game review; no road terrain sculpting or terrain heightmap edits are active."
     },
     {
       "id": "shops.native_pricing",
@@ -280,17 +287,17 @@
       "remaining": "Run the exporter in the target Schedule I installation and inspect all six native-law-*.csv files; confirm actual loaded wrapper members and route coordinates before changing law coverage."
     }
   ],
-  "overallVerdict": "The repository now contains a native S1API gameplay slice (2 dealers, 8 customers and 1 supplier using the dead-drop/meeting flow), a 14-item Hardware Store extension, and a procedural Harborline warehouse path using S1MAPI BuildingBuilder with a guarded primitive fallback. The S1MAPI door and interior A* calls are code-level integrations only and still require in-game validation. A focused read-only API scanner was added for Realtor, ownership, doors, navigation, roads and map hooks. The reference Daffy's Hills archive was inspected for architecture only; no code/assets were copied. 11 of the target 42 NPCs are coded, with 31 remaining; 8 of 30 customer profiles are coded, with 22 remaining. Separate Harborline storefront/phone orders, Realtor listing/ownership registration, normal map integration, city roads, full routines, police extension, persistence and multiplayer remain incomplete or blocked.",
+  "overallVerdict": "The repository now uses the Daffy's Hills reference more directly while keeping the implementation independent: selected vanilla render meshes are reused for streetlights, promenade bench appearance, bus-stop appearance and the Harbor Market visual shell; S1MAPI prepares the Portside warehouse footprint and static interior décor; read-only exports map scene prefab paths, all native RoadNodes transforms and Terrain dimensions/layers/height samples. 11 of 42 NPCs are coded (2 dealers, 8 customers, 1 supplier); 8 of 30 customer profiles are coded. Still not complete: native roads/A* links, real seat/transport interaction, functional shop/register, Realtor purchasable Property/Business registration, normal map markers, full NPC routines, police extension, persistent geometry and multiplayer. Visual mesh reuse must not be confused with functional businesses. No runtime game test has yet been performed.",
   "validation": {
-    "checkedCommit": "4de4c3d0417dd2c6200c160065f24067d1ac3198",
+    "checkedCommit": "pending",
     "staticValidationRunId": 41606457412,
-    "staticValidationConclusion": "success",
+    "staticValidationConclusion": "pending after latest scene/road/terrain integrations",
     "runtimeBuildRunId": 41606457450,
-    "runtimeBuildConclusion": "success",
+    "runtimeBuildConclusion": "pending after latest scene/road/terrain integrations",
     "thunderstoreArtifactId": 13216079436,
     "thunderstoreArtifactName": "ScheduleIMegaExpansion-0.3.1",
     "runtimeGameExecution": "not performed",
-    "caveat": "The build and 36 static tests passed. The build/package result was produced from code commit 4de4c3d; subsequent changes were documentation/audit/PR-description only. CI does not confirm Unity/IL2CPP behavior, BuildingBuilder placement, server-side door spawning, NPC pathfinding, transactions, save/load or multiplayer."
+    "caveat": "Only CI compile and static validation can be claimed after checking the newest commits. Unity scene reuse, terrain preparation, doors, pathfinding, purchase transactions and persistence require a target-game test."
   },
   "reviewedVersion": "0.3.1"
 }
