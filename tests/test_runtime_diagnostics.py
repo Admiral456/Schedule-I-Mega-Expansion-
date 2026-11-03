@@ -129,6 +129,12 @@ class RuntimeDiagnosticTests(unittest.TestCase):
             "native-shop-items.csv",
             "native-items.csv",
             "standalone-phone-map-pois.csv",
+            "native-law-controller.csv",
+            "native-law-manager.csv",
+            "native-law-checkpoint-locations.csv",
+            "native-law-checkpoints.csv",
+            "native-law-foot-patrol-routes.csv",
+            "native-law-vehicle-patrol-routes.csv",
         ):
             self.assertIn(filename, self.exporter)
 
@@ -150,6 +156,14 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn('"NetworkObject"', self.scanner)
         self.assertIn('"PrefabPlacer"', self.scanner)
         self.assertIn("METADATA_ONLY", self.scanner)
+        law_diagnostics = (ROOT / "src" / "Diagnostics" / "NativeLawSnapshotExporter.cs").read_text(encoding="utf-8")
+        self.assertIn("S1API.Law.CheckpointManager", law_diagnostics)
+        self.assertIn("GetAllCheckpointInfo", law_diagnostics)
+        self.assertIn("GetAllFootPatrolRoutes", law_diagnostics)
+        self.assertIn("GetAllVehiclePatrolRoutes", law_diagnostics)
+        self.assertIn("NativeLawSnapshotMode=READ_ONLY", law_diagnostics)
+        self.assertNotIn("SetCheckpointEnabled(", law_diagnostics)
+        self.assertNotIn("StartFootPatrol(", law_diagnostics)
 
     def test_registry_exporters_do_not_call_game_mutation_apis(self):
         diagnostic_helpers = self.exporter + self.scanner + self.prefabs
