@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "world": "Harborline",
+  "nativeRegion": "Docks",
+  "anchorPolicy": "Use verified runtime anchor from existing Docks Warehouse. Never invent world coordinates or write a new region enum.",
+  "coordinateStatus": "survey_required",
+  "anchors": [
+    {
+      "id": "portside_supply",
+      "name": "Portside Supply",
+      "kind": "supplier_shop",
+      "status": "runtime_supplier_npc_exists; physical_storefront_not_verified",
+      "coordinate": null
+    },
+    {
+      "id": "harbor_freight_warehouse",
+      "name": "Harbor Freight Warehouse",
+      "kind": "warehouse",
+      "status": "planned; reuse vanilla prefab after survey",
+      "coordinate": null
+    },
+    {
+      "id": "harbor_market",
+      "name": "Harbor Market",
+      "kind": "retail_shop",
+      "status": "planned",
+      "coordinate": null
+    },
+    {
+      "id": "harbor_auto_works",
+      "name": "Harbor Auto Works",
+      "kind": "vehicle_service",
+      "status": "planned",
+      "coordinate": null
+    },
+    {
+      "id": "harbor_offices",
+      "name": "Harbor Offices",
+      "kind": "office_business",
+      "status": "planned",
+      "coordinate": null
+    },
+    {
+      "id": "harbor_power_plant",
+      "name": "Harbor Power Plant",
+      "kind": "industrial_landmark",
+      "status": "planned",
+      "coordinate": null
+    },
+    {
+      "id": "pier_promenade",
+      "name": "Pier Promenade",
+      "kind": "public_space",
+      "status": "planned",
+      "coordinate": null
+    },
+    {
+      "id": "harbor_police_checkpoint",
+      "name": "Harbor Police Checkpoint",
+      "kind": "law_checkpoint",
+      "status": "planned; reuse native law system safely",
+      "coordinate": null
+    }
+  ]
+}
