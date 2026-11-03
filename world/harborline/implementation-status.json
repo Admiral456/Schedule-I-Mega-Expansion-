@@ -1,104 +1,300 @@
 {
   "schemaVersion": 1,
-  "snapshotDate": "2026-11-03",
-  "baseline": "ScheduleIMegaExpansion 0.3.1 Thunderstore package",
-  "verificationNote": "Statuses describe package documentation/source inspection. No in-game runtime session was available for this audit.",
-  "implementedButRuntimeUnverified": [
+  "project": "Schedule I Mega Expansion / Harborline",
+  "reviewedCommit": "a8cc552be385f1fffd6279123d03cc3f22588248",
+  "reviewMethod": "Source review of the current S1API 3.2.2 NPC/customer/supplier and shop surfaces, S1MAPI 2.0.1 procedural building APIs, plus the Daffy's Hills 1.2 reference archive. Focused runtime API scanner and procedural warehouse factory are included. GitHub Actions verifies compile/package/static tests only; Schedule I in-game generation, door behavior, navigation, Realtor transaction and saves remain unverified.",
+  "statusLegend": {
+    "implemented_code_unverified_runtime": "Code exists and builds, but target-game execution is not confirmed.",
+    "design_only": "Requirements/data exist as a plan or configuration, not executable runtime behavior.",
+    "not_implemented": "No connected implementation exists in this repository.",
+    "blocked_unverified_api": "The public registration/integration path has not been established from the inspected API.",
+    "not_verified_in_game": "Requires the installed game, save data, or runtime output."
+  },
+  "requirements": [
     {
-      "id": "native_dealers",
-      "label": "Two native dealers (Mason Reed, Sierra Voss)",
-      "status": "implemented_unverified"
+      "id": "buildings.interiors",
+      "requirement": "Create functional native buildings and enterable interiors.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "src/Runtime/HarborlineProceduralBuildingFactory.cs uses reflection to invoke S1MAPI BuildingBuilder/BuildingConfig for procedural floor, walls, roof and lights.",
+        "A server-side S1MAPI AddSlidingDoors call is attempted for the warehouse entrance; if the installed API surface differs, the original primitive shell fallback remains.",
+        "NavigationBuilder.CreateNavigationBuilder().Build() is attempted for interior A* navigation; this is not the city street graph and is not an enterable native Property registration."
+      ],
+      "remaining": "Verify BuildingBuilder method signatures and visible placement in the target game; test door open/manual interaction, network replication, interior NPC pathing and save/load. Replace temporary interior rack/counter props with functional native prefabs. The warehouse is not yet registered as a native Building/Property/Business."
     },
     {
-      "id": "native_customers",
-      "label": "Eight native customer NPCs",
-      "status": "implemented_unverified"
+      "id": "diagnostics.api_surface",
+      "requirement": "Survey map, building, property, NPC, door, navigation, police and networking APIs.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "src/Diagnostics/NativeApiSurfaceScanner.cs",
+        "native-game-api-surface.txt"
+      ],
+      "remaining": "Inspect the report from the user's installed game; source-level reflection inventory does not confirm that any specific gameplay hook works."
     },
     {
-      "id": "supplier_npc",
-      "label": "Portside Supply native Supplier NPC",
-      "status": "implemented_unverified"
+      "id": "diagnostics.prefabs",
+      "requirement": "Find candidate S1MAPI prefabs and report their component/network status without spawning them.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "src/Diagnostics/NativePrefabCatalogExporter.cs",
+        "native-prefabs.csv",
+        "PrefabRef.Find()"
+      ],
+      "remaining": "Validate that Find() resolves the documented prefab names and that IL2CPP component inspection reports reliable network status in game."
     },
     {
-      "id": "supplier_phone_catalog",
-      "label": "Supplier phone catalog with 14 existing item IDs and base Delivery flow",
-      "status": "implemented_unverified_with_api_limits"
+      "id": "diagnostics.registries",
+      "requirement": "Read existing native region, building, property, business and phone-map registries.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "src/Diagnostics/WorldSnapshotExporter.cs",
+        "native-regions.csv, native-buildings.csv, native-properties.csv and native-businesses.csv",
+        "native-shops.csv and native-shop-items.csv from ShopManager.GetAllShops/GetItemIds",
+        "native-items.csv from ItemManager.GetAllItemDefinitions",
+        "standalone-phone-map-pois.csv"
+      ],
+      "remaining": "Run in game and inspect row counts/errors and actual shop/item IDs; all added exports are read-only snapshots. Public property/business managers still only enumerate existing registrations."
     },
     {
-      "id": "hardware_store_catalog",
-      "label": "14 existing items listed in vanilla Hardware Store",
-      "status": "implemented_unverified_global_price_side_effect"
+      "id": "doors.interactions",
+      "requirement": "Create working native doors and interactive objects.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "src/Runtime/HarborlineProceduralBuildingFactory.cs attempts S1MAPI BuildingBuilder.AddSlidingDoors(Vector3, Quaternion, openingHours) when the documented signature is available.",
+        "S1MAPI documents this door as a server-spawned FishNet object; the code does not enable multiplayer generation."
+      ],
+      "remaining": "Confirm that the door is created by host/server, appears in game, supports manual interaction and player/NPC passage, and persists across load. Client-side proximity auto-open/close is not implemented."
     },
     {
-      "id": "runtime_placement_probe",
-      "label": "Docks Warehouse anchor and physics-based placement candidate checks",
-      "status": "implemented_unverified"
-    }
-  ],
-  "plannedOrBlocked": [
-    {
-      "id": "harborline_complete_geometry",
-      "label": "Complete Harborline district geometry and roads",
-      "status": "planned"
-    },
-    {
-      "id": "navmesh_routes",
-      "label": "NPC walking routes and building visits",
-      "status": "blocked_by_survey"
-    },
-    {
-      "id": "extra_customer_profiles",
-      "label": "22 additional customer profiles",
-      "status": "design_data_added_not_runtime_wired"
-    },
-    {
-      "id": "physical_shop",
-      "label": "Independent Harborline physical shop",
-      "status": "not_implemented"
-    },
-    {
-      "id": "phone_shop_app",
-      "label": "Dedicated phone app and online orders for new shop",
-      "status": "not_implemented"
-    },
-    {
-      "id": "shared_stock",
-      "label": "One authoritative stock for physical and online storefront",
-      "status": "blocked_by_delivery_api_capability"
-    },
-    {
-      "id": "realtor_properties",
-      "label": "New purchasable properties/businesses",
-      "status": "blocked_property_registration_hook_unproven"
-    },
-    {
-      "id": "police_patrols",
-      "label": "Additional police patrols/checkpoints and dispatch",
-      "status": "not_implemented_native_law_survey_required"
-    },
-    {
-      "id": "map_pois",
-      "label": "Harborline map POIs",
-      "status": "not_implemented"
-    },
-    {
-      "id": "persistent_geometry",
-      "label": "Persist generated world geometry across reloads",
-      "status": "not_implemented"
+      "id": "map.icons",
+      "requirement": "Show correct native building/shop/business/owned-property icons on the normal game map.",
+      "status": "not_implemented",
+      "evidence": [
+        "No map canvas extension, map bounds/world transform, native building classification registration or ownership-driven icon update is connected."
+      ],
+      "remaining": "Discover and verify map projection and registration APIs in the target game; standalone MapPOI is not a substitute."
     },
     {
       "id": "multiplayer",
-      "label": "Host-authoritative multiplayer state and late join",
-      "status": "not_implemented_or_unverified"
+      "requirement": "Host-authoritative synchronized geometry, NPCs, doors, stock and interactions.",
+      "status": "not_implemented",
+      "evidence": [
+        "Current physical generator deliberately refuses to run unless S1API.Entities.Player.All contains exactly one player."
+      ],
+      "remaining": "Implement networked generation/spawn and persistence before enabling co-op."
+    },
+    {
+      "id": "npc.appearance",
+      "requirement": "Generate each NPC appearance with the game's own appearance generator and preserve it.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "src/Runtime/HarborlineNpcRoster.cs: OnCreated calls Appearance.GenerateRandomAppearance() then Appearance.Build() once for each new NPC"
+      ],
+      "remaining": "Verify rendered avatars, unique appearances, save/load retention and late-join behavior in the target game."
+    },
+    {
+      "id": "npc.customer_profiles",
+      "requirement": "Implement 30 customer profiles with product/effect preferences mapped to real product IDs.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "HarborlineNpcRoster.cs: eight native Customer NPC profiles with distinct spending, orders/week, preferred day/time, standards, call-police probability, dependence and drug affinities."
+      ],
+      "remaining": "Eight of 30 planned customer profiles are implemented; 22 remain. Verify order generation and customer evaluation in game; complete product/effect profiles where appropriate."
+    },
+    {
+      "id": "npc.dealers",
+      "requirement": "Create two physical Harborline player-dealer NPCs with native dealer recruitment, contracts and relationship behavior.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "src/Runtime/HarborlineNpcRoster.cs: HarborlineDealerMason and HarborlineDealerSierra",
+        "WithDealerDefaults: PlayerDealer, signing fees, dealer cuts, quality filters and completed-deals variables",
+        "WithRelationshipDefaults plus native Dealer.OnRecruited, OnContractAccepted and OnRecommended handlers"
+      ],
+      "remaining": "Confirm both dealers spawn, display in world, can be approached/recruited, accept contracts, sell to assigned customers and retain state after save/load. The two current pilot dealers do not yet have fully designed Harborline dialogue or schedules."
+    },
+    {
+      "id": "npc.population",
+      "requirement": "Spawn 42 physical native NPCs, initially activate about 18, with 2 dealers.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "src/Runtime/HarborlineNpcRoster.cs: 2 native PlayerDealer NPCs, 8 physical native Customer NPCs and 1 native supplier/dead-drop/meeting NPC.",
+        "HarborlineNpcRegistrar registers eleven stable IDs after CustomNpcsReady; NPC.Get(id) prevents duplicates.",
+        "HarborlinePhysicalBuilder supplies eleven local spawn slots, but their walkability and routing have not been tested."
+      ],
+      "remaining": "Eleven of 42 target physical NPCs are coded (2 dealers, 8 customers, 1 supplier); 31 remain. Only 8 of 30 customer profiles are complete; 22 remain. Confirm all eleven spawn, have correct dialogue, use the correct native role, and persist across save/load."
+    },
+    {
+      "id": "npc.schedules",
+      "requirement": "Use native NPC schedules and allow NPCs to enter buildings.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "All eight customer types use IsCustomer=true; current S1API documents customer deal attendance as automatic and EnsureDealSignal() as an obsolete no-op since Schedule I 0.4.6.",
+        "HarborlineNpcLifecycle enables the native NPC scheduler with Schedule.Enable()."
+      ],
+      "remaining": "Daily home/work/street routes, building visits, resident interactions and dealer work shifts are not yet configured. Add current S1API WalkTo/StayInBuilding actions only after coordinates, registered buildings, doors and paths are verified."
+    },
+    {
+      "id": "packaging",
+      "requirement": "Produce installable Thunderstore package with matching dependencies/version.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "manifest.json",
+        "src/ScheduleIMegaExpansion.csproj",
+        ".github/workflows/build-runtime.yml"
+      ],
+      "remaining": "Check package installation in a clean profile with the exact dependency versions and target game build."
+    },
+    {
+      "id": "persistence",
+      "requirement": "Save/load custom world geometry and gameplay state without duplication.",
+      "status": "not_implemented",
+      "evidence": [
+        "Unity geometry is session-local; last-generation.json is diagnostic output only, not a save integration."
+      ],
+      "remaining": "Use native saveable objects or an explicit mod save-data lifecycle; verify reload, transition and crash recovery."
+    },
+    {
+      "id": "police.integration",
+      "requirement": "Native police checks, patrol and dispatch coverage across Harborline.",
+      "status": "not_implemented",
+      "evidence": [
+        "The new NativeLawSnapshotExporter reads LawController, LawManager, CheckpointManager.GetAllCheckpointInfo, CheckpointLocation and current foot/vehicle patrol route registries.",
+        "No Harborline-specific checkpoint has been enabled and no Harborline patrol route is created or started by the mod."
+      ],
+      "remaining": "Use the new in-game native-law-*.csv exports to identify existing Docks checkpoint locations and patrol route APIs/data; only then add a supported Harborline checkpoint/patrol using measured positions and documented SetCheckpointEnabled/StartFootPatrol or StartVehiclePatrol calls."
+    },
+    {
+      "id": "properties.realtor",
+      "requirement": "Register purchasable businesses/properties in the native Realtor and ownership systems.",
+      "status": "blocked_unverified_api",
+      "evidence": [
+        "S1API PropertyManager and BusinessManager expose GetAll/GetOwned/Find enumeration methods; no additive custom registration method has been established."
+      ],
+      "remaining": "Find a supported native registration hook in installed game APIs/source or implement using a verified game extension point. Do not list sites as purchasable until this works."
+    },
+    {
+      "id": "runtime.bootstrap",
+      "requirement": "MelonLoader mod loads and subscribes to native save/scene lifecycle.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "src/Core.cs",
+        "S1API.Lifecycle.GameLifecycle events: OnPreLoad, OnLoadComplete, OnPreSceneChange"
+      ],
+      "remaining": "Run the packaged DLL in the target Schedule I installation and confirm lifecycle log messages."
+    },
+    {
+      "id": "runtime.test",
+      "requirement": "Prove in-game objects appear in the correct positions and all systems work.",
+      "status": "not_verified_in_game",
+      "evidence": [
+        "CI compile and static tests only; no user game log, diagnostics folder or runtime screenshot was provided."
+      ],
+      "remaining": "Run in the actual Schedule I installation and inspect diagnostic files, logs, generated placement and gameplay behavior."
+    },
+    {
+      "id": "shops.native_stock",
+      "requirement": "Extend an existing native Schedule I shop with additional game items and prices using native purchase UI.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "src/Runtime/HarborlineShopCatalog.cs: ShopManager.GetShopByName('Hardware Store')",
+        "ItemManager.GetDefinition resolves existing vanilla StorableItemDefinition IDs.",
+        "Sets StorableItemDefinition.BasePurchasePrice before ensuring the native shop listing with Shop.AddItem(item).",
+        "Current S1API 3.2.2 ShopIntegration ignores the customPrice argument; the plugin does not rely on that unsupported argument."
+      ],
+      "remaining": "Verify each ID in the installed game, confirm displayed and charged prices, and check all other vanilla shops that sell these same item IDs. BasePurchasePrice belongs to the shared item definition, so the configured price applies globally wherever that ID is sold. This still modifies Hardware Store rather than creating a new Harborline storefront."
+    },
+    {
+      "id": "shops.online_orders",
+      "requirement": "Physical shops and Hyland Network online orders share inventory/catalogue.",
+      "status": "not_implemented",
+      "evidence": [
+        "HarborlineDeadDropSupplier uses the native S1API supplier/dead-drop/meeting-shop flow and 14 native item IDs; this is not a separate Hyland Network phone-order storefront.",
+        "Current physical stock implementation only extends the existing Hardware Store."
+      ],
+      "remaining": "Implement a separate physical Harborline store and phone-order UI with a single shared stock/inventory/order path. Verify the actual in-game app hooks and transaction/save integration first."
+    },
+    {
+      "id": "world.automatic_geometry",
+      "requirement": "Create a physical Harborline geometry slice automatically after save load.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "src/Runtime/HarborlinePhysicalBuilder.cs",
+        "S1API.Property.PropertyManager.GetAllProperties()",
+        "PropertyWrapper.PropertyName",
+        "PropertyWrapper.ExteriorSpawnPosition",
+        "Unity GameObject.CreatePrimitive"
+      ],
+      "remaining": "Test automatic generation in game, verify the exact Docks Warehouse record and visual placement. Current pieces are generic Unity cubes, not production models or native registered buildings."
+    },
+    {
+      "id": "world.placement",
+      "requirement": "Place the district in a valid open site inside the existing Docks region.",
+      "status": "not_verified_in_game",
+      "evidence": [
+        "Docks Warehouse property anchor and Physics.CheckBox/Raycast sampling exist in code."
+      ],
+      "remaining": "No captured runtime property list, Docks bounds, map projection, world transform, navmesh or scene screenshot is available. Candidate radii 42–104m are a heuristic and do not prove that the selected candidate is inside Docks or connected to a road."
+    },
+    {
+      "id": "world.roads_navigation",
+      "requirement": "Connect Harborline roads and pedestrian paths to native road/navigation graph.",
+      "status": "not_implemented",
+      "evidence": [
+        "The external dockyard road remains primitive visual geometry only.",
+        "S1MAPI NavigationBuilder is called only as an interior A* builder; it is not a full Harborline street/road graph."
+      ],
+      "remaining": "Connect roads and sidewalks to the native street graph/navmesh; add measured junctions and route checks. Verify NPC and vehicle travel to/from Docks."
+    },
+    {
+      "id": "world.water_safety",
+      "requirement": "Avoid water, steep terrain and occupied structures.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "Physics.CheckBox footprint test",
+        "five-point ground raycast sampling",
+        "slope/height checks",
+        "water name/tag/layer token filter"
+      ],
+      "remaining": "Water filtering is heuristic; generic/unlabelled water colliders can still pass. Test on the real Docks shoreline and add a verified terrain/region boundary check before treating placement as safe."
+    },
+    {
+      "id": "shops.native_pricing",
+      "requirement": "Apply the configured catalogue prices through the game's native item pricing source.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "src/Runtime/HarborlineShopCatalog.cs writes StorableItemDefinition.BasePurchasePrice for the existing vanilla item definition.",
+        "The S1API 3.2.2 source for ShopIntegration.CreateListing explicitly warns that customPrice is not applied and uses BasePurchasePrice instead."
+      ],
+      "remaining": "Run an in-game purchase and compare the visible price and charged amount. This is a shared item-definition price, not a per-store override; verify the effect on every vanilla shop that sells the same item ID."
+    },
+    {
+      "id": "diagnostics.law",
+      "requirement": "Survey native police intensity, checkpoint locations and existing foot/vehicle patrol routes.",
+      "status": "implemented_code_unverified_runtime",
+      "evidence": [
+        "src/Diagnostics/NativeLawSnapshotExporter.cs uses S1API.Law reflection to export LawController/LawManager values and CheckpointManager.GetAllCheckpointInfo.",
+        "Exports native-law-checkpoint-locations.csv, native-law-checkpoints.csv, native-law-foot-patrol-routes.csv and native-law-vehicle-patrol-routes.csv.",
+        "The snapshot is read-only and does not enable a checkpoint or start a patrol."
+      ],
+      "remaining": "Run the exporter in the target Schedule I installation and inspect all six native-law-*.csv files; confirm actual loaded wrapper members and route coordinates before changing law coverage."
     }
   ],
-  "externalIntegrations": [
-    {
-      "id": "daffys_hills",
-      "label": "Daffy's Hills 1.2 optional companion mod",
-      "status": "compatibility_test_required",
-      "bundled": false,
-      "requiredDependency": false
-    }
-  ]
+  "overallVerdict": "The repository now contains a native S1API gameplay slice (2 dealers, 8 customers and 1 supplier using the dead-drop/meeting flow), a 14-item Hardware Store extension, and a procedural Harborline warehouse path using S1MAPI BuildingBuilder with a guarded primitive fallback. The S1MAPI door and interior A* calls are code-level integrations only and still require in-game validation. A focused read-only API scanner was added for Realtor, ownership, doors, navigation, roads and map hooks. The reference Daffy's Hills archive was inspected for architecture only; no code/assets were copied. 11 of the target 42 NPCs are coded, with 31 remaining; 8 of 30 customer profiles are coded, with 22 remaining. Separate Harborline storefront/phone orders, Realtor listing/ownership registration, normal map integration, city roads, full routines, police extension, persistence and multiplayer remain incomplete or blocked.",
+  "validation": {
+    "checkedCommit": "fd84b89888441bb6be9b8cfeb75bc5b742d77d6e",
+    "staticValidationRunId": 41603985697,
+    "staticValidationConclusion": "success",
+    "runtimeBuildRunId": 41603985784,
+    "runtimeBuildConclusion": "success",
+    "thunderstoreArtifactId": 13215063448,
+    "thunderstoreArtifactName": "ScheduleIMegaExpansion-0.3.1",
+    "runtimeGameExecution": "not performed",
+    "caveat": "CI compile/package/static tests do not prove Unity/IL2CPP runtime behavior, BuildingBuilder calls, server-spawned door creation, NPC pathfinding, transactions or persistence.",
+    "reviewedVersion": "0.3.1",
+    "nativeNpcAndShopCode": "added this development cycle; target game runtime not tested",
+    "latestSourceBuild": "pending",
+    "latestStaticValidation": "pending"
+  },
+  "reviewedVersion": "0.3.1"
 }
