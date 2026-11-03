@@ -22,13 +22,17 @@ namespace ScheduleIMegaExpansion.Diagnostics
             "BusinessManager", "Property", "Business", "NPCEnterableBuilding",
             "DoorController", "StaticDoor", "PivotDoor", "InteractableObject",
             "NPCMovement", "NPCSchedule", "NavMesh", "Navigation", "AstarPath",
-            "RoadNodes", "NodeLink", "Road", "Region", "Map"
+            "Pathfinding", "RecastGraph", "PointGraph", "GraphNode", "Seeker",
+            "AIPath", "RoadNodes", "NodeLink", "Road", "Region", "Map"
         };
 
         private static readonly string[] MemberTokens =
         {
             "ShouldChoiceBeShown", "ModifyChoiceText", "CheckChoice", "ChoiceCallback",
             "AgentShow", "AgentText", "AgentCheck", "AgentPick", "SetOwned",
+            "SetDestination", "GetNearest", "GetNearestNode", "UpdateGraph",
+            "Scan", "AddWorkItem", "Connect", "StayInBuilding", "WalkTo",
+            "SetHouse", "House", "Home", "RecalculatePath", "Build",
             "BuyingProperty", "Register", "AddProperty", "AddBusiness",
             "StartFootPatrol", "StartVehiclePatrol", "SetDestination",
             "GetAllProperties", "GetAllBusinesses", "WalkTo", "StayInBuilding",
