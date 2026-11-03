@@ -344,11 +344,12 @@ namespace ScheduleIMegaExpansion.Diagnostics
             if (find == null)
                 yield break;
 
-            object? result;
+            object? result = null;
+            bool lookupFailed = false;
             try { result = find.Invoke(null, new object[] { componentType }); }
-            catch { yield break; }
+            catch { lookupFailed = true; }
 
-            if (!(result is IEnumerable items))
+            if (lookupFailed || !(result is IEnumerable items))
                 yield break;
             foreach (object? item in items)
             {
