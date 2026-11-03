@@ -219,6 +219,9 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn("slot > 10", self.npcs)
         self.assertIn("slot > 9", self.physical)
         self.assertIn("5 => -21.0f", self.physical)
+        self.assertIn("9 => 21.0f", self.physical)
+        self.assertIn("10 => -19.0f", self.physical)
+        self.assertIn("10 => -8.0f", self.physical)
         self.assertNotIn("InitializeActions()", self.npcs)
         self.assertNotIn("HandleDeal(900)", self.npcs)
 
