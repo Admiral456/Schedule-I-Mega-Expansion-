@@ -44,6 +44,9 @@ namespace ScheduleIMegaExpansion.Runtime
             new StockItem("cauldron", 3500f)
         };
 
+        public static string[] GetSupplierCatalogIds() =>
+            ExpansionStock.Select(stock => stock.Id).ToArray();
+
         public static void ResetForNewSave()
         {
             _loggedMissingNativeShop = false;
@@ -159,7 +162,7 @@ namespace ScheduleIMegaExpansion.Runtime
                 _shopApplied = HarborlineShopCatalog.TryApply(log, warn);
 
             if (_npcApplied && _shopApplied)
-                log("Harborline native gameplay slice activated: 2 native dealers, 8 native customer NPCs and repriced native Hardware Store catalog.");
+                log("Harborline native gameplay slice activated: 2 native dealers, 8 native customer NPCs, 1 native Portside Supply phone-order supplier and a shared 14-item catalog definition.");
             return _npcApplied && _shopApplied;
         }
 
