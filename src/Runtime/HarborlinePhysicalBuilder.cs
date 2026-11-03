@@ -629,9 +629,34 @@ namespace ScheduleIMegaExpansion.Runtime
 
         private static void BuildWarehouse()
         {
-            // Open-front warehouse shell: a real walk-in space with a wide vehicle bay.
+            // Portside Supply warehouse is the first Harborline structure. Prefer
+            // S1MAPI's procedural BuildingBuilder and network-capable door pipeline.
+            // If this installed S1MAPI build has a different surface, keep the
+            // existing safe primitive shell as a fallback rather than breaking load.
             const float x = -7.0f;
             const float z = 1.2f;
+
+            if (_rootTransform != null &&
+                HarborlineProceduralBuildingFactory.TryBuildWarehouse(
+                    _rootTransform,
+                    x,
+                    z,
+                    message => MelonLogger.Msg("[Schedule I Mega Expansion] " + message),
+                    message => MelonLogger.Warning("[Schedule I Mega Expansion] " + message)))
+            {
+                // Interior stock props remain simple geometry for now. The
+                // BuildingBuilder supplies the procedural floor, walls and roof.
+                Add("Warehouse stock rack lower", x - 4.5f, 1.25f, z - 2.0f, 0.45f, 2.1f, 6.0f, 0.22f, 0.25f, 0.27f);
+                Add("Warehouse stock rack upper", x - 4.5f, 2.55f, z - 2.0f, 0.48f, 0.16f, 6.0f, 0.72f, 0.37f, 0.13f);
+                Add("Warehouse counter", x + 3.9f, 0.85f, z + 2.8f, 2.6f, 1.5f, 0.8f, 0.43f, 0.25f, 0.13f);
+                Add("Warehouse cargo pallet A", x - 1.6f, 0.65f, z - 1.2f, 2.0f, 0.55f, 1.6f, 0.46f, 0.29f, 0.14f);
+                Add("Warehouse cargo pallet B", x + 1.2f, 0.65f, z - 3.7f, 2.0f, 0.55f, 1.6f, 0.46f, 0.29f, 0.14f);
+                Add("Warehouse sign backing", x, 4.55f, z + 6.05f, 4.5f, 0.8f, 0.12f, 0.12f, 0.19f, 0.22f);
+                Add("Warehouse sign accent", x, 4.55f, z + 6.14f, 3.4f, 0.09f, 0.08f, 0.88f, 0.52f, 0.18f);
+                return;
+            }
+
+            // Compatibility fallback: the previous geometry-only warehouse.
             Add("Warehouse concrete floor", x, 0.18f, z, 12.5f, 0.24f, 12.0f, 0.48f, 0.47f, 0.43f);
             Add("Warehouse rear wall", x, 2.65f, z - 6.0f, 12.5f, 5.0f, 0.38f, 0.34f, 0.37f, 0.38f);
             Add("Warehouse left wall", x - 6.05f, 2.65f, z, 0.38f, 5.0f, 12.0f, 0.32f, 0.35f, 0.36f);
@@ -640,8 +665,6 @@ namespace ScheduleIMegaExpansion.Runtime
             Add("Warehouse front wall right", x + 4.1f, 2.65f, z + 5.8f, 4.3f, 5.0f, 0.38f, 0.30f, 0.33f, 0.34f);
             Add("Warehouse loading bay lintel", x, 4.75f, z + 5.8f, 3.9f, 0.8f, 0.42f, 0.24f, 0.27f, 0.28f);
             Add("Warehouse roof", x, 5.25f, z, 13.0f, 0.35f, 12.7f, 0.22f, 0.25f, 0.26f);
-
-            // Interior shelving, counter, crates and a clearly readable loading area.
             Add("Warehouse stock rack lower", x - 4.5f, 1.25f, z - 2.0f, 0.45f, 2.1f, 6.0f, 0.22f, 0.25f, 0.27f);
             Add("Warehouse stock rack upper", x - 4.5f, 2.55f, z - 2.0f, 0.48f, 0.16f, 6.0f, 0.72f, 0.37f, 0.13f);
             Add("Warehouse counter", x + 3.9f, 0.85f, z + 2.8f, 2.6f, 1.5f, 0.8f, 0.43f, 0.25f, 0.13f);
@@ -649,8 +672,6 @@ namespace ScheduleIMegaExpansion.Runtime
             Add("Warehouse cargo pallet B", x + 1.2f, 0.65f, z - 3.7f, 2.0f, 0.55f, 1.6f, 0.46f, 0.29f, 0.14f);
             Add("Warehouse sign backing", x, 4.55f, z + 6.05f, 4.5f, 0.8f, 0.12f, 0.12f, 0.19f, 0.22f);
             Add("Warehouse sign accent", x, 4.55f, z + 6.14f, 3.4f, 0.09f, 0.08f, 0.88f, 0.52f, 0.18f);
-
-            // Windows are intentionally inset as solid glass-colored geometry for now.
             Add("Warehouse front window left", x - 4.55f, 3.65f, z + 6.02f, 1.4f, 1.0f, 0.08f, 0.28f, 0.62f, 0.72f);
             Add("Warehouse front window right", x + 4.55f, 3.65f, z + 6.02f, 1.4f, 1.0f, 0.08f, 0.28f, 0.62f, 0.72f);
         }
