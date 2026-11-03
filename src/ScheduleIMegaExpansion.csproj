@@ -7,12 +7,12 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
-    <Version>0.3.1</Version>
+    <Version>0.3.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="LavaGang.MelonLoader" Version="0.7.3" PrivateAssets="all" NoWarn="NU1701" />
-    <PackageReference Include="S1API.Forked" Version="3.2.2" />
+    <PackageReference Include="S1API.Forked" Version="3.2.3" />
   </ItemGroup>
 
   <!-- S1API is a runtime dependency supplied by the mod manager; the API package is compile-time only. -->
