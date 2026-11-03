@@ -48,6 +48,14 @@ namespace ScheduleIMegaExpansion.Runtime
         private static int _placementAttempts;
         private static bool _reportedMissingDocksAnchor;
         private static bool _reportedNoClearSite;
+        private static bool _reportedExternalMapExpansion;
+        private static readonly string[] ExternalMapExpansionFiles =
+        {
+            "PierExpansion.dll",
+            "UnofficialMapEnhancer.dll",
+            "UME.HylandBridge.dll",
+            "SerenaFlats.Il2cpp.dll"
+        };
         private static string? _selectedPlacement;
         private static Anchor? _lastPlacementAnchor;
 
@@ -83,6 +91,9 @@ namespace ScheduleIMegaExpansion.Runtime
 
             try
             {
+                if (ShouldPauseForExternalMapExpansion(AppDomain.CurrentDomain.BaseDirectory, null))
+                    return false;
+
                 if (!_lastPlacementAnchor.HasValue)
                 {
                     if (!TryFindDocksWarehouseAnchor(out Anchor docksAnchor))
@@ -147,6 +158,9 @@ namespace ScheduleIMegaExpansion.Runtime
 
         public static bool TryAutoGenerate(string gameRoot, Action<string> log, Action<string> warn)
         {
+            if (ShouldPauseForExternalMapExpansion(gameRoot, warn))
+                return false;
+
             if (_built)
                 return true;
 
@@ -279,6 +293,32 @@ namespace ScheduleIMegaExpansion.Runtime
                 warn(ex.StackTrace ?? string.Empty);
                 return false;
             }
+        }
+
+        private static bool ShouldPauseForExternalMapExpansion(string gameRoot, Action<string>? warn)
+        {
+            string modsDirectory = Path.Combine(gameRoot, "Mods");
+            string[] detected = ExternalMapExpansionFiles
+                .Where(fileName => File.Exists(Path.Combine(modsDirectory, fileName)))
+                .ToArray();
+
+            if (detected.Length == 0)
+                return false;
+
+            if (!_reportedExternalMapExpansion)
+            {
+                string message = "External map expansion DLL(s) detected in Mods: "
+                    + string.Join(", ", detected)
+                    + ". Harborline geometry and NPC position assignment are paused until an in-game survey defines tested exclusion zones. "
+                    + "The independent shop catalogue can still initialize.";
+                if (warn != null)
+                    warn(message);
+                else
+                    MelonLogger.Warning("[Schedule I Mega Expansion] " + message);
+                _reportedExternalMapExpansion = true;
+            }
+
+            return true;
         }
 
         private static bool TryFindDocksWarehouseAnchor(out Anchor anchor)
