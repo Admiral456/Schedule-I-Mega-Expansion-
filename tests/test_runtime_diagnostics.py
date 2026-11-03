@@ -177,12 +177,18 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertNotIn("EnsureDealSignal()", self.npcs)
         self.assertNotIn("InitializeActions()", self.npcs)
 
-    def test_shop_stock_uses_native_shop_and_existing_item_registry(self):
+    def test_shop_stock_uses_native_shared_item_prices_and_purchase_ui(self):
         self.assertIn('ShopManager.GetShopByName("Hardware Store")', self.shop)
         self.assertIn("ItemManager.GetDefinition(stock.Id)", self.shop)
-        self.assertIn("storable.BasePurchasePrice = stock.Price", self.shop)\n        self.assertIn("hardwareStore.AddItem(item)", self.shop)\n        self.assertNotIn("hardwareStore.AddItem(item, stock.Price)", self.shop)\n        self.assertIn("shared item definition", self.shop)\n        self.assertIn("Price override", self.shop) if "Price override" in self.shop else self.assertIn("customPrice is currently", self.shop)
+        self.assertIn("item is not StorableItemDefinition storable", self.shop)
+        self.assertIn("storable.BasePurchasePrice = stock.Price", self.shop)
+        self.assertIn("hardwareStore.AddItem(item)", self.shop)
+        self.assertNotIn("hardwareStore.AddItem(item, stock.Price)", self.shop)
+        self.assertIn("customPrice argument is currently ignored", self.shop)
+        self.assertIn("shared item definition", self.shop)
         self.assertIn("hardwareStore.HasItem(item.ID)", self.shop)
-        self.assertEqual(self.shop.count("new StockItem("), 14)\n        self.assertIn("using S1API.Items.Storable;", self.shop)
+        self.assertEqual(self.shop.count("new StockItem("), 14)
+        self.assertIn("using S1API.Items.Storable;", self.shop)
         for item_id in (
             "plasticpot", "moisturepreservingpot", "airpot",
             "suspensionrack", "halogengrowlight", "ledgrowlight",
@@ -194,14 +200,14 @@ class RuntimeDiagnosticTests(unittest.TestCase):
 
     def test_thunderstore_manifest_and_package_layout_are_consistent(self):
         self.assertEqual(self.manifest["name"], "ScheduleIMegaExpansion")
-        self.assertEqual(self.manifest["version_number"], "0.3.0")
+        self.assertEqual(self.manifest["version_number"], "0.3.1")
         dependencies = set(self.manifest["dependencies"])
         self.assertIn("LavaGang-MelonLoader-0.7.3", dependencies)
         self.assertIn("ifBars-S1API_Forked-3.2.2", dependencies)
         self.assertIn("ifBars-S1MAPI-2.0.1", dependencies)
         workflow = self.build_workflow
         self.assertIn("package/Mods/", workflow)
-        self.assertIn("ScheduleIMegaExpansion-0.3.0.zip", workflow)
+        self.assertIn("ScheduleIMegaExpansion-0.3.1.zip", workflow)
         for required in (
             "Mods/ScheduleIMegaExpansion.dll",
             "manifest.json",
