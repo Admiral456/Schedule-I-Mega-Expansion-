@@ -37,7 +37,7 @@ jobs:
           cp manifest.json package/
           cp README.md package/
           cp LICENSE package/
-          (cd package && zip -r ../ScheduleIMegaExpansion-0.3.1.zip .)
+          (cd package && zip -r ../ScheduleIMegaExpansion-0.3.2.zip .)
           unzip -Z1 ScheduleIMegaExpansion-0.3.1.zip > package-contents.txt
           grep -Fxq "Mods/ScheduleIMegaExpansion.dll" package-contents.txt
           grep -Fxq "manifest.json" package-contents.txt
@@ -46,6 +46,6 @@ jobs:
       - name: Upload installable mod package
         uses: actions/upload-artifact@v4
         with:
-          name: ScheduleIMegaExpansion-0.3.1
+          name: ScheduleIMegaExpansion-0.3.2
           path: ScheduleIMegaExpansion-0.3.1.zip
           if-no-files-found: error
