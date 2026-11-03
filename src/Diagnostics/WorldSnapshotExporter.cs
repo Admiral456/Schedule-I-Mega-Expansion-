@@ -103,6 +103,16 @@ namespace ScheduleIMegaExpansion.Diagnostics
                 AddError("NativeTerrainSurvey", ex, summary, warn);
             }
 
+            try
+            {
+                int roadNodes = NativeRoadGraphExporter.Export(outputDirectory, summary, warn);
+                summary.Add("NativeRoadGraphNodesScanned=" + roadNodes.ToString(CultureInfo.InvariantCulture));
+            }
+            catch (Exception ex)
+            {
+                AddError("NativeRoadGraph", ex, summary, warn);
+            }
+
             string summaryPath = Path.Combine(outputDirectory, "summary.txt");
             File.WriteAllLines(summaryPath, summary);
             log("Native world snapshot complete.");
