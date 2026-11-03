@@ -61,7 +61,7 @@ Kód používá `ItemManager.GetDefinition` a upravuje `StorableItemDefinition.B
 
 ### Nová diagnostika obchodů a položek
 
-`WorldSnapshotExporter` nyní čte přes `ShopManager.GetAllShops()` a `ItemManager.GetAllItemDefinitions()` tři další výpisy; navíc přes nativní `S1API.Law` registry přidává read-only soubory `native-law-controller.csv`, `native-law-manager.csv`, `native-law-checkpoint-locations.csv`, `native-law-checkpoints.csv`, `native-law-foot-patrol-routes.csv` a `native-law-vehicle-patrol-routes.csv`: `native-shops.csv`, `native-shop-items.csv` a `native-items.csv`. Jde pouze o čtení nativních registrů; neprovádí nákup ani nemění herní stav. Výpis umožní vybrat další skutečně existující předměty a obchody v konkrétní verzi hry.
+`WorldSnapshotExporter` nyní čte přes `ShopManager.GetAllShops()` a `ItemManager.GetAllItemDefinitions()` tři soubory: `native-shops.csv`, `native-shop-items.csv` a `native-items.csv`. Samostatný `NativeLawSnapshotExporter` přidává šest read-only souborů: `native-law-controller.csv`, `native-law-manager.csv`, `native-law-checkpoint-locations.csv`, `native-law-checkpoints.csv`, `native-law-foot-patrol-routes.csv` a `native-law-vehicle-patrol-routes.csv`. Jde pouze o čtení nativních registrů; export nespouští hlídky, nepovoluje checkpointy a nemění herní stav.
 
 ## Co zůstává nedokončené
 
