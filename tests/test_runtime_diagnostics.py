@@ -31,7 +31,8 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIsNotNone(target)
         self.assertEqual(target.text, "net6.0")
         self.assertIsNotNone(version)
-        self.assertEqual(version.text, self.manifest["version_number"])\n        self.assertEqual(version.text, "0.3.1")
+        self.assertEqual(version.text, self.manifest["version_number"])
+        self.assertEqual(version.text, "0.3.1")
 
     def test_runtime_uses_official_s1api_package_without_bundling_game_assemblies(self):
         self.assertEqual(self.project.findall(".//Reference"), [])
@@ -54,7 +55,9 @@ class RuntimeDiagnosticTests(unittest.TestCase):
         self.assertIn("HarborlinePhysicalBuilder.ResetForNewSave();", self.core)
         self.assertIn("private void OnPreSceneChange()", self.core)
         self.assertIn("_saveLoaded = true", self.core)
-        self.assertIn("HarborlineGameplayBootstrap.TryActivate(", self.core)\n        self.assertIn("if (_saveLoaded && !_gameplayInitialized)", self.core)\n        self.assertNotIn("if (_saveLoaded && _harborlineGenerated && !_gameplayInitialized)", self.core)
+        self.assertIn("HarborlineGameplayBootstrap.TryActivate(", self.core)
+        self.assertIn("if (_saveLoaded && !_gameplayInitialized)", self.core)
+        self.assertNotIn("if (_saveLoaded && _harborlineGenerated && !_gameplayInitialized)", self.core)
         self.assertIn("_gameplayInitialized", self.core)
 
     def test_player_safety_gate_uses_real_s1api_player_registry(self):
