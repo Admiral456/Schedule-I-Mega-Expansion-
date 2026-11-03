@@ -48,7 +48,7 @@ def validate() -> list[str]:
         errors.append("NPC group target sum must equal npcTarget.physicalNpcCount")
     if npc_target.get("uniqueCustomerProfiles") != len(designs.get("profiles", [])):
         errors.append("NPC target profile count must match customer-designs.json")
-    if npc_target.get("newDealers") != len(roster.get("dealers", [])):
+    if npc_target.get("newDealers") != len(roster.get("dealerProfiles", [])):
         errors.append("Dealer target count must match the dealer roster")
     if roster.get("nativeRegion") != "Docks":
         errors.append("NPC roster must use the native Docks region")
