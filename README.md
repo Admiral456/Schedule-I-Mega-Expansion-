@@ -89,6 +89,8 @@ The exact C# gameplay source for 0.3.1 has been recovered from the commit record
 
 Daffy's Hills 1.2 is an **optional external companion mod** for the eastern high-ground residential area. It is not bundled or required by Mega Expansion. Its DLL, source and assets are not copied or modified. Harborline remains a separate port district within the native Docks region. See [Daffy's Hills integration](docs/DAFFYSHILLS-INTEGRATION.md).
 
+Optional map companions are tracked separately in [map-mod compatibility](docs/OPTIONAL-MAP-COMPANION-COMPATIBILITY.md). The supplied Pier Expansion archive was inspected (one DLL; no source/assets); Unofficial Map Enhancer is documented from its public page because its archive is not available in this workspace. A conservative runtime guard pauses Harborline geometry/NPC placement when a known overlapping map-expansion DLL is detected. These profiles do not claim that combined in-game operation has been tested.
+
 After running the mod in a single-player save, the read-only diagnostic exports can be summarized automatically:
 
 ```bash

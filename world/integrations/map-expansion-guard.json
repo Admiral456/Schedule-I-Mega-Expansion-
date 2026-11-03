@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "external_map_expansion_placement_guard",
+  "purpose": "Prevent automatic Harborline geometry and native NPC placement until map exclusion zones can be surveyed when a known external map-expansion mod is installed.",
+  "detectedModFiles": [
+    "PierExpansion.dll",
+    "UnofficialMapEnhancer.dll",
+    "UME.HylandBridge.dll",
+    "SerenaFlats.Il2cpp.dll"
+  ],
+  "behavior": {
+    "pauseAutomaticHarborlineGeometry": true,
+    "pauseHarborlineNpcPositionResolution": true,
+    "continueIndependentShopCatalogInitialization": true,
+    "deleteExternalModFiles": false,
+    "editExternalModFiles": false,
+    "modifyGameAssets": false,
+    "resumeRequires": "Remove the map-expansion mod from the Mods folder or replace this conservative guard only after an in-game survey establishes tested exclusion bounds and non-overlapping spawn coordinates."
+  },
+  "caveat": "File-presence detection is a conservative safety gate, not a compatibility test. It does not prove that a companion mod loaded successfully or that two mods are otherwise compatible."
+}
