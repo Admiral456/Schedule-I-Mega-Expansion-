@@ -123,7 +123,9 @@ namespace ScheduleIMegaExpansion.Runtime
                 .WithDelta(1.5f)
                 .SetUnlocked(false)
                 .SetUnlockType(NPCRelationship.UnlockType.DirectApproach));
-        }
+        
+            builder.WithSchedule(plan => plan.HandleDeal(900));
+}
 
         protected override void OnCreated()
         {
@@ -191,7 +193,9 @@ namespace ScheduleIMegaExpansion.Runtime
                 .WithDelta(1.5f)
                 .SetUnlocked(false)
                 .SetUnlockType(NPCRelationship.UnlockType.DirectApproach));
-        }
+        
+            builder.WithSchedule(plan => plan.HandleDeal(900));
+}
 
         protected override void OnCreated()
         {
@@ -258,7 +262,9 @@ namespace ScheduleIMegaExpansion.Runtime
                     (DrugType.Marijuana, 0.75f),
                     (DrugType.Methamphetamine, -0.25f)
                 }));
-        }
+        
+            builder.WithSchedule(plan => plan.EnsureDealSignal());
+}
 
         protected override void OnCreated()
         {
@@ -291,7 +297,9 @@ namespace ScheduleIMegaExpansion.Runtime
                     (DrugType.Methamphetamine, 0.75f),
                     (DrugType.Marijuana, -0.30f)
                 }));
-        }
+        
+            builder.WithSchedule(plan => plan.EnsureDealSignal());
+}
 
         protected override void OnCreated()
         {
@@ -325,7 +333,9 @@ namespace ScheduleIMegaExpansion.Runtime
                     (DrugType.Shrooms, 0.35f),
                     (DrugType.Methamphetamine, -0.30f)
                 }));
-        }
+        
+            builder.WithSchedule(plan => plan.EnsureDealSignal());
+}
 
         protected override void OnCreated()
         {
@@ -348,7 +358,9 @@ namespace ScheduleIMegaExpansion.Runtime
                 .WithStandards(CustomerStandard.Moderate).AllowDirectApproach(true)
                 .WithCallPoliceChance(0.03f).WithDependence(0.12f, 0.28f)
                 .WithAffinities(new[] { (DrugType.Marijuana, 0.55f), (DrugType.Cocaine, 0.15f), (DrugType.Methamphetamine, -0.20f) }));
-        }
+        
+            builder.WithSchedule(plan => plan.EnsureDealSignal());
+}
         protected override void OnCreated() { base.OnCreated(); HarborlineNpcLifecycle.InitializePhysicalNpc(this); }
     }
 
@@ -366,7 +378,9 @@ namespace ScheduleIMegaExpansion.Runtime
                 .WithStandards(CustomerStandard.High).AllowDirectApproach(true)
                 .WithCallPoliceChance(0.05f).WithDependence(0.18f, 0.32f)
                 .WithAffinities(new[] { (DrugType.Cocaine, 0.65f), (DrugType.Shrooms, 0.25f), (DrugType.Marijuana, -0.25f) }));
-        }
+        
+            builder.WithSchedule(plan => plan.EnsureDealSignal());
+}
         protected override void OnCreated() { base.OnCreated(); HarborlineNpcLifecycle.InitializePhysicalNpc(this); }
     }
 
@@ -384,7 +398,9 @@ namespace ScheduleIMegaExpansion.Runtime
                 .WithStandards(CustomerStandard.Low).AllowDirectApproach(true)
                 .WithCallPoliceChance(0.01f).WithDependence(0.08f, 0.18f)
                 .WithAffinities(new[] { (DrugType.Marijuana, 0.80f), (DrugType.Methamphetamine, -0.45f) }));
-        }
+        
+            builder.WithSchedule(plan => plan.EnsureDealSignal());
+}
         protected override void OnCreated() { base.OnCreated(); HarborlineNpcLifecycle.InitializePhysicalNpc(this); }
     }
 
@@ -402,7 +418,9 @@ namespace ScheduleIMegaExpansion.Runtime
                 .WithStandards(CustomerStandard.VeryHigh).AllowDirectApproach(true)
                 .WithCallPoliceChance(0.08f).WithDependence(0.05f, 0.16f)
                 .WithAffinities(new[] { (DrugType.Cocaine, 0.75f), (DrugType.Shrooms, 0.45f), (DrugType.Methamphetamine, -0.35f) }));
-        }
+        
+            builder.WithSchedule(plan => plan.EnsureDealSignal());
+}
         protected override void OnCreated() { base.OnCreated(); HarborlineNpcLifecycle.InitializePhysicalNpc(this); }
     }
 
@@ -420,7 +438,9 @@ namespace ScheduleIMegaExpansion.Runtime
                 .WithStandards(CustomerStandard.High).AllowDirectApproach(true)
                 .WithCallPoliceChance(0.035f).WithDependence(0.14f, 0.26f)
                 .WithAffinities(new[] { (DrugType.Methamphetamine, 0.55f), (DrugType.Marijuana, 0.25f), (DrugType.Cocaine, -0.20f) }));
-        }
+        
+            builder.WithSchedule(plan => plan.EnsureDealSignal());
+}
         protected override void OnCreated() { base.OnCreated(); HarborlineNpcLifecycle.InitializePhysicalNpc(this); }
     }
 
@@ -444,6 +464,7 @@ namespace ScheduleIMegaExpansion.Runtime
             try
             {
                 npc.Schedule.Enable();
+                npc.Schedule.InitializeActions();
             }
             catch (Exception ex)
             {
