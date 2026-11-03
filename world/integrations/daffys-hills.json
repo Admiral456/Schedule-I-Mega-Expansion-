@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "id": "daffys_hills",
+  "displayName": "Daffy's Hills",
+  "version": "1.2",
+  "author": "DrDaffy",
+  "sourcePage": "https://www.nexusmods.com/schedule1/mods/2618?tab=description",
+  "archiveContents": [
+    {
+      "path": "DaffysHills.dll",
+      "sizeBytes": 2757632,
+      "sha256": "826e09f50485a2c82f1c0e2460ce1a2f42551515efdca57c305966e0968c506a"
+    }
+  ],
+  "featuresFromAuthorDescription": {
+    "roadLengthMeters": 720,
+    "houses": 32,
+    "customerNpcs": 43,
+    "dealer": 1,
+    "knockableDoors": true,
+    "residentSchedules": true,
+    "neighborVisits": true,
+    "vehicles": true,
+    "monument": true,
+    "billboard": true
+  },
+  "testedGameVersionByAuthor": "0.4.6f13",
+  "requirementsByAuthor": {
+    "melonloader": "0.7.x",
+    "s1api": "3.2.0+"
+  },
+  "integrationPolicy": {
+    "optionalCompanion": true,
+    "bundled": false,
+    "requiredDependency": false,
+    "copyBinary": false,
+    "copyAssets": false,
+    "modifyExternalFiles": false,
+    "doNotOverlapArea": "Eastern elevated plateau / cliff road / housing plots",
+    "ourArea": "Harborline within original Docks region",
+    "testRequired": [
+      "co-load order A/B",
+      "fresh save",
+      "reload save",
+      "spawn overlap",
+      "NPC/navmesh load",
+      "performance",
+      "multiplayer"
+    ]
+  },
+  "permissionNotice": "Author's Nexus page forbids modification of the mod and reuse of its assets without permission; do not redistribute this DLL or assets."
+}
