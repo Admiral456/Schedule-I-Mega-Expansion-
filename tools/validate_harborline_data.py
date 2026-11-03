@@ -133,6 +133,29 @@ def validate() -> list[str]:
     if native_integration.get("regionIntegration", {}).get("harborlineParentNativeRegion") != "Docks":
         errors.append("Native integration contract must map Harborline to Docks")
 
+    # Native NPC schedules must use S1API and the current matching runtime dependency.
+    manifest = load("manifest.json")
+    manifest_dependencies = manifest.get("dependencies", [])
+    project_file = (ROOT / "src/ScheduleIMegaExpansion.csproj").read_text(encoding="utf-8")
+    roster_source = (ROOT / "src/Runtime/HarborlineNpcRoster.cs").read_text(encoding="utf-8")
+    navigation_source = (ROOT / "src/Diagnostics/NativeNavigationSurveyExporter.cs").read_text(encoding="utf-8")
+    snapshot_source = (ROOT / "src/Diagnostics/WorldSnapshotExporter.cs").read_text(encoding="utf-8")
+    if manifest.get("version_number") != "0.3.2":
+        errors.append("Thunderstore manifest version must match the current 0.3.2 source build")
+    if "ifBars-S1API_Forked-3.2.3" not in manifest_dependencies:
+        errors.append("Thunderstore manifest must require S1API Forked 3.2.3")
+    if 'PackageReference Include="S1API.Forked" Version="3.2.3"' not in project_file:
+        errors.append("Compile-time S1API.Forked package must match runtime dependency 3.2.3")
+    if "SitAtSeatSet(" not in roster_source or "WithSchedule(" not in roster_source:
+        errors.append("At least one native S1API schedule must be declared in NPC.ConfigurePrefab")
+    if "EnsureDealSignal()" in roster_source:
+        errors.append("Do not use obsolete EnsureDealSignal; IsCustomer configures native deal attendance")
+    if "NativeNavigationSurveyExporter.Export" not in snapshot_source:
+        errors.append("Native NavMesh/seat-set survey must be included in save-load diagnostics")
+    for api_member in ("SamplePosition", "CalculatePath", "AvatarSeatSet"):
+        if api_member not in navigation_source:
+            errors.append(f"Native navigation survey is missing {api_member} inspection")
+
     # Implementation status IDs are the canonical requirement identifiers.
     requirements = status.get("requirements", [])
     requirement_ids = [requirement.get("id") for requirement in requirements]
