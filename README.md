@@ -81,3 +81,18 @@ python -m unittest discover -s tests -v
 Runtime mod se sestavuje jako .NET 6 projekt s oficiálním `S1API.Forked` NuGet 3.2.2 a MelonLoader. GitHub Actions provede restore, build a vytvoří ZIP artefakt. Runtime S1API zajišťuje deklarovaná závislost v manifestu.
 
 Současný fyzický prototyp není finální Harborline. Kompletní audit: docs/implementation-audit.md. Strojově čitelný stav: world/harborline/implementation-status.json.
+
+
+## Source recovery and companion compatibility
+
+The exact C# gameplay source for 0.3.1 has been recovered from the commit recorded in the DLL assembly metadata: `202b0b9080d2edadd09724cfd157d4fc0fee5a5a`. The matching runtime project, diagnostics, NPC roster, physical builder, shop catalogue, build workflow, tests and data contracts are now present under `src/`, `tests/`, `docs/` and `world/`. See [source recovery](docs/SOURCE-RECOVERY.md).
+
+Daffy's Hills 1.2 is an **optional external companion mod** for the eastern high-ground residential area. It is not bundled or required by Mega Expansion. Its DLL, source and assets are not copied or modified. Harborline remains a separate port district within the native Docks region. See [Daffy's Hills integration](docs/DAFFYSHILLS-INTEGRATION.md).
+
+After running the mod in a single-player save, the read-only diagnostic exports can be summarized automatically:
+
+```bash
+python tools/analyze_runtime_survey.py "./ScheduleIMegaExpansion-Diagnostics.zip" --markdown runtime-survey-report.md --json runtime-survey-report.json
+```
+
+The report helps identify the exact Docks Warehouse anchor, vanilla shop inventory, native property/business registries, law checkpoints/patrol routes and candidate prefabs. It does not alter the save or invent world coordinates.
