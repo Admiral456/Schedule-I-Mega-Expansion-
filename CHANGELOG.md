@@ -2,6 +2,23 @@
 
 All notable changes to Schedule I Mega Expansion are documented here.
 
+## [0.3.1] - 2026-11-03
+
+### Fixed
+- Corrected Hardware Store pricing to write the native `StorableItemDefinition.BasePurchasePrice`; S1API 3.2.2 ignores the `Shop.AddItem(item, customPrice)` argument.
+- Applied native shop catalogue activation independently from physical Harborline geometry, so multiplayer sessions and failed terrain placement do not block the existing-shop stock integration.
+
+### Clarified
+- Item prices are set on shared vanilla item definitions and therefore affect every shop that sells the same item ID; they are not per-shop prices.
+- The Realtor registration and separate Harborline storefront remain unimplemented until a supported native registration path is verified.
+
+## [0.3.0] - 2026-11-02
+
+### Added
+- Two physical native S1API dealer NPCs and three customer NPCs with individual native economy data.
+- Native Hardware Store catalogue integration for 14 existing Schedule I item IDs.
+- S1API compile-time dependency pinned to 3.2.2 and a CI-built Thunderstore package.
+
 ## [0.2.0] - 2026-11-02
 
 ### Added
