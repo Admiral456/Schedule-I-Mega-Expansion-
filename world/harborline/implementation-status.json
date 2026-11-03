@@ -47,13 +47,12 @@
       "status": "implemented_code_unverified_runtime",
       "evidence": [
         "src/Diagnostics/WorldSnapshotExporter.cs",
-        "native-regions.csv",
-        "native-buildings.csv",
-        "native-properties.csv",
-        "native-businesses.csv",
+        "native-regions.csv, native-buildings.csv, native-properties.csv and native-businesses.csv",
+        "native-shops.csv and native-shop-items.csv from ShopManager.GetAllShops/GetItemIds",
+        "native-items.csv from ItemManager.GetAllItemDefinitions",
         "standalone-phone-map-pois.csv"
       ],
-      "remaining": "Run in game and inspect exported row counts and errors; public manager APIs only enumerate existing registrations."
+      "remaining": "Run in game and inspect row counts/errors and actual shop/item IDs; all added exports are read-only snapshots. Public property/business managers still only enumerate existing registrations."
     },
     {
       "id": "doors.interactions",
