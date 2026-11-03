@@ -7,10 +7,11 @@
 
 | Oblast | Kód | Co dělá | Ověření |
 |---|---|---|---|
-| NPC – první vlna | `HarborlineNpcRoster.cs` | 10 fyzických S1API NPC: 2 dealeři, 8 zákazníků | Čeká na spuštění ve hře |
+| NPC – první vlna | `HarborlineNpcRoster.cs` | 11 fyzických S1API NPC: 2 dealeři, 8 zákazníků a 1 supplier Portside Supply | Čeká na spuštění ve hře |
 | Dealeři | `WithDealerDefaults` | PlayerDealer, poplatek, provize, pravidla kvality, počitadlo smluv a nativní dealer události | Čeká na nábor a obchodní test |
 | Zákazníci | `WithCustomerDefaults` | Osm individuálních rozpočtů, frekvencí/časů objednávek, standardů, affinities, policejních šancí a dependence | Čeká na test objednávek |
 | Vzhled | `Appearance.GenerateRandomAppearance()` + `Build()` | Náhodný vzhled vytvořený herním generátorem při OnCreated | Čeká na render/save-load test |
+| Portside Supply | `HarborlineOnlineSupplier` | Nativní Supplier NPC s limity objednávek $25–$8,000 a 14 existujícími item ID pro telefonní/delivery workflow hry; vlastní katalog a sklad dodavatele nejsou sdílenou skladovou zásobou Hardware Store | Čeká na ověření odemčení, telefonní nabídky a doručení ve hře |
 | NPC scheduler | `WithSchedule`, `Schedule.Enable()` | Všech osm zákazníků dostává `EnsureDealSignal()`; dealeři používají automatické `DealerAttendDealBehaviour` v cílové herní verzi. `HandleDeal()` je zastaralé a `NPCSchedule.InitializeActions()` v S1API 3.2.2 není dostupné. | Základní zákaznické čekání je nakonfigurované; pěší trasy a návštěvy budov čekají na ověřené navmesh body a nativní budovy |
 | Sortiment | `HarborlineShopCatalog.cs` | 14 existujících vanilla item definitions přidá do nativního Hardware Store | Čeká na kontrolu shop UI a nákupu |
 | Ceny | `StorableItemDefinition.BasePurchasePrice` | Nastaví cenu na existující nativní definici předmětu; `Shop.AddItem` používá tuto cenu | Čeká na herní nákupní test; cena je sdílená napříč obchody používajícími stejné ID |
@@ -70,8 +71,8 @@ Kód používá `ItemManager.GetDefinition` a upravuje `StorableItemDefinition.B
 | Cílových 42 NPC | Částečně | Implementováno 10; zbývá 32 |
 | 30 zákaznických profilů | Částečně | Implementováno 8; zbývá 22 |
 | Denní režimy NPC | Částečně implementováno | Zákaznické `EnsureDealSignal` je nakonfigurované a dealeři používají automatické herní dealer chování; chybí ověřené navmesh trasy, body a native building visits |
-| Harborline Supply – nová provozovna | Nedokončeno | S1API veřejně poskytuje čtení existujících shopů a přidání itemu do nich; registrace nového Shop nebyla doložena |
-| Online objednávky | Nedokončeno | Není propojená phone order cesta se stejným inventářem a skladovostí |
+| Harborline Supply – fyzická provozovna | Nedokončeno | Nativní supplier kontakt Portside Supply je připraven pro telefonní/delivery workflow; fyzická budova, pokladna a nový nativní Shop nejsou registrované |
+| Online objednávky | Částečně implementováno | Nativní Supplier NPC nabízí 14 item ID přes herní supplier/delivery workflow; vlastní online katalog a sklad dodavatele nejsou synchronizované se zásobami Hardware Store |
 | Koupitelné podniky / Realtor | Blokováno neověřeným API | `PropertyManager` a `BusinessManager` zpřístupňují existující záznamy; ověřený aditivní registrační hook pro novou Property/Business není znám |
 | Nové mapové ikony | Nedokončeno | Chybí ověřený map registry/projekce a vlastnické změny |
 | Funkční budovy/interiéry/dveře | Nedokončeno | Současný shell není nativní building a není průchozí interiér |
@@ -91,9 +92,9 @@ Kód používá `ItemManager.GetDefinition` a upravuje `StorableItemDefinition.B
 ## Ověření před vydáním
 
 1. Build proti S1API 3.2.2 a odpovídajícím Schedule I IL2CPP references musí projít v CI.
-2. V cílové hře ověřit spawn všech pěti NPC, jejich komponenty, vzhled, uložení a další načtení.
+2. V cílové hře ověřit spawn všech 11 NPC (2 dealeři, 8 zákazníků, 1 supplier), jejich komponenty, vzhled, uložení a další načtení.
 3. Ověřit, že Hardware Store zobrazuje všech 14 položek s uvedenými cenami a nákup skutečně odečítá peníze a vydává item.
 4. Získat runtime diagnostiky pro Docks property/regions a nativní PropertyManager, BusinessManager, map, shop a building registry.
 5. Teprve poté implementovat další NPC, vlastní prodejnu, telefonní objednávky, Realtor listings a jejich propojení se stejnou inventurou.
 
-**Závěr:** PR #13 nyní obsahuje první nativní gameplay slice pro NPC, dealery a rozšíření existujícího obchodu. Nejde ještě o hotový Harborline: nový Realtor business inventory, samostatná Harborline prodejna, online objednávky, plné osídlení 42 NPC a další district systémy zůstávají před námi.
+**Závěr:** PR #13 nyní obsahuje 11 nativních S1API NPC (2 dealeři, 8 zákazníků, 1 supplier), rozšíření Hardware Store a nativní telefonní/delivery supplier základ. Sdílená skladovost, nový fyzický obchod, Realtor business inventory, plné osídlení 42 NPC a další district systémy zůstávají před námi. Nejde ještě o hotový Harborline: nový Realtor business inventory, samostatná Harborline prodejna, online objednávky, plné osídlení 42 NPC a další district systémy zůstávají před námi.
