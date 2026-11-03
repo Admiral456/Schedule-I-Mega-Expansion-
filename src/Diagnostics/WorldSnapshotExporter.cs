@@ -93,6 +93,16 @@ namespace ScheduleIMegaExpansion.Diagnostics
                 AddError("NativeScenePrefabs", ex, summary, warn);
             }
 
+            try
+            {
+                int terrains = NativeTerrainSurveyExporter.Export(outputDirectory, summary, warn);
+                summary.Add("NativeTerrainObjectsScanned=" + terrains.ToString(CultureInfo.InvariantCulture));
+            }
+            catch (Exception ex)
+            {
+                AddError("NativeTerrainSurvey", ex, summary, warn);
+            }
+
             string summaryPath = Path.Combine(outputDirectory, "summary.txt");
             File.WriteAllLines(summaryPath, summary);
             log("Native world snapshot complete.");
