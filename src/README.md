@@ -48,8 +48,8 @@ Ceny níže jsou ceny nakonfigurované modem, nikoliv vanilla ceny hry. `BasePur
 ## Ověření a sestavení
 
 - Build cílí na .NET 6 / Schedule I IL2CPP.
-- Je vyžadován MelonLoader 0.7.3, S1API Forked 3.2.2 a S1MAPI 2.0.1.
-- Pro lokální build stačí `dotnet restore` a `dotnet build`; projekt používá oficiální NuGet balíček `S1API.Forked` 3.2.2. Runtime mod manager stáhne S1API samostatně podle manifestu.
+- Je vyžadován MelonLoader 0.7.3, S1API Forked 3.2.3 a S1MAPI 2.0.1.
+- Pro lokální build stačí `dotnet restore` a `dotnet build`; projekt používá oficiální NuGet balíček `S1API.Forked` 3.2.3. Runtime mod manager stáhne S1API samostatně podle manifestu.
 - Kompilace a statické testy neprokazují, že NPC, spawn body a změna nabídky skutečně fungují ve hře. Je potřeba otestovat instalaci v cílové verzi Schedule I.
 
 Diagnostické soubory se ukládají do `UserData/ScheduleIMegaExpansion/Diagnostics/<timestamp>/`. Vedle regionů, budov, nemovitostí a podniků nyní vznikají také `native-shops.csv`, `native-shop-items.csv` a `native-items.csv`; obsahují skutečné názvy obchodů, jejich položky a základní ceny z item registry. Fyzická poloha Harborline se zapisuje do `UserData/ScheduleIMegaExpansion/Harborline/last-generation.json`.
