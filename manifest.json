@@ -1,8 +1,8 @@
 {
   "name": "ScheduleIMegaExpansion",
-  "version_number": "0.3.0",
+  "version_number": "0.3.1",
   "website_url": "https://github.com/Admiral456/Schedule-I-Mega-Expansion-",
-  "description": "Harborline prototype with native S1API NPC pilot and expanded vanilla Hardware Store stock.",
+  "description": "Harborline with native S1API NPCs and repriced vanilla Hardware Store stock.",
   "dependencies": [
     "LavaGang-MelonLoader-0.7.3",
     "ifBars-S1API_Forked-3.2.2",
