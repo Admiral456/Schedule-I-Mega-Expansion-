@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "project": "Schedule I Mega Expansion / Harborline",
-  "reviewedCommit": "a4842ae2987a1aaf6ffe358baf410e7dd5267422",
+  "reviewedCommit": "c92728b9e17b2cc6fd7bbd0c5fba11ea2597fe9e",
   "reviewMethod": "Source review of native Harborline NPC/shop pilot against official S1API Forked 3.2.2 public API, successful GitHub Actions compile, package assembly and all 36 repository tests. No Schedule I game runtime or user save was available; in-game behavior remains unverified.",
   "statusLegend": {
     "implemented_code_unverified_runtime": "Code exists and builds, but target-game execution is not confirmed.",
@@ -95,10 +95,9 @@
       "requirement": "Implement 30 customer profiles with product/effect preferences mapped to real product IDs.",
       "status": "implemented_code_unverified_runtime",
       "evidence": [
-        "src/Runtime/HarborlineNpcRoster.cs: three native CustomerDataBuilder profiles, native DrugType affinities, spending/order frequency/time, standards, call-police probability and dependence",
-        "S1API.Economy.CustomerStandard and S1API.Products.DrugType"
+        "HarborlineNpcRoster.cs: eight native CustomerDataBuilder profiles with distinct spending, orders/week, preferred day/time, standards, police probability, dependence and DrugType affinities."
       ],
-      "remaining": "Three of 30 planned profiles are implemented. The other 27 remain design-only; test real customer ordering and affinity evaluation in game."
+      "remaining": "Eight of 30 planned customer profiles are implemented; 22 remain. Map preferences to actual game product/effect IDs where required and test native order generation and customer evaluation in game."
     },
     {
       "id": "npc.dealers",
@@ -116,11 +115,11 @@
       "requirement": "Spawn 42 physical native NPCs, initially activate about 18, with 2 dealers.",
       "status": "implemented_code_unverified_runtime",
       "evidence": [
-        "src/Runtime/HarborlineNpcRoster.cs: two physical IsDealer NPC subclasses and three physical IsCustomer NPC subclasses",
-        "NPCPrefabBuilder identity, Docks region, spawn points, customer/dealer defaults",
-        "HarborlineNpcRegistrar creates stable IDs after S1API CustomNpcsReady and checks NPC.Get(id) to avoid duplicates"
+        "src/Runtime/HarborlineNpcRoster.cs: two native PlayerDealer NPC subclasses and eight physical Customer NPC subclasses.",
+        "HarborlineNpcRegistrar registers ten stable IDs through S1API after CustomNpcsReady; NPC.Get(id) prevents duplicate creation.",
+        "HarborlinePhysicalBuilder supplies ten measured spawn slots from the same candidate footprint."
       ],
-      "remaining": "Only the initial five-NPC pilot exists, not the full target of 42 physical NPCs. Confirm physical spawn, NPC registry, first load and subsequent save/load in the actual game. Remaining 37 target NPCs are not implemented."
+      "remaining": "Ten of 42 target NPCs are implemented (2 dealers + 8 customers); 32 remain. Confirm all ten spawn at valid walkable positions, native dialogue/customer ordering, save/load and schedule behavior in the target game."
     },
     {
       "id": "npc.schedules",
@@ -263,9 +262,9 @@
       "remaining": "Run an in-game purchase and compare the visible price and charged amount. This is a shared item-definition price, not a per-store override; verify the effect on every vanilla shop that sells the same item ID."
     }
   ],
-  "overallVerdict": "The repository contains a buildable native gameplay pilot: two S1API PlayerDealer NPC types, three S1API customer NPC types with individual customer preferences, and a native Hardware Store catalogue extension that sets the shared vanilla StorableItemDefinition prices and uses the native shop purchase/listing UI. The 42-person target roster, additional 27 customer profiles, daily routes, a new Harborline shop and phone ordering, new Realtor properties, map integration, functional interiors, police, geometry persistence and multiplayer remain incomplete or not verified. A real Schedule I runtime test is still required.",
+  "overallVerdict": "The repository contains a buildable native gameplay pilot: two S1API PlayerDealer NPCs, eight S1API customer NPCs with individual customer preferences, and a native Hardware Store catalogue extension using existing vanilla item definitions and the native purchase UI. Ten of the target 42 physical NPCs are now coded. The 30-profile target is not complete; 22 profiles and 32 NPCs remain. A new Harborline storefront, online orders, Realtor-purchasable businesses, map integration, functional interiors, police, persistence, multiplayer and in-game validation remain incomplete or blocked.",
   "validation": {
-    "checkedCommit": "a4842ae2987a1aaf6ffe358baf410e7dd5267422",
+    "checkedCommit": "c92728b9e17b2cc6fd7bbd0c5fba11ea2597fe9e",
     "staticValidationRunId": 41443011877,
     "staticValidationConclusion": "success",
     "runtimeBuildRunId": 41443011860,
