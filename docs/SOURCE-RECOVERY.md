@@ -1,26 +1,43 @@
-# Zdrojový kód a obnova
+# Zdrojový kód – obnovení revize 0.3.1
 
-## Dostupné artefakty
-| Soubor | Obsah |
-|---|---|
-| `ScheduleIMegaExpansion-0.3.1-thunderstore.zip` | Gameplay DLL 114 688 B + README/manifest/licence |
-| `ScheduleIMegaExpansion-current.dll` | Diagnostická read-only DLL 43 520 B; jiný SHA-256 |
-| `ScheduleIMegaExpansion-runtime-diagnostic-current.zip` | Read-only diagnostický build |
-| `Harborline_Expansion_Dev_v0_2.zip` | Starší C# greybox: ModEntry, Config, World, csproj a docs |
+## Výsledek
+Přesný C# zdrojový projekt pro gameplay DLL 0.3.1 byl nalezen v historii tohoto repozitáře a obnoven do hlavní větve.
 
-## Co chybí
-Přesný C# projekt, ze kterého vznikla gameplay DLL 0.3.1. Při kontrole měl GitHub pouze licenci a placeholder README; cesty `src/`, `docs/` a `world/` vracely 404.
+DLL `ScheduleIMegaExpansion.dll` z balíčku 0.3.1 obsahuje assembly informational version:
+`0.3.1+202b0b9080d2edadd09724cfd157d4fc0fee5a5a`
 
-Názvy tříd/metod lze z DLL částečně vyčíst, ale bez dekompilátoru a ověření nelze metadata vydávat za původní zdroj. Tento repozitář proto nebude vydávat odhadnutý kód za originální zdroj 0.3.1.
+Toto je přesná Git commit revize použitá při sestavení DLL. Commit zůstal dostupný v historii i přesto, že tehdejší aktuální větev obsahovala pouze placeholder README a licenci. Zdroj byl obnoven podle této revize, nikoli rekonstruován odhadem.
 
-## Starší zdroj v0.2
-Dostupný prototyp v0.2 je pouze vizuální greybox, defaultně vypnutý (`Enabled=false`) a používá `S1MAPI_Mono.dll`. Není zdrojem současného IL2CPP buildu. Má být zachován pouze v archivu.
+## Obnovené soubory
+- `src/ScheduleIMegaExpansion.csproj`
+- `src/Core.cs`
+- `src/Runtime/HarborlineNpcRoster.cs`
+- `src/Runtime/HarborlinePhysicalBuilder.cs`
+- `src/Runtime/HarborlineProceduralBuildingFactory.cs`
+- `src/Runtime/HarborlineShopCatalog.cs`
+- `src/Diagnostics/HarborlineIntegrationApiScanner.cs`
+- `src/Diagnostics/NativeApiSurfaceScanner.cs`
+- `src/Diagnostics/NativeLawSnapshotExporter.cs`
+- `src/Diagnostics/NativePrefabCatalogExporter.cs`
+- `src/Diagnostics/WorldSnapshotExporter.cs`
+- `.github/workflows/build-runtime.yml`
+- `.github/workflows/validate.yml`
+- původní testy, datové soubory, manifest, changelog a dokumentace 0.3.1.
 
-## Bezpečná obnova
-1. Zachovat 0.3.1 DLL jako referenční baseline.
-2. Obnovit originální pracovní adresář nebo CI artefakt.
-3. Přidat přesný .csproj, všechny .cs soubory, verze NuGet a build nastavení.
-4. Znovu sestavit proti správným IL2CPP/game assemblies a porovnat manifest i výsledný build.
-5. Teprve poté rozvíjet původní herní třídy.
+## Build baseline
+- .NET 6 / IL2CPP.
+- Compile-time S1API Forked 3.2.2.
+- Thunderstore dependencies: MelonLoader 0.7.3, S1API Forked 3.2.2 a S1MAPI 2.0.1.
+- Původní CI zaznamenalo úspěšný runtime build a statickou validaci pro baseline 0.3.1. To neprokazuje běh v cílové hře.
 
-Viditelné názvy z DLL zahrnují např. `HarborlineGameplayBootstrap`, `HarborlineNpcRoster`, `HarborlineNpcRegistrar`, `HarborlineNpcLifecycle`, `HarborlinePhysicalBuilder`, `HarborlineProceduralBuildingFactory`, `HarborlineShopCatalog`, `NativeApiSurfaceScanner`, `NativePrefabCatalogExporter` a `NativeLawSnapshotExporter`. Jde o metadata, nikoli obnovený C# zdroj.
+## Další zdrojové artefakty
+- `ScheduleIMegaExpansion-current.dll` je odlišný read-only diagnostický build (43 520 B), nikoli gameplay DLL.
+- `Harborline_Expansion_Dev_v0_2.zip` je starší Mono/S1MAPI vizuální greybox. Je uložen v `archive/Harborline_Expansion_Dev_v0_2/` a nesmí být zaměněn za 0.3.1.
+- Daffy's Hills 1.2 obsahuje jen cizí DLL. Její kód ani assety nejsou součástí projektu.
+
+## Stav obnovy
+Zdrojový kód 0.3.1: **obnoven**.
+Reprodukovatelné nové sestavení aktuální hlavní větve: **čeká na CI po obnově**.
+Runtime test v cílové hře: **čeká na spuštění v uživatelově instalaci**.
+
+Po každé změně runtime kódu musí projít `build-runtime.yml` a `validate.yml`. Verzi závislostí ani gameplay manifestu nezvyšovat bez kompatibilitního buildu a testu.
