@@ -194,7 +194,7 @@ class RuntimeDiagnosticTests(unittest.TestCase):
     def test_shop_stock_uses_native_shared_item_prices_and_purchase_ui(self):
         self.assertIn('ShopManager.GetShopByName("Hardware Store")', self.shop)
         self.assertIn("ItemManager.GetDefinition(stock.Id)", self.shop)
-        self.assertIn("item is not StorableItemDefinition storable", self.shop)
+        self.assertIn("item is not NativeStorableItemDefinition storable", self.shop)
         self.assertIn("storable.BasePurchasePrice = stock.Price", self.shop)
         self.assertIn("hardwareStore.AddItem(item)", self.shop)
         self.assertNotIn("hardwareStore.AddItem(item, stock.Price)", self.shop)
