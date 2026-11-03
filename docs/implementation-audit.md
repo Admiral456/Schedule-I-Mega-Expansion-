@@ -11,7 +11,7 @@
 | Dealeři | `WithDealerDefaults` | PlayerDealer, poplatek, provize, pravidla kvality, počitadlo smluv a nativní dealer události | Čeká na nábor a obchodní test |
 | Zákazníci | `WithCustomerDefaults` | Osm individuálních rozpočtů, frekvencí/časů objednávek, standardů, affinities, policejních šancí a dependence | Čeká na test objednávek |
 | Vzhled | `Appearance.GenerateRandomAppearance()` + `Build()` | Náhodný vzhled vytvořený herním generátorem při OnCreated | Čeká na render/save-load test |
-| NPC scheduler | `Schedule.Enable()` | Zapne nativní scheduler komponentu | Denní trasy zatím nejsou nastavené |
+| NPC scheduler | `WithSchedule`, `Schedule.Enable()`, `Schedule.InitializeActions()` | Oba dealeři dostávají `HandleDeal(900)`, všech osm zákazníků `EnsureDealSignal()`; po vytvoření se akce inicializují | Základní směna/čekání na obchod je nakonfigurováno; pěší trasy a návštěvy budov čekají na ověřené navmesh body a nativní budovy |
 | Sortiment | `HarborlineShopCatalog.cs` | 14 existujících vanilla item definitions přidá do nativního Hardware Store | Čeká na kontrolu shop UI a nákupu |
 | Ceny | `StorableItemDefinition.BasePurchasePrice` | Nastaví cenu na existující nativní definici předmětu; `Shop.AddItem` používá tuto cenu | Čeká na herní nákupní test; cena je sdílená napříč obchody používajícími stejné ID |
 | Fyzická čtvrť | `HarborlinePhysicalBuilder.cs` | Geometrický prototyp Unity primitiv | Umístění dosud neověřeno ve hře |
@@ -36,7 +36,7 @@ Oba mají nativní dealer defaults, omezení kvality, vlastní completed-deals p
 
 Všech osm profilů navíc nastavuje individuální policejní šanci, dependence a drogové afinity v `WithCustomerDefaults`.
 
-Hodnoty jsou uložené v nativním CustomerDataBuilder. Policejní šance a dependence se nastavují individuálně. Kompletní 30členný zákaznický roster zatím dokončený není.
+Hodnoty jsou uložené v nativním CustomerDataBuilder. Policejní šance a dependence se nastavují individuálně. Každý zákazník má navíc nativní `EnsureDealSignal()` a po vytvoření se inicializují jeho schedule akce. Kompletní 30členný zákaznický roster zatím dokončený není.
 
 ### Sortiment a cenová vrstva nativního Hardware Store
 
@@ -69,7 +69,7 @@ Kód používá `ItemManager.GetDefinition` a upravuje `StorableItemDefinition.B
 |---|---|---|
 | Cílových 42 NPC | Částečně | Implementováno 10; zbývá 32 |
 | 30 zákaznických profilů | Částečně | Implementováno 8; zbývá 22 |
-| Denní režimy NPC | Nedokončeno | Ověřené navmesh trasy, body a native building visits |
+| Denní režimy NPC | Částečně implementováno | Základní `HandleDeal` a `EnsureDealSignal` jsou nakonfigurované; chybí ověřené navmesh trasy, body a native building visits |
 | Harborline Supply – nová provozovna | Nedokončeno | S1API veřejně poskytuje čtení existujících shopů a přidání itemu do nich; registrace nového Shop nebyla doložena |
 | Online objednávky | Nedokončeno | Není propojená phone order cesta se stejným inventářem a skladovostí |
 | Koupitelné podniky / Realtor | Blokováno neověřeným API | `PropertyManager` a `BusinessManager` zpřístupňují existující záznamy; ověřený aditivní registrační hook pro novou Property/Business není znám |
